@@ -2,9 +2,12 @@ import { z } from "zod";
 
 export const orgNameValidation = z
   .string()
-  .min(2, "Username must be at least 2 characters")
-  .max(20, "Username must be no more than 20 characters")
-  .regex(/^[A-Za-z0-9_]+$/, "Username must not contain special character");
+  .min(2, "Organization Name must be at least 2 characters")
+  .max(20, "Organization Name must be no more than 20 characters")
+  .regex(
+    /^[A-Za-z0-9_ ]+$/,
+    "Organization Name must not contain special characters"
+  );
 
 export const signUpSchema = z.object({
   organizationName: orgNameValidation,
