@@ -23,7 +23,7 @@ function Page() {
   const form = useForm({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      username: "",
+      organizationName: "",
       address: "",
       phoneNumber: "",
       email: "",
@@ -33,8 +33,8 @@ function Page() {
   });
 
   const handleNext = () => {
-    const { username, address, phoneNumber } = form.getValues();
-    if (username && address && phoneNumber) {
+    const { organizationName, address, phoneNumber } = form.getValues();
+    if (organizationName && address && phoneNumber) {
       setStep(2);
     }
   };
@@ -47,7 +47,7 @@ function Page() {
         title: "Success",
         description: response.data.message,
       });
-      router.replace(`/verify/${data.username}`);
+      router.replace(`/verify/${data.organizationName}`);
     } catch (error) {
       console.error("Error signing up:", error);
       toast({
@@ -79,11 +79,14 @@ function Page() {
               <>
                 <FormField
                   control={form.control}
-                  name="username"
+                  name="organizationName"
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Enter Organisation Name" {...field} />
+                        <Input
+                          placeholder="Enter Organisation Name"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
