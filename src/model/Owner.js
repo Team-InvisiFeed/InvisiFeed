@@ -16,9 +16,9 @@ const FeedbackSchema = new Schema({
 });
 
 const OwnerSchema = new Schema({
-  username: {
+  organizationName: {
     type: String,
-    required: [true, "Username is required"],
+    required: [true, "Organization Name is required"],
     trim: true,
     unique: true,
   },
