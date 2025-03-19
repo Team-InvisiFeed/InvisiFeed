@@ -11,14 +11,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { registerSchema } from "@/schemas/registerSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+
 
 function Page() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState(1);
+  const router = useRouter();
+
 
   const form = useForm({
     resolver: zodResolver(registerSchema),
@@ -47,7 +53,7 @@ function Page() {
         title: "Success",
         description: response.data.message,
       });
-      router.replace(`/verify/${data.organizationName}`);
+      router.replace(`/verify/${data.email}`);
     } catch (error) {
       console.error("Error signing up:", error);
       toast({
