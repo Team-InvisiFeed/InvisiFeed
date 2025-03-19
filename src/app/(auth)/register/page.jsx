@@ -11,21 +11,72 @@ import {
 import { Input } from "@/components/ui/input";
 import { registerSchema } from "@/schemas/registerSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-
+import { Country, State, City } from "country-state-city";
+import axios from "axios";
 
 function Page() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState(1);
   const router = useRouter();
 
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
 
+  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedState, setSelectedState] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
+  const [localAddress, setLocalAddress] = useState("");
+  const [pincode, setPincode] = useState("");
+
+  // ✅ Fetch Countries using country-state-city
+  useEffect(() => {
+    const fetchedCountries = Country.getAllCountries();
+    setCountries(fetchedCountries);
+  }, []);
+
+  // ✅ Fetch states based on country
+  useEffect(() => {
+    if (selectedCountry) {
+      const countryCode = countries.find(
+        (country) => country.name === selectedCountry
+      )?.isoCode;
+
+      if (countryCode) {
+        const fetchedStates = State.getStatesOfCountry(countryCode);
+        setStates(fetchedStates);
+        setSelectedState("");
+        setCities([]);
+      }
+    }
+  }, [selectedCountry, countries]);
+
+  // ✅ Fetch cities based on state
+  useEffect(() => {
+    if (selectedCountry && selectedState) {
+      const countryCode = countries.find(
+        (country) => country.name === selectedCountry
+      )?.isoCode;
+
+      const stateCode = states.find(
+        (state) => state.name === selectedState
+      )?.isoCode;
+
+      if (countryCode && stateCode) {
+        const fetchedCities = City.getCitiesOfState(countryCode, stateCode);
+        setCities(fetchedCities);
+        setSelectedCity("");
+      }
+    }
+  }, [selectedState, selectedCountry, states]);
+
+  // ✅ Form Setup
   const form = useForm({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -38,13 +89,35 @@ function Page() {
     },
   });
 
+  // ✅ Handle Next Step
   const handleNext = () => {
-    const { organizationName, address, phoneNumber } = form.getValues();
-    if (organizationName && address && phoneNumber) {
-      setStep(2);
+    const { organizationName, phoneNumber } = form.getValues();
+
+    // 👇 Address ko update kar rahe hain yahan
+    const formattedAddress = `${localAddress}, ${selectedCity}, ${selectedState}, ${selectedCountry}, ${pincode}`;
+    form.setValue("address", formattedAddress);
+
+    if (
+      organizationName &&
+      phoneNumber &&
+      localAddress &&
+      selectedCity &&
+      selectedState &&
+      selectedCountry &&
+      pincode
+    ) {
+        setTimeout(() => setStep(2), 0);
+
+    } else {
+      toast({
+        title: "Error",
+        description: "Please fill all fields before proceeding.",
+        variant: "destructive",
+      });
     }
   };
 
+  // ✅ Form Submit
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
@@ -55,10 +128,9 @@ function Page() {
       });
       router.replace(`/verify/${data.email}`);
     } catch (error) {
-      console.error("Error signing up:", error);
       toast({
         title: "Error",
-        description: error.response?.data.message || "Sign-up failed",
+        description: error.response?.data?.message || "Sign-up failed",
         variant: "destructive",
       });
     } finally {
@@ -83,6 +155,7 @@ function Page() {
             {/* Step 1: Organisation Details */}
             {step === 1 && (
               <>
+                {/* Organisation Name */}
                 <FormField
                   control={form.control}
                   name="organizationName"
@@ -100,18 +173,6 @@ function Page() {
                 />
                 <FormField
                   control={form.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input placeholder="Enter Address" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
                   name="phoneNumber"
                   render={({ field }) => (
                     <FormItem>
@@ -122,6 +183,68 @@ function Page() {
                     </FormItem>
                   )}
                 />
+
+                {/* Local Address */}
+                <Input
+                  value={localAddress}
+                  onChange={(e) => setLocalAddress(e.target.value)}
+                  placeholder="Enter Local Address"
+                  className="w-full p-2 border rounded"
+                />
+
+                {/* Country Dropdown */}
+                <select
+                  value={selectedCountry}
+                  onChange={(e) => setSelectedCountry(e.target.value)}
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="">Select Country</option>
+                  {countries.map((country) => (
+                    <option key={country.isoCode} value={country.name}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* State Dropdown */}
+                <select
+                  value={selectedState}
+                  onChange={(e) => setSelectedState(e.target.value)}
+                  className="w-full p-2 border rounded"
+                  disabled={!selectedCountry}
+                >
+                  <option value="">Select State</option>
+                  {states.map((state) => (
+                    <option key={state.isoCode} value={state.name}>
+                      {state.name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* City Dropdown */}
+                <select
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.target.value)}
+                  className="w-full p-2 border rounded"
+                  disabled={!selectedState}
+                >
+                  <option value="">Select City</option>
+                  {cities.map((city) => (
+                    <option key={city.name} value={city.name}>
+                      {city.name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Pincode */}
+                <Input
+                  value={pincode}
+                  onChange={(e) => setPincode(e.target.value)}
+                  placeholder="Enter Pincode"
+                  className="w-full p-2 border rounded"
+                />
+
+                {/* Next Button */}
                 <Button
                   type="button"
                   onClick={handleNext}
@@ -205,15 +328,6 @@ function Page() {
             )}
           </form>
         </Form>
-
-        <div className="text-center mt-4">
-          <p>
-            Already a member?{" "}
-            <Link href="/sign-in" className="text-blue-600 hover:text-blue-800">
-              Sign in
-            </Link>
-          </p>
-        </div>
       </div>
     </div>
   );
