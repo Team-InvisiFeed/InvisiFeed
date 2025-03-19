@@ -1,8 +1,12 @@
 import dbConnect from "@/lib/dbConnect";
 import OwnerModel from "@/model/Owner";
+import { ApiError } from "@/utils/ApiError";
+import { ApiResponse } from "@/utils/ApiResponse";
 import mongoose from "mongoose";
+import { asyncHandler } from "@/utils/asyncHandler";
+import { NextResponse } from "next/server";
 
-const getAllOwners = async (req, res) => {
+export async function GET(req, res) {
   await dbConnect(); // Establish a connection to the database.
 
   // Fetch all Owners from the database.
@@ -10,18 +14,12 @@ const getAllOwners = async (req, res) => {
 
   // If no Owners are found, return a 404 Not Found response.
   if (!owners || owners.length === 0) {
-    return res.status(404).json({
-      success: false,
-      message: "No Owners found", // Message for no owners.
-    });
+    throw new ApiError(404, "No Owners found");
   }
 
   // Return the list of Owners as a successful response.
-  return res.status(200).json({
-    success: true,
-    owners, // Array of Owners.
-  });
-};
-
-// Wrap the function with asyncHandler.
-export const GET = asyncHandler(getAllOwners);
+  return NextResponse.json(
+    new ApiResponse(200, owners, "Owners retrieved successfully"),
+    { status: 200 }
+  );
+}
