@@ -3,7 +3,6 @@ import mongoose, { Schema, Document } from "mongoose";
 const FeedbackSchema = new Schema({
   content: {
     type: String,
-    required: true,
   },
   createdAt: {
     type: Date,
@@ -12,6 +11,7 @@ const FeedbackSchema = new Schema({
   },
   ratings: {
     type: Number,
+    required: true,
   },
 });
 
@@ -44,12 +44,20 @@ const OwnerSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  phoneNumber: {
+    type: String,
+    required: [true, "Phone Number is required"],
+  },
+  address: {
+    type: String,
+    required: [true, "Address is required"],
+  },
   feedbacks: [FeedbackSchema],
   orderIds: {
     type: [
       {
         orderId: { type: String, required: true },
-        frequency: { type: Number, default: 0 },
+        feedbackCount: { type: Number, default: 0 },
       },
     ],
     default: [],
