@@ -53,6 +53,7 @@ export const authOptions = {
         token._id = user._id?.toString();
         token.isVerified = user.isVerified;
         token.email = user.email;
+        token.organizationName = user.organizationName;
       }
       return token;
     },
@@ -62,6 +63,7 @@ export const authOptions = {
         session.user._id = token._id;
         session.user.isVerified = token.isVerified;
         session.user.email = token.email;
+        session.user.organizationName = token.organizationName;
       }
       return session;
     },
