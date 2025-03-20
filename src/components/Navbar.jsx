@@ -6,7 +6,7 @@ import { signOut, useSession } from "next-auth/react";
 
 function Navbar() {
   const { data: session } = useSession();
-  const user = session?.user;
+  const owner = session?.user;
 
   return (
     <nav className="p-4 md:p-6 bg-white text-gray-800 shadow-lg border-b-2">
@@ -33,7 +33,7 @@ function Navbar() {
         </div>
 
         {/* Login Button */}
-        {!user ? (
+        {!owner ? (
           <Link href={"/register"}>
             <Button className="bg-gray-800 text-white hover:bg-gray-700">
               Register
@@ -42,7 +42,7 @@ function Navbar() {
         ) : (
           <div className="flex items-center space-x-4">
             <span className="text-sm md:text-base">
-              Welcome, {user?.username || user?.email}
+              Welcome, {owner?.username || owner?.email}
             </span>
             <Button
               className="bg-gray-800 text-white hover:bg-gray-700"
