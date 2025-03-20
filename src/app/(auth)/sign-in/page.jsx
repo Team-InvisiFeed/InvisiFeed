@@ -21,6 +21,7 @@ import {
 import { Input } from "@/components/ui/input"; // Input component
 import { Button } from "@/components/ui/button"; // Button component
 import { signInSchema } from "@/schemas/signinSchema";
+import { signIn } from "next-auth/react";
 // import { signIn } from "next-auth/react";
 
 // Main page component
