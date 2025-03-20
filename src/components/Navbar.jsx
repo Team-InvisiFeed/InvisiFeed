@@ -2,9 +2,11 @@
 import React from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
 
 function Navbar() {
-  const session = false; // Dummy session state
+  const { data: session } = useSession();
+  const user = session?.user;
 
   return (
     <nav className="p-4 md:p-6 bg-white text-gray-800 shadow-lg border-b-2">
@@ -31,7 +33,7 @@ function Navbar() {
         </div>
 
         {/* Login Button */}
-        {!session ? (
+        {!user ? (
           <Link href={"/register"}>
             <Button className="bg-gray-800 text-white hover:bg-gray-700">
               Register
@@ -40,7 +42,7 @@ function Navbar() {
         ) : (
           <div className="flex items-center space-x-4">
             <span className="text-sm md:text-base">
-              Welcome, {session?.owner?.username || session?.owner?.email}
+              Welcome, {user?.username || user?.email}
             </span>
             <Button
               className="bg-gray-800 text-white hover:bg-gray-700"
