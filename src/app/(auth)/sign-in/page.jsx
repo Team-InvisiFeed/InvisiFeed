@@ -21,12 +21,17 @@ import {
 import { Input } from "@/components/ui/input"; // Input component
 import { Button } from "@/components/ui/button"; // Button component
 import { signInSchema } from "@/schemas/signinSchema";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 // import { signIn } from "next-auth/react";
 
 // Main page component
 function page() {
   const [isSubmitting, setIsSubmitting] = useState(false); // Flag for form submission
+
+  const { data: session } = useSession();
+  const owner = session?.user;
+  console.log(owner);
+  
 
   // Toast notifications for feedback
   // const { toast } = useToast();
@@ -45,7 +50,7 @@ function page() {
   });
 
   // Handle form submission
-  const onSubmit = async () => {
+  const onSubmit = async (data) => {
     setIsSubmitting(true); // Indicate that form submission is in progress
 
     const result = await signIn("credentials", {
@@ -53,6 +58,9 @@ function page() {
       password: data.password,
       redirect: false,
     });
+
+    console.log("Result : " , result);
+    
 
     if (result?.error) {
       if (result.error == "CredentialsSignin") {
@@ -71,7 +79,7 @@ function page() {
     }
 
     if (result?.url) {
-      router.replace("/dashboard");
+      router.replace(result.url);
     }
   };
 
