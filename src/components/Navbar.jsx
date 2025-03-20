@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { Button } from "./ui/button";
+import Link from "next/link";
 
 function Navbar() {
   const session = false; // Dummy session state
@@ -31,9 +32,11 @@ function Navbar() {
 
         {/* Login Button */}
         {!session ? (
-          <Button className="bg-gray-800 text-white hover:bg-gray-700">
-            Login
-          </Button>
+          <Link href={"/register"}>
+            <Button className="bg-gray-800 text-white hover:bg-gray-700">
+              Register
+            </Button>
+          </Link>
         ) : (
           <div className="flex items-center space-x-4">
             <span className="text-sm md:text-base">
