@@ -66,7 +66,7 @@ export async function POST(req) {
     }
 
     const existedInvoice = owner.invoiceIds.some(
-      (invoice) => invoice.invoiceId === invoiceNumber
+      (invoiceId) => invoiceId === invoiceNumber
     );
 
     if (existedInvoice) {
@@ -76,13 +76,10 @@ export async function POST(req) {
       );
     }
 
-    const newInvoice = {
-      invoiceId: invoiceNumber, // ✅ Ensure correct field name
-      feedbackCount: 0, // ✅ Default frequency value (set as per your logic)
-    };
-    
+    const newInvoiceId = invoiceNumber;
+
     // Push the new object into invoiceIds array
-    owner.invoiceIds.push(newInvoice);
+    owner.invoiceIds.push(newInvoiceId);
     await owner.save();
 
     // Generate QR Code PDF
@@ -151,8 +148,11 @@ async function extractInvoiceNumberFromPdf(pdfUrl) {
 async function generateQrPdf(invoiceNumber, username) {
   try {
     // Create QR Code buffer
-    const url = `http://localhost:3000/feedback/${username}/${invoiceNumber}`;
-    const qrData = encodeURI(url);
+    const encodedUsername = encodeURIComponent(username);
+    const encodedInvoiceNumber = encodeURIComponent(invoiceNumber);
+    const qrData = `http://localhost:3000/feedback/${encodedUsername}/${encodedInvoiceNumber}`;
+    console.log(qrData);
+
     const qrBuffer = await QRCode.toBuffer(qrData, { width: 300 });
 
     // Create a new PDF document
@@ -216,3 +216,17 @@ async function mergePdfs(invoicePdfUrl, qrPdfBuffer) {
     throw error;
   }
 }
+
+/*
+
+invoice+qr+1.pdf => kanha
+
+kanha filled it submitted it. 
+then feedback count ===1
+and feedback page => useeffect (check feedback count) => 
+  if (feedback count === 1) => show regenerate button
+if (feedback count >= 2) => show "you reached the limit to give feedback"
+
+now kanha wants to give feedback again
+
+*/
