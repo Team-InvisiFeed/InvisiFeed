@@ -48,8 +48,6 @@ export default function FeedbackForm() {
 
       if (response.status == 400) {
       }
-
-      console.log(formData);
       toast.success("Feedback submitted successfully!");
     } catch (error) {}
   };

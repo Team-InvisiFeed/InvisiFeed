@@ -60,14 +60,10 @@ export async function POST(req) {
       );
     }
 
-    console.log(username);
-
     const owner = await OwnerModel.findOne({ username });
     if (!owner) {
       return NextResponse.json({ error: "Owner not found" }, { status: 404 });
     }
-
-    console.log("invoiceIds dekh : ", owner);
 
     const existedInvoice = owner.invoiceIds.some(
       (invoice) => invoice.invoiceId === invoiceNumber

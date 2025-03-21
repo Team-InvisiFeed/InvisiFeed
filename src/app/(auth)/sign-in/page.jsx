@@ -30,8 +30,6 @@ function page() {
 
   const { data: session } = useSession();
   const owner = session?.user;
-  console.log(owner);
-  
 
   // Toast notifications for feedback
   // const { toast } = useToast();
@@ -58,8 +56,6 @@ function page() {
       password: data.password,
       redirect: false,
     });
-
-    console.log("Result : " , result);
     
 
     if (result?.error) {
