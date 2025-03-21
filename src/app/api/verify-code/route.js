@@ -5,10 +5,10 @@ export async function POST(request) {
   await dbConnect();
 
   try {
-    const { email, code } = await request.json();
+    const { username, code } = await request.json();
 
-    const decodedEmail = decodeURIComponent(email);
-    const owner = await OwnerModel.findOne({ email: decodedEmail });
+    const decodedUsername = decodeURIComponent(username);
+    const owner = await OwnerModel.findOne({ username: decodedUsername });
 
     if (!owner) {
       return new Response(
