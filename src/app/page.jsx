@@ -117,7 +117,7 @@ const Page = () => {
                 </p>
                 <p className="text-gray-600 mt-2">
                   {/* Add other fields you want to display */}
-                  ID: {business._id}
+                  Address: {business.address}
                 </p>
               </div>
             ))
