@@ -19,6 +19,7 @@ export const authOptions = {
           const user = await OwnerModel.findOne({
             $or: [
               { email: credentials.identifier },
+              { username: credentials.identifier },
             ],
           });
 
@@ -54,6 +55,7 @@ export const authOptions = {
         token.isVerified = user.isVerified;
         token.email = user.email;
         token.organizationName = user.organizationName;
+        token.username = user.username;
       }
       return token;
     },
@@ -64,6 +66,7 @@ export const authOptions = {
         session.user.isVerified = token.isVerified;
         session.user.email = token.email;
         session.user.organizationName = token.organizationName;
+        session.user.username = token.username;
       }
       return session;
     },
