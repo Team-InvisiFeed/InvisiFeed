@@ -34,9 +34,9 @@ function Navbar() {
 
         {/* Login Button */}
         {!owner ? (
-          <Link href={"/register"}>
+          <Link href={"/sign-in"}>
             <Button className="bg-gray-800 text-white hover:bg-gray-700">
-              Register
+              Login
             </Button>
           </Link>
         ) : (
