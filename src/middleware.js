@@ -14,10 +14,7 @@ export const config = {
 
 export async function middleware(request) {
   const token = await getToken({ req: request }); 
-  const url = request.nextUrl; 
-
-  console.log(token);
-  
+  const url = request.nextUrl;   
 
   if (
     token && 
@@ -26,7 +23,7 @@ export async function middleware(request) {
       url.pathname.startsWith("/verify") || 
       url.pathname === "/")
   ) {
-    return NextResponse.redirect(new URL(`/user/${token.organizationName}`, request.url)); 
+    return NextResponse.redirect(new URL(`/user/${token.username}`, request.url)); 
   }
 
   if (!token && url.pathname.startsWith("/user")) {
