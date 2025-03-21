@@ -11,6 +11,7 @@ export async function POST(req) {
       qualityOfService,
       valueForMoney,
       likelihoodToRecommend,
+      overallRating
     } = body;
 
     const prompt = `
@@ -19,6 +20,7 @@ export async function POST(req) {
       Quality of Service: ${qualityOfService}/5,
       Value for Money: ${valueForMoney}/5,
       Likelihood to Recommend: ${likelihoodToRecommend}/5.
+      Overall Rating: ${overallRating}/5
       
       Based on these ratings, generate a professional 30-word feedback(no need to mention the numbers).
     `;
