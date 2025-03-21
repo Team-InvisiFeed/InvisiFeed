@@ -7,8 +7,32 @@ export async function POST(req) {
   await dbConnect();
 
   try {
-    const { organizationName, email, password, phoneNumber, address } =
-      await req.json();
+    const {
+      organizationName,
+      email,
+      username,
+      password,
+      phoneNumber,
+      address,
+    } = await req.json();
+
+    const existingUserVerifiedByUsername = await OwnerModel.findOne({
+      username,
+      isVerified: true, // Sirf wo users jo pehle se verified hain
+    });
+
+    // Agar username already kisi verified user ke paas hai toh error return kar do
+    if (existingUserVerifiedByUsername) {
+      return Response.json(
+        {
+          success: false,
+          message: "Username already exists.",
+        },
+        {
+          status: 400, // Bad Request
+        }
+      );
+    }
 
     const existingUserByEmail = await OwnerModel.findOne({ email });
 
@@ -40,6 +64,7 @@ export async function POST(req) {
       const newUser = new OwnerModel({
         organizationName,
         email,
+        username,
         password: hashedPassword,
         verifyCode,
         verifyCodeExpiry: expiryDate,
@@ -47,6 +72,7 @@ export async function POST(req) {
         phoneNumber,
         address,
         feedbacks: [],
+        invoiceIds : []
       });
 
       await newUser.save();
