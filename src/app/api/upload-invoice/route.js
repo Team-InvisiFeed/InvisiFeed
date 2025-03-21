@@ -78,7 +78,7 @@ export async function POST(req) {
 
     const newInvoice = {
       invoiceId: invoiceNumber, // ✅ Ensure correct field name
-      feedbackCount: 1, // ✅ Default frequency value (set as per your logic)
+      feedbackCount: 0, // ✅ Default frequency value (set as per your logic)
     };
     
     // Push the new object into invoiceIds array
