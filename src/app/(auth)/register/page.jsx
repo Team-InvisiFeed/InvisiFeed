@@ -84,6 +84,7 @@ function Page() {
       address: "",
       phoneNumber: "",
       email: "",
+      username: "",
       password: "",
       confirmPassword: "",
     },
@@ -126,7 +127,7 @@ function Page() {
         title: "Success",
         description: response.data.message,
       });
-      router.replace(`/verify/${data.email}`);
+      router.replace(`/verify/${data.username}`);
     } catch (error) {
       toast({
         title: "Error",
@@ -273,6 +274,18 @@ function Page() {
                     <FormItem>
                       <FormControl>
                         <Input placeholder="Enter Email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="username"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input placeholder="Enter Username" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
