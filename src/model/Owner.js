@@ -1,17 +1,41 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 const FeedbackSchema = new Schema({
-  content: {
+  satisfactionRating: {
+    type: Number,
+    required: true,
+  },
+  communicationRating: {
+    type: Number,
+    required: true,
+  },
+  qualityOfServiceRating: {
+    type: Number,
+    required: true,
+  },
+  valueForMoneyRating: {
+    type: Number,
+    required: true,
+  },
+  recommendRating: {
+    type: Number,
+    required: true,
+  },
+  overAllRating: {
+    type: Number,
+    required: true,
+  },
+  feedbackContent: {
     type: String,
   },
+  suggestionContent: {
+    type: String,
+  },
+
   createdAt: {
     type: Date,
     required: true,
     default: Date.now,
-  },
-  ratings: {
-    type: Number,
-    required: true,
   },
 });
 
@@ -20,13 +44,18 @@ const OwnerSchema = new Schema({
     type: String,
     required: [true, "Organization Name is required"],
     trim: true,
-    unique: true,
   },
   email: {
     type: String,
     required: [true, "Email is required"],
     unique: true,
     match: [/.+\@.+\..+/, "Please use a valid email address"],
+  },
+  username: {
+    type: String,
+    required: [true, "Username is required"],
+    trim: true,
+    unique: true,
   },
   password: {
     type: String,
@@ -53,10 +82,10 @@ const OwnerSchema = new Schema({
     required: [true, "Address is required"],
   },
   feedbacks: [FeedbackSchema],
-  orderIds: {
+  invoiceIds: {
     type: [
       {
-        orderId: { type: String, required: true },
+        invoiceId: { type: String, required: true },
         feedbackCount: { type: Number, default: 0 },
       },
     ],
