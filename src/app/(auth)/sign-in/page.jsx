@@ -154,10 +154,10 @@ function page() {
           <p className="text-gray-300">
             Not a member yet?{" "}
             <Link
-              href="/sign-up"
+              href="/register"
               className="text-teal-400 hover:text-amber-400"
             >
-              Sign Up
+              Register
             </Link>
           </p>
         </div>
