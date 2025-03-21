@@ -24,27 +24,28 @@ export default function FeedbackForm() {
   const { username, invoiceNumber } = params;
 
   const [formData, setFormData] = useState({
-    overallSatisfaction: 3,
-    communication: 3,
-    qualityOfService: 3,
-    valueForMoney: 3,
-    likelihoodToRecommend: 3,
-    overallRating : 3,
-    customFeedback: "",
-    suggestions: "",
+    satisfactionRating: 3,
+    communicationRating: 3,
+    qualityOfServiceRating: 3,
+    valueForMoneyRating: 3,
+    recommendRating: 3,
+    overAllRating : 3,
+    feedbackContent: "",
+    suggestionContent: "",
   });
 
   const payload = { formData, username, invoiceNumber };
   const [loading, setLoading] = useState(false);
 
+
   const handleChange = (key, value) => {
-    setFormData({ ...formData, [key]: value });
+    setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      const response = await axios.post("/api/submit-feedback", { data: payload });
+      const response = await axios.post("/api/submit-feedback", payload );
 
       if (response.status == 400) {
       }
@@ -62,19 +63,19 @@ export default function FeedbackForm() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          overallSatisfaction: formData.overallSatisfaction,
-          communication: formData.communication,
-          qualityOfService: formData.qualityOfService,
-          valueForMoney: formData.valueForMoney,
-          likelihoodToRecommend: formData.likelihoodToRecommend,
-          overallRating : formData.overallRating
+          satisfactionRating: formData.satisfactionRating,
+          communicationRating: formData.communicationRating,
+          qualityOfServiceRating: formData.qualityOfServiceRating,
+          valueForMoneyRating: formData.valueForMoneyRating,
+          recommendRating: formData.recommendRating,
+          overAllRating : formData.overAllRating
         }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        handleChange("customFeedback", data.feedback);
+        handleChange("feedbackContent", data.feedback);
         toast.success("AI-generated feedback added!");
       } else {
         toast.error(data.message || "Failed to generate feedback");
@@ -88,7 +89,7 @@ export default function FeedbackForm() {
   };
 
   const generateSuggestionsAI = () => {
-    handleChange("suggestions", "Offer more flexible payment options.");
+    handleChange("suggestionContent", "Offer more flexible payment options.");
     toast.success("AI-generated suggestion added!");
   };
 
@@ -103,12 +104,12 @@ export default function FeedbackForm() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Rating Fields */}
           {[
-            { key: "overallSatisfaction", label: "Overall Satisfaction" },
-            { key: "communication", label: "Communication" },
-            { key: "qualityOfService", label: "Quality of Service" },
-            { key: "valueForMoney", label: "Value for Money" },
-            { key: "likelihoodToRecommend", label: "Likelihood to Recommend" },
-            { key: "overallRating", label: "Overall Rating" }
+            { key: "satisfactionRating", label: "Overall Satisfaction" },
+            { key: "communicationRating", label: "Communication" },
+            { key: "qualityOfServiceRating", label: "Quality of Service" },
+            { key: "valueForMoneyRating", label: "Value for Money" },
+            { key: "recommendRating", label: "Likelihood to Recommend" },
+            { key: "overAllRating", label: "Overall Rating" }
           ].map(({ key, label }) => (
             <div key={key}>
               <Label className="block mb-2 font-medium">{label}</Label>
@@ -141,8 +142,8 @@ export default function FeedbackForm() {
             </Label>
             <Textarea
               placeholder="Share your thoughts here..."
-              value={formData.customFeedback}
-              onChange={(e) => handleChange("customFeedback", e.target.value)}
+              value={formData.feedbackContent}
+              onChange={(e) => handleChange("feedbackContent", e.target.value)}
               className="min-h-[100px]"
             />
             <Button
@@ -167,8 +168,8 @@ export default function FeedbackForm() {
             <Input
               type="text"
               placeholder="Let us know how we can improve..."
-              value={formData.suggestions}
-              onChange={(e) => handleChange("suggestions", e.target.value)}
+              value={formData.suggestionContent}
+              onChange={(e) => handleChange("suggestionContent", e.target.value)}
             />
             <Button
               type="button"
