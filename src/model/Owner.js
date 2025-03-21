@@ -83,13 +83,7 @@ const OwnerSchema = new Schema({
   },
   feedbacks: [FeedbackSchema],
   invoiceIds: {
-    type: [
-      {
-        invoiceId: { type: String, required: true },
-        feedbackCount: { type: Number, default: 0 },
-      },
-    ],
-    default: [],
+    type: [String],
   },
 });
 
