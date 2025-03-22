@@ -151,7 +151,7 @@ async function generateQrPdf(invoiceNumber, username) {
     const encodedUsername = encodeURIComponent(username);
     const encodedInvoiceNumber = encodeURIComponent(invoiceNumber);
     const qrData = `http://localhost:3000/feedback/${encodedUsername}/${encodedInvoiceNumber}`;
-    console.log(qrData);
+    // console.log(qrData);
 
     const qrBuffer = await QRCode.toBuffer(qrData, { width: 300 });
 
