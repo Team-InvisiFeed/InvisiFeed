@@ -133,7 +133,7 @@ async function extractInvoiceNumberFromPdf(pdfUrl) {
           mimeType: "application/pdf",
         },
       },
-      "Extract only the invoice identifier like Invoice ID/Invoice No./ Order ID / Customer ID / Reference ID etc. Return the identifier only , no unnecessary text. If not found, return 'Not Found'.",
+      "Extract only the invoice identifier, such as Invoice ID, Invoice No., Order ID, Customer ID, or Reference ID. The identifier may include a combination of alphanumeric characters and special symbols. Return only the identifier, excluding any additional text or formatting. If no identifier is found, return 'Not Found'.",
     ]);
     // console.log(result.response.text().trim());
 
