@@ -7,8 +7,6 @@ export async function POST(req) {
 
   const { formData, username, invoiceNumber } = await req.json();
 
-  console.log(formData);
-
   const decodedUsername = decodeURIComponent(username);
   // console.log(decodedUsername);
 
@@ -17,23 +15,18 @@ export async function POST(req) {
 
   try {
     const owner = await OwnerModel.findOne({ username: decodedUsername });
-    console.log("owner dekh : ", owner);
 
     if (!owner) {
       throw new ApiError(404, "Organisation not found");
     }
 
-    owner.feedbacks.push(formData);
-    
-    await owner.save();
-
     const invoiceId = await owner.invoiceIds.some(
       (id) => id === decodedInvoiceNumber
-    );    
-    console.log(invoiceId);
-    
+    );
 
     if (invoiceId) {
+      owner.feedbacks.push(formData);
+      await owner.save();
       await OwnerModel.updateOne(
         { _id: owner._id },
         { $pull: { invoiceIds: decodedInvoiceNumber } }
