@@ -145,13 +145,13 @@ function Page() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-900">
-      <div className="w-full max-w-md p-8 space-y-8 bg-gray-800 rounded-lg shadow-md">
+    <div className="flex justify-center items-center min-h-screen bg-white">
+      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
         <div className="text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6 text-white">
+          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6 text-gray-900">
             Join InvisiFeed
           </h1>
-          <p className="mb-4 text-gray-300">
+          <p className="mb-4 text-gray-600">
             Start your journey to honest, anonymous feedback
           </p>
         </div>
@@ -171,7 +171,7 @@ function Page() {
                         <Input
                           placeholder="Enter Organisation Name"
                           {...field}
-                          className="bg-gray-700 text-white border-gray-600"
+                          className="bg-white text-gray-900 border-gray-300"
                         />
                       </FormControl>
                       <FormMessage />
@@ -187,7 +187,7 @@ function Page() {
                         <Input
                           placeholder="Enter Phone Number"
                           {...field}
-                          className="bg-gray-700 text-white border-gray-600"
+                          className="bg-white text-gray-900 border-gray-300"
                         />
                       </FormControl>
                       <FormMessage />
@@ -195,19 +195,11 @@ function Page() {
                   )}
                 />
 
-                {/* Local Address */}
-                <Input
-                  value={localAddress}
-                  onChange={(e) => setLocalAddress(e.target.value)}
-                  placeholder="Enter Local Address"
-                  className="w-full p-2 border rounded bg-gray-700 text-white border-gray-600"
-                />
-
                 {/* Country Dropdown */}
                 <select
                   value={selectedCountry}
                   onChange={(e) => setSelectedCountry(e.target.value)}
-                  className="w-full p-2 border rounded bg-gray-700 text-gray-100 border-gray-600 cursor-pointer"
+                  className="w-full p-2 border rounded bg-white text-gray-900 border-gray-300 cursor-pointer"
                 >
                   <option value="">Select Country</option>
                   {countries.map((country) => (
@@ -221,7 +213,7 @@ function Page() {
                 <select
                   value={selectedState}
                   onChange={(e) => setSelectedState(e.target.value)}
-                  className="w-full p-2 border rounded bg-gray-700 text-gray-100 border-gray-600 cursor-pointer"
+                  className="w-full p-2 border rounded bg-white text-gray-900 border-gray-300 cursor-pointer"
                   disabled={!selectedCountry}
                 >
                   <option value="">Select State</option>
@@ -236,7 +228,7 @@ function Page() {
                 <select
                   value={selectedCity}
                   onChange={(e) => setSelectedCity(e.target.value)}
-                  className="w-full p-2 border rounded bg-gray-700 text-gray-100 border-gray-600 cursor-pointer"
+                  className="w-full p-2 border rounded bg-white text-gray-900 border-gray-300 cursor-pointer"
                   disabled={!selectedState}
                 >
                   <option value="">Select City</option>
@@ -247,12 +239,20 @@ function Page() {
                   ))}
                 </select>
 
+                {/* Local Address */}
+                <Input
+                  value={localAddress}
+                  onChange={(e) => setLocalAddress(e.target.value)}
+                  placeholder="Enter Local Address"
+                  className="w-full p-2 border rounded bg-white text-gray-900 border-gray-300"
+                />
+
                 {/* Pincode */}
                 <Input
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value)}
                   placeholder="Enter Pincode"
-                  className="w-full p-2 border rounded bg-gray-700 text-white border-gray-600"
+                  className="w-full p-2 border rounded bg-white text-gray-900 border-gray-300"
                 />
 
                 {/* Next Button */}
@@ -260,7 +260,7 @@ function Page() {
                   type="button"
                   onClick={handleNext}
                   disabled={isSubmitting}
-                  className="w-full bg-gray-100 hover:bg-gray-300 text-black cursor-pointer"
+                  className="w-full bg-gray-900 hover:bg-gray-700 text-white cursor-pointer"
                 >
                   {isSubmitting ? (
                     <>
@@ -279,7 +279,7 @@ function Page() {
               <>
                 <div className="flex justify-start mb-4">
                   <button
-                    className="flex items-center gap-2 text-gray-300 hover:text-gray-100"
+                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
                     onClick={() => setStep(1)}
                   >
                     <IoIosArrowBack className="h-5 w-5 cursor-pointer" />
@@ -295,7 +295,7 @@ function Page() {
                         <Input
                           placeholder="Enter Email"
                           {...field}
-                          className="bg-gray-700 text-white border-gray-600"
+                          className="bg-white text-gray-900 border-gray-300"
                         />
                       </FormControl>
                       <FormMessage />
@@ -311,7 +311,7 @@ function Page() {
                         <Input
                           placeholder="Enter Username"
                           {...field}
-                          className="bg-gray-700 text-white border-gray-600"
+                          className="bg-white text-gray-900 border-gray-300"
                         />
                       </FormControl>
                       <FormMessage />
@@ -329,7 +329,7 @@ function Page() {
                             type={showPassword ? "text" : "password"}
                             placeholder="Enter Password"
                             {...field}
-                            className="bg-gray-700 text-white border-gray-600"
+                            className="bg-white text-gray-900 border-gray-300"
                           />
                           <button
                             type="button"
@@ -359,7 +359,7 @@ function Page() {
                             type={showConfirmPassword ? "text" : "password"}
                             placeholder="Confirm Password"
                             {...field}
-                            className="bg-gray-700 text-white border-gray-600"
+                            className="bg-white text-gray-900 border-gray-300"
                           />
                           <button
                             type="button"
@@ -383,7 +383,7 @@ function Page() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gray-100 hover:bg-gray-300 text-black cursor-pointer"
+                  className="w-full bg-gray-900 hover:bg-gray-700 text-white cursor-pointer"
                 >
                   {isSubmitting ? (
                     <>
