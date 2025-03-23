@@ -13,7 +13,7 @@ export async function POST(req) {
       username,
       password,
       phoneNumber,
-      address,
+      address: { localAddress, city, state, country, pincode },
     } = await req.json();
 
     const existingUserVerifiedByUsername = await OwnerModel.findOne({
@@ -70,9 +70,10 @@ export async function POST(req) {
         verifyCodeExpiry: expiryDate,
         isVerified: false,
         phoneNumber,
-        address,
+        address: { localAddress, city, state, country, pincode },
+
         feedbacks: [],
-        invoiceIds : []
+        invoiceIds: [],
       });
 
       await newUser.save();
