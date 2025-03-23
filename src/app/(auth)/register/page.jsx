@@ -8,6 +8,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { IoIosArrowBack } from "react-icons/io";
 import { Input } from "@/components/ui/input";
 import { registerSchema } from "@/schemas/registerSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -107,8 +108,7 @@ function Page() {
       selectedCountry &&
       pincode
     ) {
-        setTimeout(() => setStep(2), 0);
-
+      setTimeout(() => setStep(2), 0);
     } else {
       toast({
         title: "Error",
@@ -267,6 +267,16 @@ function Page() {
             {/* Step 2: User Credentials */}
             {step === 2 && (
               <>
+                <div className="flex justify-start mb-4">
+                  <button
+                    className="flex items-center gap-2 text-gray-600 hover:text-gray-800"
+                    onClick={() => setStep(1)} // Update the step to 1
+                  >
+                    <IoIosArrowBack className="h-5 w-5 cursor-pointer" />{" "}
+                    {/* Back icon */}
+                    Back
+                  </button>
+                </div>
                 <FormField
                   control={form.control}
                   name="email"
