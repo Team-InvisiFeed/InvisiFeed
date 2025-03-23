@@ -122,11 +122,7 @@ function Page() {
     ) {
       setTimeout(() => setStep(2), 0);
     } else {
-      toast({
-        title: "Error",
-        description: "Please fill all fields before proceeding.",
-        variant: "destructive",
-      });
+      toast("Please fill all fields before proceeding.");
     }
   };
 
@@ -135,17 +131,11 @@ function Page() {
     setIsSubmitting(true);
     try {
       const response = await axios.post("/api/register", data);
-      toast({
-        title: "Success",
-        description: response.data.message,
-      });
+      toast(response.data.message);
       router.replace(`/verify/${data.username}`);
     } catch (error) {
-      toast({
-        title: "Error",
-        description: error.response?.data?.message || "Sign-up failed",
-        variant: "destructive",
-      });
+      // toast(error.response?.data?.message || "Sign-up failed");
+      toast("Sign-up failed");
     } finally {
       setIsSubmitting(false);
     }
