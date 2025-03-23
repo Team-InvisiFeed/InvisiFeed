@@ -40,13 +40,13 @@ const VerifyAccount = () => {
         code: data.code,
       });
 
-      toast.success(response.data.message);
+      toast(response.data.message);
 
       router.replace("/sign-in");
     } catch (error) {
       console.error("Signup failed");
       const errorMessage = error.response?.data?.message || "An error occurred";
-      toast.error(errorMessage);
+      toast(errorMessage);
     }
   };
 

@@ -73,7 +73,7 @@ export default function FeedbackForm() {
 
       if (response.status == 400) {
       }
-      toast.success("Feedback submitted successfully!");
+      toast("Feedback submitted successfully!");
     } catch (error) {}
   };
 
@@ -100,13 +100,13 @@ export default function FeedbackForm() {
 
       if (response.ok) {
         handleChange("feedbackContent", data.feedback);
-        toast.success("AI-generated feedback added!");
+        toast("AI-generated feedback added!");
       } else {
-        toast.error(data.message || "Failed to generate feedback");
+        toast(data.message || "Failed to generate feedback");
       }
     } catch (error) {
       console.error("Error generating feedback:", error);
-      toast.error("Something went wrong!");
+      toast("Something went wrong!");
     } finally {
       setLoading(false);
     }
@@ -114,7 +114,7 @@ export default function FeedbackForm() {
 
   const generateSuggestionsAI = () => {
     handleChange("suggestionContent", "Offer more flexible payment options.");
-    toast.success("AI-generated suggestion added!");
+    toast("AI-generated suggestion added!");
   };
 
   return (
