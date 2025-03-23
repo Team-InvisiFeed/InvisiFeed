@@ -56,7 +56,6 @@ function page() {
       password: data.password,
       redirect: false,
     });
-    
 
     if (result?.error) {
       if (result.error == "CredentialsSignin") {
@@ -80,16 +79,16 @@ function page() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-900">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
       {/* Card container */}
-      <div className="w-full max-w-md p-8 space-y-8 bg-gray-800 rounded-lg shadow-lg">
+      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-lg">
         <div className="text-center">
           {/* Heading */}
-          <h1 className="text-3xl font-extrabold tracking-tight text-teal-400 lg:text-4xl mb-6">
-            Join Anonymous Message
+          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 lg:text-4xl mb-6">
+            Join InvisiFeed
           </h1>
           {/* Subheading */}
-          <p className="mb-4 text-gray-300">
+          <p className="mb-4 text-gray-600">
             Sign in to start your anonymous adventure
           </p>
         </div>
@@ -103,12 +102,12 @@ function page() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-300">
+                  <FormLabel className="text-gray-800">
                     Email/Username
                   </FormLabel>
                   <FormControl>
                     <Input
-                      className="focus:ring-2 focus:ring-teal-500 focus:outline-none bg-gray-700 text-gray-300 border-gray-600"
+                      className="focus:ring-2 focus:ring-gray-500 focus:outline-none bg-gray-100 text-gray-800 border-gray-300"
                       placeholder="Email/Username"
                       {...field}
                     />
@@ -124,10 +123,10 @@ function page() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-300">Password</FormLabel>
+                  <FormLabel className="text-gray-800">Password</FormLabel>
                   <FormControl>
                     <Input
-                      className="focus:ring-2 focus:ring-teal-500 focus:outline-none bg-gray-700 text-gray-300 border-gray-600"
+                      className="focus:ring-2 focus:ring-gray-500 focus:outline-none bg-gray-100 text-gray-800 border-gray-300"
                       type="password"
                       placeholder="Password"
                       {...field}
@@ -141,7 +140,7 @@ function page() {
             {/* Submit button */}
             <Button
               type="submit"
-              className="w-full bg-teal-500 text-gray-900 hover:bg-amber-400 hover:text-gray-900"
+              className="w-full bg-black text-white hover:bg-gray-800 disabled:opacity-50"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Submitting..." : "Sign In"}
@@ -151,11 +150,11 @@ function page() {
 
         {/* Sign-in link */}
         <div className="text-center mt-4">
-          <p className="text-gray-300">
+          <p className="text-gray-600">
             Not a member yet?{" "}
             <Link
               href="/register"
-              className="text-teal-400 hover:text-amber-400"
+              className="text-black font-semibold hover:underline"
             >
               Register
             </Link>
