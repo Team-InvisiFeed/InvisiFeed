@@ -3,10 +3,27 @@ import React from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { usePathname, useRouter } from "next/navigation";
 
 function Navbar() {
   const { data: session } = useSession();
   const owner = session?.user;
+
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const handleNavigation = (route) => {
+    router.push(route); // Redirect to the provided route
+  };
+
+  const onManageProfile = () => {};
 
   return (
     <nav className="p-4 md:p-6 bg-white text-gray-800 shadow-lg border-b-2">
@@ -18,18 +35,46 @@ function Navbar() {
 
         {/* Navigation Links */}
         <div className="hidden md:flex space-x-6">
-          <a href="#home" className="text-gray-800 hover:text-gray-600">
-            Home
-          </a>
-          <a href="#about" className="text-gray-800 hover:text-gray-600">
+          {owner ? (
+            <>
+              {pathname === "/" ? (
+                <button
+                  onClick={() => handleNavigation(`/user/${owner?.username}`)}
+                  className="text-gray-800 hover:text-gray-600 cursor-pointer"
+                >
+                  Dashboard
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleNavigation("/")}
+                  className="text-gray-800 hover:text-gray-600 cursor-pointer"
+                >
+                  Home
+                </button>
+              )}
+            </>
+          ) : (
+            <Link
+              href="/"
+              className={`text-gray-800 hover:text-gray-600 ${
+                pathname === "/" ? "font-bold text-blue-600" : ""
+              }`}
+            >
+              Home
+            </Link>
+          )}
+          <Link href="#about" className="text-gray-800 hover:text-gray-600">
             AboutUs
-          </a>
-          <a href="#businesses" className="text-gray-800 hover:text-gray-600">
+          </Link>
+          <Link
+            href="#businesses"
+            className="text-gray-800 hover:text-gray-600"
+          >
             Businesses
-          </a>
-          <a href="#contact" className="text-gray-800 hover:text-gray-600">
+          </Link>
+          <Link href="#contact" className="text-gray-800 hover:text-gray-600">
             ContactUs
-          </a>
+          </Link>
         </div>
 
         {/* Login Button */}
@@ -44,12 +89,29 @@ function Navbar() {
             <span className="text-sm md:text-base">
               Welcome, {owner?.username || owner?.email}
             </span>
-            <Button
-              className="bg-gray-800 text-white hover:bg-gray-700"
-              onClick={() => signOut()}
-            >
-              Logout
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Avatar className="cursor-pointer">
+                  <AvatarImage src="https://github.com/shadcn.png" />
+                  <AvatarFallback>username</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-gray-800 text-white">
+                <DropdownMenuItem>Hi, {owner?.username}</DropdownMenuItem>
+                <DropdownMenuItem
+                  className="hover:bg-gray-700 cursor-pointer"
+                  // onClick={onManageProfile}
+                >
+                  Manage Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="hover:bg-gray-700 cursor-pointer"
+                  onClick={signOut}
+                >
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         )}
       </div>
