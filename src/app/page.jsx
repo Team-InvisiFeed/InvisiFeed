@@ -13,12 +13,8 @@ const Page = () => {
 
   return (
     <>
-      {/* Navbar with updated links */}
-
-      {/* Hero Section with Carousel */}
       <HeroSection />
 
-      {/* Main Content Section */}
       <ShowBusinesses />
     </>
   );
