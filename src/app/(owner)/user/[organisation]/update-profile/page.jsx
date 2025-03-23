@@ -17,21 +17,27 @@ import axios from "axios";
 function UpdateProfilePage() {
   const { data: session } = useSession();
   const owner = session?.user;
-  console.log(owner);
   const [ownerInfo, setOwnerInfo] = useState({});
+  const [editableFields, setEditableFields] = useState({});
+  const [updatedFields, setUpdatedFields] = useState({});
+
   const fetchOwnerInfo = async () => {
     const response = await axios.post("/api/get-owner-info", {
-      username: owner?.username, // Payload should be an object
+      username: owner?.username,
     });
-    console.log(response.data.data);
     const ownerInfo = response.data.data;
     return ownerInfo;
+    console.log(updatedFields); // Initialize updatedFields with ownerInfo
   };
 
   useEffect(() => {
     const fetchAndSetOwnerInfo = async () => {
       const ownerInfo = await fetchOwnerInfo(); // Await the fetchOwnerInfo
-      setOwnerInfo(ownerInfo); // Then update the state
+
+      if (ownerInfo?.address) {
+        setOwnerInfo(ownerInfo);
+        setUpdatedFields(ownerInfo);
+      }
     };
 
     if (owner?.username) {
@@ -47,22 +53,12 @@ function UpdateProfilePage() {
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedState, setSelectedState] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
-  const [localAddress, setLocalAddress] = useState("");
-  const [pincode, setPincode] = useState("");
-
-  // Form handlers and states
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Add logic to handle profile update
-    console.log("Profile updated");
-  };
 
   useEffect(() => {
     const fetchedCountries = Country.getAllCountries();
     setCountries(fetchedCountries);
   }, []);
 
-  // ✅ Fetch states based on country
   useEffect(() => {
     if (selectedCountry) {
       const countryCode = countries.find(
@@ -72,13 +68,12 @@ function UpdateProfilePage() {
       if (countryCode) {
         const fetchedStates = State.getStatesOfCountry(countryCode);
         setStates(fetchedStates);
-        setSelectedState("");
-        setCities([]);
+        setSelectedState(""); // Reset state when country changes
+        setCities([]); // Reset cities when country changes
       }
     }
   }, [selectedCountry, countries]);
 
-  // ✅ Fetch cities based on state
   useEffect(() => {
     if (selectedCountry && selectedState) {
       const countryCode = countries.find(
@@ -92,10 +87,89 @@ function UpdateProfilePage() {
       if (countryCode && stateCode) {
         const fetchedCities = City.getCitiesOfState(countryCode, stateCode);
         setCities(fetchedCities);
-        setSelectedCity("");
+        setSelectedCity(""); // Reset city when state changes
       }
     }
   }, [selectedState, selectedCountry, states]);
+
+  const handleEdit = (field) => {
+    setEditableFields((prev) => ({ ...prev, [field]: true }));
+  };
+
+  const handleSave = (field) => {
+    setEditableFields((prev) => ({ ...prev, [field]: false }));
+  };
+
+  const handleChange = (field, value) => {
+    if (field === "country" && value !== ownerInfo?.address?.country) {
+      setSelectedCountry(value); // Update selected country
+      setSelectedState(""); // Reset state
+      setSelectedCity(""); // Reset city
+
+      setUpdatedFields((prev) => ({
+        ...prev,
+        address: {
+          ...prev.address,
+          country: value,
+          state: "", // Reset state in updatedFields
+          city: "", // Reset city in updatedFields
+          pincode: "",
+        },
+      }));
+    } else if (field === "state" && value !== ownerInfo?.address?.state) {
+      setSelectedState(value); // Update selected state
+      setSelectedCity(""); // Reset city
+
+      setUpdatedFields((prev) => ({
+        ...prev,
+        address: {
+          ...prev.address,
+          state: value,
+          city: "", // Reset city in updatedFields
+          pincode: "",
+        },
+      }));
+    } else if (field === "city") {
+      setSelectedCity(value); // Update selected city
+      setUpdatedFields((prev) => ({
+        ...prev,
+        address: {
+          ...prev.address,
+          city: value,
+          pincode: "",
+        },
+      }));
+    } else {
+      setUpdatedFields((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+    }
+  };
+
+  useEffect(() => {
+    // Check and update the fields actively
+    if (selectedCountry !== ownerInfo?.address?.country) {
+      handleChange("country", selectedCountry);
+    }
+    if (selectedState !== ownerInfo?.address?.state) {
+      handleChange("state", selectedState);
+    }
+    if (selectedCity !== ownerInfo?.address?.city) {
+      handleChange("city", selectedCity);
+    }
+  }, [selectedCountry, selectedState, selectedCity]);
+  const handleApplyChanges = async () => {
+    try {
+      const response = await axios.post("/api/update-profile", {
+        username: owner?.username,
+        updates: updatedFields,
+      });
+      console.log("Profile updated successfully:", response.data);
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+    }
+  };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -109,19 +183,41 @@ function UpdateProfilePage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
           {/* Organisation Name */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
               Organization Name
             </label>
-            <input
-              type="text"
-              placeholder="Enter Organisation Name"
-              className="w-full p-2 border rounded"
-              disabled={true}
-              defaultValue={ownerInfo.organizationName}
-            />
+            <div className="flex items-center">
+              <input
+                type="text"
+                placeholder="Enter Organisation Name"
+                className="w-full p-2 border rounded"
+                disabled={!editableFields.organizationName}
+                value={updatedFields.organizationName || ""}
+                onChange={(e) =>
+                  handleChange("organizationName", e.target.value)
+                }
+              />
+              {editableFields.organizationName ? (
+                <Button
+                  type="button"
+                  onClick={() => handleSave("organizationName")}
+                  className="ml-2"
+                >
+                  Save
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={() => handleEdit("organizationName")}
+                  className="ml-2"
+                >
+                  Edit
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Phone Number */}
@@ -129,12 +225,33 @@ function UpdateProfilePage() {
             <label className="block text-sm font-medium text-gray-700">
               Phone Number
             </label>
-            <input
-              type="text"
-              placeholder="Enter Phone Number"
-              className="w-full p-2 border rounded"
-              defaultValue={ownerInfo.phoneNumber}
-            />
+            <div className="flex items-center">
+              <input
+                type="text"
+                placeholder="Enter Phone Number"
+                className="w-full p-2 border rounded"
+                disabled={!editableFields.phoneNumber}
+                value={updatedFields.phoneNumber || ""}
+                onChange={(e) => handleChange("phoneNumber", e.target.value)}
+              />
+              {editableFields.phoneNumber ? (
+                <Button
+                  type="button"
+                  onClick={() => handleSave("phoneNumber")}
+                  className="ml-2"
+                >
+                  Save
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={() => handleEdit("phoneNumber")}
+                  className="ml-2"
+                >
+                  Edit
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Local Address */}
@@ -142,12 +259,33 @@ function UpdateProfilePage() {
             <label className="block text-sm font-medium text-gray-700">
               Local Address
             </label>
-            <input
-              type="text"
-              placeholder="Enter Local Address"
-              className="w-full p-2 border rounded"
-              defaultValue={ownerInfo.address}
-            />
+            <div className="flex items-center">
+              <input
+                type="text"
+                placeholder="Enter Local Address"
+                className="w-full p-2 border rounded"
+                disabled={!editableFields.localAddress}
+                value={updatedFields?.address?.localAddress || ""}
+                onChange={(e) => handleChange("localAddress", e.target.value)}
+              />
+              {editableFields.localAddress ? (
+                <Button
+                  type="button"
+                  onClick={() => handleSave("localAddress")}
+                  className="ml-2"
+                >
+                  Save
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={() => handleEdit("localAddress")}
+                  className="ml-2"
+                >
+                  Edit
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Country Dropdown */}
@@ -155,18 +293,41 @@ function UpdateProfilePage() {
             <label className="block text-sm font-medium text-gray-700">
               Country
             </label>
-            <select
-              className="w-full p-2 border rounded"
-              value={selectedCountry}
-              onChange={(e) => setSelectedCountry(e.target.value)}
-            >
-              <option value="">Select Country</option>
-              {countries.map((country) => (
-                <option key={country.isoCode} value={country.name}>
-                  {country.name}
+            <div className="flex items-center">
+              <select
+                className="w-full p-2 border rounded"
+                value={selectedCountry}
+                onChange={(e) => handleChange("country", e.target.value)}
+                disabled={!editableFields.country}
+              >
+                <option value={updatedFields?.address?.country}>
+                  {updatedFields?.address?.country}
                 </option>
-              ))}
-            </select>
+
+                {countries.map((country) => (
+                  <option key={country.isoCode} value={country.name}>
+                    {country.name}
+                  </option>
+                ))}
+              </select>
+              {editableFields.country ? (
+                <Button
+                  type="button"
+                  onClick={() => handleSave("country")}
+                  className="ml-2"
+                >
+                  Save
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={() => handleEdit("country")}
+                  className="ml-2"
+                >
+                  Edit
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* State Dropdown */}
@@ -174,19 +335,45 @@ function UpdateProfilePage() {
             <label className="block text-sm font-medium text-gray-700">
               State
             </label>
-            <select
-              className="w-full p-2 border rounded"
-              disabled={false}
-              value={selectedState}
-              onChange={(e) => setSelectedState(e.target.value)}
-            >
-              <option value="">Select State</option>
-              {states.map((state) => (
-                <option key={state.isoCode} value={state.name}>
-                  {state.name}
-                </option>
-              ))}
-            </select>
+            <div className="flex items-center">
+              <select
+                className="w-full p-2 border rounded"
+                disabled={!editableFields.state || !selectedCountry}
+                value={selectedState}
+                onChange={(e) => handleChange("state", e.target.value)}
+              >
+                {updatedFields?.address?.country ===
+                ownerInfo?.address?.country ? (
+                  <option value={updatedFields?.address?.state}>
+                    {updatedFields?.address?.state}
+                  </option>
+                ) : (
+                  <option value="">Select State</option>
+                )}
+                {states.map((state) => (
+                  <option key={state.isoCode} value={state.name}>
+                    {state.name}
+                  </option>
+                ))}
+              </select>
+              {editableFields.state ? (
+                <Button
+                  type="button"
+                  onClick={() => handleSave("state")}
+                  className="ml-2"
+                >
+                  Save
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={() => handleEdit("state")}
+                  className="ml-2"
+                >
+                  Edit
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* City Dropdown */}
@@ -194,19 +381,44 @@ function UpdateProfilePage() {
             <label className="block text-sm font-medium text-gray-700">
               City
             </label>
-            <select
-              className="w-full p-2 border rounded"
-              disabled={false}
-              value={selectedCity}
-              onChange={(e) => setSelectedCity(e.target.value)}
-            >
-              <option value="">Select City</option>
-              {cities.map((city) => (
-                <option key={city.name} value={city.name}>
-                  {city.name}
-                </option>
-              ))}
-            </select>
+            <div className="flex items-center">
+              <select
+                className="w-full p-2 border rounded"
+                disabled={!editableFields.city || !selectedState}
+                value={selectedCity}
+                onChange={(e) => handleChange("city", e.target.value)}
+              >
+                {updatedFields?.address?.state === ownerInfo?.address?.state ? (
+                  <option value={updatedFields?.address?.city}>
+                    {updatedFields?.address?.city}
+                  </option>
+                ) : (
+                  <option value="">Select City</option>
+                )}
+                {cities.map((city) => (
+                  <option key={city.name} value={city.name}>
+                    {city.name}
+                  </option>
+                ))}
+              </select>
+              {editableFields.city ? (
+                <Button
+                  type="button"
+                  onClick={() => handleSave("city")}
+                  className="ml-2"
+                >
+                  Save
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={() => handleEdit("city")}
+                  className="ml-2"
+                >
+                  Edit
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Pincode */}
@@ -214,45 +426,42 @@ function UpdateProfilePage() {
             <label className="block text-sm font-medium text-gray-700">
               Pincode
             </label>
-            <input
-              type="text"
-              placeholder="Enter Pincode"
-              className="w-full p-2 border rounded"
-            />
+            <div className="flex items-center">
+              <input
+                type="text"
+                placeholder="Enter Pincode"
+                className="w-full p-2 border rounded"
+                disabled={!editableFields.pincode}
+                value={updatedFields?.address?.pincode || ""}
+                onChange={(e) => handleChange("pincode", e.target.value)}
+              />
+              {editableFields.pincode ? (
+                <Button
+                  type="button"
+                  onClick={() => handleSave("pincode")}
+                  className="ml-2"
+                >
+                  Save
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={() => handleEdit("pincode")}
+                  className="ml-2"
+                >
+                  Edit
+                </Button>
+              )}
+            </div>
           </div>
 
-          {/* Email */}
-          {/* <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              placeholder="Enter Email"
-              className="w-full p-2 border rounded"
-              defaultValue={owner?.email}
-              disabled
-            />
-          </div> */}
-
-          {/* Username */}
-          {/* <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Username
-            </label>
-            <input
-              type="text"
-              placeholder="Enter Username"
-              className="w-full p-2 border rounded"
-              defaultValue={owner?.name}
-            />
-          </div> */}
-          {/* Update Button */}
+          {/* Apply Changes Button */}
           <button
-            type="submit"
+            type="button"
+            onClick={handleApplyChanges}
             className="w-full p-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
-            Update Profile
+            Apply Changes
           </button>
         </form>
       </div>
