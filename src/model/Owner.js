@@ -39,6 +39,33 @@ const FeedbackSchema = new Schema({
   },
 });
 
+const AddressSchema = new Schema({
+  localAddress: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  city: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  state: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  country: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  pincode: {
+    type: String,
+    required: true,
+  },
+});
+
 const OwnerSchema = new Schema({
   organizationName: {
     type: String,
@@ -78,7 +105,7 @@ const OwnerSchema = new Schema({
     required: [true, "Phone Number is required"],
   },
   address: {
-    type: String,
+    type: AddressSchema,
     required: [true, "Address is required"],
   },
   feedbacks: [FeedbackSchema],
