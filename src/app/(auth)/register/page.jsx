@@ -82,7 +82,13 @@ function Page() {
     resolver: zodResolver(registerSchema),
     defaultValues: {
       organizationName: "",
-      address: "",
+      address: {
+        localAddress: "",
+        city: "",
+        state: "",
+        country: "",
+        pincode: "",
+      },
       phoneNumber: "",
       email: "",
       username: "",
@@ -95,8 +101,14 @@ function Page() {
   const handleNext = () => {
     const { organizationName, phoneNumber } = form.getValues();
 
-    // 👇 Address ko update kar rahe hain yahan
-    const formattedAddress = `${localAddress}, ${selectedCity}, ${selectedState}, ${selectedCountry}, ${pincode}`;
+    const formattedAddress = {
+      localAddress: localAddress.trim(),
+      city: selectedCity.trim(),
+      state: selectedState.trim(),
+      country: selectedCountry.trim(),
+      pincode: pincode.trim(),
+    };
+
     form.setValue("address", formattedAddress);
 
     if (
