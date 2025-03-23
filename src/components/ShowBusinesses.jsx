@@ -56,10 +56,10 @@ function ShowBusinesses() {
               <p className="text-gray-600">
                 Email: {business.email} {/* Business Email */}
               </p>
-              <p className="text-gray-600 mt-2">
-                {/* Add other fields you want to display */}
+              {/* <p className="text-gray-600 mt-2">
+                
                 Address: {business.address}
-              </p>
+              </p> */}
             </div>
           ))
         ) : (
