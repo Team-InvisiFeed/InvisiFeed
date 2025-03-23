@@ -24,10 +24,8 @@ const Page = () => {
     <>
       {owner && (
         <>
-          <Navbar />
           <Dashboard />
           <GenerateInvoiceQR />
-          <Footer />
         </>
       )}
     </>
