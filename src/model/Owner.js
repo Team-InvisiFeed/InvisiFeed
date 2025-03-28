@@ -70,7 +70,6 @@ const InvoiceSchema = new Schema({
   invoiceId: {
     type: String,
     required: true,
-    unique: true,
   },
   AIuseCount: {
     type: Number,
@@ -131,6 +130,9 @@ const OwnerSchema = new Schema({
   feedbacks: [FeedbackSchema],
   invoices: [InvoiceSchema],
 });
+
+// Add compound unique index for invoices
+OwnerSchema.index({ username: 1, "invoices.invoiceId": 1 }, { unique: true });
 
 const OwnerModel =
   mongoose.models.Owner || mongoose.model("Owner", OwnerSchema);
