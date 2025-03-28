@@ -39,6 +39,8 @@ export default function FeedbackForm() {
   const [loadingFeedback, setLoadingFeedback] = useState(false);
   const [loadingSuggestion, setLoadingSuggestion] = useState(false);
   const [invalidInvoice, setInvalidInvoice] = useState(null);
+  const [aiUsageCount, setAiUsageCount] = useState(0);
+  const [aiLimitReached, setAiLimitReached] = useState(false);
 
   const handleChange = (key, value) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -51,6 +53,18 @@ export default function FeedbackForm() {
         invoiceNumber,
       });
       setInvalidInvoice(false);
+      // Get AI usage count
+      const owner = response.data.owner;
+      if (!owner.invoices) {
+        setAiUsageCount(0);
+        setAiLimitReached(false);
+      } else {
+        const invoice = owner.invoices.find(
+          (inv) => inv.invoiceId === invoiceNumber
+        );
+        setAiUsageCount(invoice?.AIuseCount || 0);
+        setAiLimitReached((invoice?.AIuseCount || 0) >= 3);
+      }
     } catch (error) {
       if (error.response && error.response.status === 404) {
         setInvalidInvoice(true);
@@ -76,6 +90,11 @@ export default function FeedbackForm() {
 
   const generateFeedbackAI = async () => {
     try {
+      if (aiLimitReached) {
+        toast.error("AI usage limit reached for this invoice");
+        return;
+      }
+
       setLoadingFeedback(true);
       const response = await fetch("/api/generate-feedback", {
         method: "POST",
@@ -90,6 +109,8 @@ export default function FeedbackForm() {
           recommendRating: formData.recommendRating,
           overAllRating: formData.overAllRating,
           feedbackContent: formData.feedbackContent,
+          username,
+          invoiceNumber,
         }),
       });
 
@@ -97,9 +118,18 @@ export default function FeedbackForm() {
 
       if (response.ok) {
         handleChange("feedbackContent", data.feedback);
+        setAiUsageCount((prev) => prev + 1);
+        if (aiUsageCount + 1 >= 3) {
+          setAiLimitReached(true);
+        }
         toast.success("AI-generated feedback added!");
       } else {
-        toast.error(data.message || "Failed to generate feedback");
+        if (response.status === 429) {
+          setAiLimitReached(true);
+          toast.error("AI usage limit reached for this invoice");
+        } else {
+          toast.error(data.message || "Failed to generate feedback");
+        }
       }
     } catch (error) {
       console.error("Error generating feedback:", error);
@@ -111,6 +141,11 @@ export default function FeedbackForm() {
 
   const generateSuggestionsAI = async () => {
     try {
+      if (aiLimitReached) {
+        toast.error("AI usage limit reached for this invoice");
+        return;
+      }
+
       setLoadingSuggestion(true);
       const response = await axios.post("/api/generate-suggestion", {
         satisfactionRating: formData.satisfactionRating,
@@ -120,6 +155,8 @@ export default function FeedbackForm() {
         recommendRating: formData.recommendRating,
         overAllRating: formData.overAllRating,
         feedbackContent: formData.feedbackContent,
+        username,
+        invoiceNumber,
       });
 
       if (
@@ -128,13 +165,22 @@ export default function FeedbackForm() {
         response.data.data.suggestion
       ) {
         handleChange("suggestionContent", response.data.data.suggestion);
+        setAiUsageCount((prev) => prev + 1);
+        if (aiUsageCount + 1 >= 3) {
+          setAiLimitReached(true);
+        }
         toast.success("AI-generated Suggestion added!");
       } else {
         toast.error("Failed to generate suggestion");
       }
     } catch (error) {
       console.error("Error generating suggestion:", error);
-      toast.error(error.response?.data?.message || "Something went wrong!");
+      if (error.response?.status === 429) {
+        setAiLimitReached(true);
+        toast.error("AI usage limit reached for this invoice");
+      } else {
+        toast.error(error.response?.data?.message || "Something went wrong!");
+      }
     } finally {
       setLoadingSuggestion(false);
     }
@@ -239,20 +285,29 @@ export default function FeedbackForm() {
                   }
                   className="min-h-[100px] sm:min-h-[120px] bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20 text-sm sm:text-base"
                 />
-                <Button
-                  type="button"
-                  onClick={generateFeedbackAI}
-                  className="absolute top-1 right-1 p-1.5 sm:p-2 bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 border-yellow-400/20"
-                  variant="ghost"
-                  title="Generate Feedback using AI"
-                  disabled={loadingFeedback}
-                >
-                  {loadingFeedback ? (
-                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
-                  ) : (
-                    <Wand2 size={16} className="sm:w-5 sm:h-5" />
-                  )}
-                </Button>
+                <div className="flex items-center justify-between mt-2">
+                  <span className="text-xs text-yellow-400/80">
+                    AI Usage: {aiUsageCount}/3
+                  </span>
+                  <Button
+                    type="button"
+                    onClick={generateFeedbackAI}
+                    className="p-1.5 sm:p-2 bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 border-yellow-400/20"
+                    variant="ghost"
+                    title={
+                      aiLimitReached
+                        ? "AI usage limit reached"
+                        : "Generate Feedback using AI"
+                    }
+                    disabled={loadingFeedback || aiLimitReached}
+                  >
+                    {loadingFeedback ? (
+                      <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                    ) : (
+                      <Wand2 size={16} className="sm:w-5 sm:h-5" />
+                    )}
+                  </Button>
+                </div>
               </motion.div>
 
               {/* Suggestions */}
@@ -273,20 +328,29 @@ export default function FeedbackForm() {
                   }
                   className="min-h-[100px] sm:min-h-[120px] bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20 text-sm sm:text-base"
                 />
-                <Button
-                  type="button"
-                  onClick={generateSuggestionsAI}
-                  className="absolute top-1 right-1 p-1.5 sm:p-2 bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 border-yellow-400/20"
-                  variant="ghost"
-                  title="Generate Suggestion using AI"
-                  disabled={loadingSuggestion}
-                >
-                  {loadingSuggestion ? (
-                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
-                  ) : (
-                    <Sparkles size={16} className="sm:w-5 sm:h-5" />
-                  )}
-                </Button>
+                <div className="flex items-center justify-between mt-2">
+                  <span className="text-xs text-yellow-400/80">
+                    AI Usage: {aiUsageCount}/3
+                  </span>
+                  <Button
+                    type="button"
+                    onClick={generateSuggestionsAI}
+                    className="p-1.5 sm:p-2 bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 border-yellow-400/20"
+                    variant="ghost"
+                    title={
+                      aiLimitReached
+                        ? "AI usage limit reached"
+                        : "Generate Suggestion using AI"
+                    }
+                    disabled={loadingSuggestion || aiLimitReached}
+                  >
+                    {loadingSuggestion ? (
+                      <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                    ) : (
+                      <Sparkles size={16} className="sm:w-5 sm:h-5" />
+                    )}
+                  </Button>
+                </div>
               </motion.div>
 
               {/* Submit Button */}
