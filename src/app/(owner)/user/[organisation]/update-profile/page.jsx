@@ -5,11 +5,39 @@ import { Country, State, City } from "country-state-city";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
-import { Loader2, Save, Edit2, Check, X } from "lucide-react";
+import { Loader2, Check, Edit2 } from "lucide-react";
 import axios from "axios";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+const formSchema = z.object({
+  organizationName: z.string().min(1, "Organization name is required"),
+  phoneNumber: z.string().min(1, "Phone number is required"),
+  address: z.object({
+    country: z.string().min(1, "Country is required"),
+    state: z.string().min(1, "State is required"),
+    city: z.string().min(1, "City is required"),
+    localAddress: z.string().min(1, "Local address is required"),
+    pincode: z.string().min(1, "Pincode is required"),
+  }),
+});
 
 function UpdateProfilePage() {
   const { data: session } = useSession();
@@ -17,37 +45,41 @@ function UpdateProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editingField, setEditingField] = useState(null);
-  const [formData, setFormData] = useState({
-    organizationName: "",
-    phoneNumber: "",
-    address: {
-      localAddress: "",
-      country: "",
-      state: "",
-      city: "",
-      pincode: "",
-    },
-  });
-
-  // Location data states
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
 
-  // Fetch user data on component mount
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      organizationName: "",
+      phoneNumber: "",
+      address: {
+        country: "",
+        state: "",
+        city: "",
+        localAddress: "",
+        pincode: "",
+      },
+    },
+  });
+
+  // Fetch initial data
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchData = async () => {
       try {
+        // Fetch countries
+        const fetchedCountries = Country.getAllCountries();
+        setCountries(fetchedCountries);
+
+        // Fetch user data
         const response = await axios.post("/api/get-owner-info", {
           username: owner?.username,
         });
         const userData = response.data.data;
-        setFormData(userData);
-        
-        // Initialize location data
-        const fetchedCountries = Country.getAllCountries();
-        setCountries(fetchedCountries);
+        form.reset(userData);
 
+        // If user has country selected, fetch states
         if (userData?.address?.country) {
           const countryCode = fetchedCountries.find(
             (c) => c.name === userData.address.country
@@ -57,13 +89,17 @@ function UpdateProfilePage() {
             const fetchedStates = State.getStatesOfCountry(countryCode);
             setStates(fetchedStates);
 
+            // If user has state selected, fetch cities
             if (userData?.address?.state) {
               const stateCode = fetchedStates.find(
                 (s) => s.name === userData.address.state
               )?.isoCode;
 
               if (stateCode) {
-                const fetchedCities = City.getCitiesOfState(countryCode, stateCode);
+                const fetchedCities = City.getCitiesOfState(
+                  countryCode,
+                  stateCode
+                );
                 setCities(fetchedCities);
               }
             }
@@ -77,179 +113,78 @@ function UpdateProfilePage() {
     };
 
     if (owner?.username) {
-      fetchUserData();
+      fetchData();
     }
-  }, [owner]);
+  }, [owner?.username, form]);
 
-  // Add validation function
-  const validateField = (field, value) => {
-    if (!value || value.trim() === "") {
-      toast.error(`${field} cannot be empty`);
-      return false;
-    }
-    return true;
-  };
-
-  // Add address validation function
-  const validateAddress = () => {
-    const { country, state, city, localAddress, pincode } = formData.address;
-    
-    if (!country || country.trim() === "") {
-      toast.error("Country is required");
-      return false;
-    }
-    if (!state || state.trim() === "") {
-      toast.error("State is required");
-      return false;
-    }
-    if (!city || city.trim() === "") {
-      toast.error("City is required");
-      return false;
-    }
-    if (!localAddress || localAddress.trim() === "") {
-      toast.error("Local Address is required");
-      return false;
-    }
-    if (!pincode || pincode.trim() === "") {
-      toast.error("Pincode is required");
-      return false;
-    }
-    return true;
-  };
-
-  // Handle country change
   const handleCountryChange = (countryName) => {
-    if (!validateField("Country", countryName)) return;
-
-    const countryCode = countries.find(
-      (c) => c.name === countryName
-    )?.isoCode;
-
+    const countryCode = countries.find((c) => c.name === countryName)?.isoCode;
     if (countryCode) {
       const fetchedStates = State.getStatesOfCountry(countryCode);
       setStates(fetchedStates);
-      setFormData(prev => ({
-        ...prev,
-        address: {
-          ...prev.address,
-          country: countryName,
-          state: "",
-          city: "",
-          localAddress: "",
-          pincode: "",
-        },
-      }));
+      form.setValue("address.country", countryName);
+      form.setValue("address.state", "");
+      form.setValue("address.city", "");
+      form.setValue("address.localAddress", "");
+      form.setValue("address.pincode", "");
     }
   };
 
-  // Handle state change
   const handleStateChange = (stateName) => {
-    if (!validateField("State", stateName)) return;
-
     const countryCode = countries.find(
-      (c) => c.name === formData.address.country
+      (c) => c.name === form.getValues("address.country")
     )?.isoCode;
-
-    const stateCode = states.find(
-      (s) => s.name === stateName
-    )?.isoCode;
+    const stateCode = states.find((s) => s.name === stateName)?.isoCode;
 
     if (countryCode && stateCode) {
       const fetchedCities = City.getCitiesOfState(countryCode, stateCode);
       setCities(fetchedCities);
-      setFormData(prev => ({
-        ...prev,
-        address: {
-          ...prev.address,
-          state: stateName,
-          city: "",
-          localAddress: "",
-          pincode: "",
-        },
-      }));
+      form.setValue("address.state", stateName);
+      form.setValue("address.city", "");
+      form.setValue("address.localAddress", "");
+      form.setValue("address.pincode", "");
     }
   };
 
-  // Handle city change
   const handleCityChange = (cityName) => {
-    if (!validateField("City", cityName)) return;
-
-    setFormData(prev => ({
-      ...prev,
-      address: {
-        ...prev.address,
-        city: cityName,
-        localAddress: "",
-        pincode: "",
-      },
-    }));
+    form.setValue("address.city", cityName);
+    form.setValue("address.localAddress", "");
+    form.setValue("address.pincode", "");
   };
 
-  // Handle field edit
-  const handleEdit = (field) => {
-    if (field === "address") {
-      setEditingField("address");
+  const handleGlobalEdit = () => {
+    if (editingField === "all") {
+      // If already in edit mode, save the changes
+      setEditingField(null);
     } else {
-      setEditingField(field);
+      // Enter edit mode
+      setEditingField("all");
     }
   };
 
-  // Update handleSave function
-  const handleSave = async (field) => {
+  const handleSaveProfile = async (data) => {
+    if (editingField === "all") {
+      toast.error(
+        "Please save your current changes before updating the profile"
+      );
+      return;
+    }
+
     try {
       setSaving(true);
-      
-      // Validate fields before saving
-      if (field === "address") {
-        if (!validateAddress()) {
-          setSaving(false);
-          return;
-        }
-      } else {
-        if (!validateField(field, formData[field])) {
-          setSaving(false);
-          return;
-        }
-      }
 
       const response = await axios.post("/api/update-profile", {
         username: owner?.username,
-        updates: field === "address" ? { address: formData.address } : {
-          [field]: formData[field],
-        },
+        updates: data,
       });
-      
+
       if (response.status === 200) {
-        setEditingField(null);
-        toast.success(`${field === "address" ? "Address" : field} updated successfully`);
+        toast.success("Profile updated successfully");
       }
     } catch (error) {
-      toast.error(`Failed to update ${field === "address" ? "address" : field}`);
+      toast.error("Failed to update profile");
     } finally {
       setSaving(false);
-    }
-  };
-
-  // Update handleChange to include validation
-  const handleChange = (field, value) => {
-    if (field.startsWith('address.')) {
-      const addressField = field.split('.')[1];
-      if (!validateField(addressField, value)) return;
-      
-      setFormData(prev => ({
-        ...prev,
-        address: {
-          ...prev.address,
-          [addressField]: value,
-        },
-      }));
-    } else {
-      if (!validateField(field, value)) return;
-      
-      setFormData(prev => ({
-        ...prev,
-        [field]: value,
-      }));
     }
   };
 
@@ -266,224 +201,270 @@ function UpdateProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] py-8 px-4 sm:px-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-2xl mx-auto"
-      >
+      <div className="max-w-2xl mx-auto">
         <div className="bg-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/20 rounded-xl shadow-lg shadow-yellow-400/5">
           <div className="p-6 sm:p-8">
-            <div className="text-center mb-8">
+            <div className="text-center mb-8 relative">
               <h1 className="text-2xl sm:text-3xl font-bold text-yellow-400 mb-2">
                 Your Profile
               </h1>
               <p className="text-gray-400">
                 View and update your profile information below.
               </p>
+              <Button
+                type="button"
+                onClick={handleGlobalEdit}
+                className="absolute top-0 right-0 px-3 bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 border-yellow-400/20"
+              >
+                {editingField === "all" ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <Edit2 className="w-4 h-4" />
+                )}
+              </Button>
             </div>
 
-            <div className="space-y-6">
-              {/* Organization Name */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="space-y-2"
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(handleSaveProfile)}
+                className="space-y-6"
               >
-                <Label className="text-gray-200">Organization Name</Label>
-                <div className="flex gap-2">
-                  <Input
-                    type="text"
-                    placeholder="Enter Organisation Name"
-                    className="bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20"
-                    disabled={editingField !== "organizationName"}
-                    value={formData.organizationName}
-                    onChange={(e) => handleChange("organizationName", e.target.value)}
+                {/* Organization Name */}
+                <FormField
+                  control={form.control}
+                  name="organizationName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-200">
+                        Organization Name
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Enter Organisation Name"
+                          className="bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20"
+                          disabled={editingField !== "all"}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Phone Number */}
+                <FormField
+                  control={form.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-200">
+                        Phone Number
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="tel"
+                          placeholder="Enter Phone Number"
+                          className="bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20"
+                          disabled={editingField !== "all"}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Address Information */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <FormLabel className="text-gray-200 text-lg">
+                      Address Information
+                    </FormLabel>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {/* Country */}
+                    <FormField
+                      control={form.control}
+                      name="address.country"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-200">
+                            Country
+                          </FormLabel>
+                          <Select
+                            value={field.value}
+                            onValueChange={handleCountryChange}
+                            disabled={editingField !== "all"}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 focus:border-yellow-400/50 focus:ring-yellow-400/20">
+                                <SelectValue placeholder="Select Country" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
+                              {countries.map((country) => (
+                                <SelectItem
+                                  key={country.isoCode}
+                                  value={country.name}
+                                  className="text-gray-200 hover:bg-yellow-400/10"
+                                >
+                                  {country.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* State */}
+                    <FormField
+                      control={form.control}
+                      name="address.state"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-200">State</FormLabel>
+                          <Select
+                            value={field.value}
+                            onValueChange={handleStateChange}
+                            disabled={
+                              editingField !== "all" ||
+                              !form.getValues("address.country")
+                            }
+                          >
+                            <FormControl>
+                              <SelectTrigger className="bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 focus:border-yellow-400/50 focus:ring-yellow-400/20">
+                                <SelectValue placeholder="Select State" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
+                              {states.map((state) => (
+                                <SelectItem
+                                  key={state.isoCode}
+                                  value={state.name}
+                                  className="text-gray-200 hover:bg-yellow-400/10"
+                                >
+                                  {state.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* City */}
+                    <FormField
+                      control={form.control}
+                      name="address.city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-200">City</FormLabel>
+                          <Select
+                            value={field.value}
+                            onValueChange={handleCityChange}
+                            disabled={
+                              editingField !== "all" ||
+                              !form.getValues("address.state")
+                            }
+                          >
+                            <FormControl>
+                              <SelectTrigger className="bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 focus:border-yellow-400/50 focus:ring-yellow-400/20">
+                                <SelectValue placeholder="Select City" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
+                              {cities.map((city) => (
+                                <SelectItem
+                                  key={city.name}
+                                  value={city.name}
+                                  className="text-gray-200 hover:bg-yellow-400/10"
+                                >
+                                  {city.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Local Address */}
+                  <FormField
+                    control={form.control}
+                    name="address.localAddress"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-200">
+                          Local Address
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="text"
+                            placeholder="Enter Local Address"
+                            className="bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20"
+                            disabled={editingField !== "all"}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
+
+                  {/* Pincode */}
+                  <FormField
+                    control={form.control}
+                    name="address.pincode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-200">Pincode</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="text"
+                            placeholder="Enter Pincode"
+                            className="bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20"
+                            disabled={editingField !== "all"}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Save Profile Button */}
+                <div className="flex justify-center mt-8">
                   <Button
-                    type="button"
-                    onClick={() => editingField === "organizationName" ? handleSave("organizationName") : handleEdit("organizationName")}
-                    className="px-3 bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 border-yellow-400/20"
-                    disabled={saving}
+                    type="submit"
+                    disabled={saving || editingField === "all"}
+                    className={`px-8 py-2 font-semibold ${
+                      editingField !== "all"
+                        ? "bg-yellow-400 hover:bg-yellow-500 text-black"
+                        : "bg-gray-700 text-gray-400 cursor-not-allowed"
+                    }`}
                   >
                     {saving ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : editingField === "organizationName" ? (
-                      <Check className="w-4 h-4" />
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        Saving Profile...
+                      </>
                     ) : (
-                      <Edit2 className="w-4 h-4" />
+                      "Save Profile"
                     )}
                   </Button>
                 </div>
-              </motion.div>
-
-              {/* Phone Number */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="space-y-2"
-              >
-                <Label className="text-gray-200">Phone Number</Label>
-                <div className="flex gap-2">
-                  <Input
-                    type="tel"
-                    placeholder="Enter Phone Number"
-                    className="bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20"
-                    disabled={editingField !== "phoneNumber"}
-                    value={formData.phoneNumber}
-                    onChange={(e) => handleChange("phoneNumber", e.target.value)}
-                  />
-                  <Button
-                    type="button"
-                    onClick={() => editingField === "phoneNumber" ? handleSave("phoneNumber") : handleEdit("phoneNumber")}
-                    className="px-3 bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 border-yellow-400/20"
-                    disabled={saving}
-                  >
-                    {saving ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : editingField === "phoneNumber" ? (
-                      <Check className="w-4 h-4" />
-                    ) : (
-                      <Edit2 className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
-              </motion.div>
-
-              {/* Location Fields */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="space-y-4"
-              >
-                <div className="flex items-center justify-between">
-                  <Label className="text-gray-200 text-lg">Address Information</Label>
-                  <Button
-                    type="button"
-                    onClick={() => editingField === "address" ? handleSave("address") : handleEdit("address")}
-                    className="px-3 bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 border-yellow-400/20"
-                    disabled={saving}
-                  >
-                    {saving ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : editingField === "address" ? (
-                      <Check className="w-4 h-4" />
-                    ) : (
-                      <Edit2 className="w-4 h-4" />
-                    )}
-                  </Button>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {/* Country */}
-                  <div className="space-y-2">
-                    <Label className="text-gray-200">Country</Label>
-                    <Select
-                      value={formData.address.country}
-                      onValueChange={handleCountryChange}
-                      disabled={editingField !== "address"}
-                    >
-                      <SelectTrigger className="bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 focus:border-yellow-400/50 focus:ring-yellow-400/20">
-                        <SelectValue placeholder="Select Country" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
-                        {countries.map((country) => (
-                          <SelectItem
-                            key={country.isoCode}
-                            value={country.name}
-                            className="text-gray-200 hover:bg-yellow-400/10"
-                          >
-                            {country.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* State */}
-                  <div className="space-y-2">
-                    <Label className="text-gray-200">State</Label>
-                    <Select
-                      value={formData.address.state}
-                      onValueChange={handleStateChange}
-                      disabled={editingField !== "address" || !formData.address.country}
-                    >
-                      <SelectTrigger className="bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 focus:border-yellow-400/50 focus:ring-yellow-400/20">
-                        <SelectValue placeholder="Select State" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
-                        {states.map((state) => (
-                          <SelectItem
-                            key={state.isoCode}
-                            value={state.name}
-                            className="text-gray-200 hover:bg-yellow-400/10"
-                          >
-                            {state.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* City */}
-                  <div className="space-y-2">
-                    <Label className="text-gray-200">City</Label>
-                    <Select
-                      value={formData.address.city}
-                      onValueChange={handleCityChange}
-                      disabled={editingField !== "address" || !formData.address.state}
-                    >
-                      <SelectTrigger className="bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 focus:border-yellow-400/50 focus:ring-yellow-400/20">
-                        <SelectValue placeholder="Select City" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
-                        {cities.map((city) => (
-                          <SelectItem
-                            key={city.name}
-                            value={city.name}
-                            className="text-gray-200 hover:bg-yellow-400/10"
-                          >
-                            {city.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                {/* Local Address */}
-                <div className="space-y-2">
-                  <Label className="text-gray-200">Local Address</Label>
-                  <Input
-                    type="text"
-                    placeholder="Enter Local Address"
-                    className="bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20"
-                    disabled={editingField !== "address"}
-                    value={formData.address.localAddress}
-                    onChange={(e) => handleChange("address.localAddress", e.target.value)}
-                  />
-                </div>
-
-                {/* Pincode */}
-                <div className="space-y-2">
-                  <Label className="text-gray-200">Pincode</Label>
-                  <Input
-                    type="text"
-                    placeholder="Enter Pincode"
-                    className="bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20"
-                    disabled={editingField !== "address"}
-                    value={formData.address.pincode}
-                    onChange={(e) => handleChange("address.pincode", e.target.value)}
-                  />
-                </div>
-              </motion.div>
-            </div>
+              </form>
+            </Form>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
