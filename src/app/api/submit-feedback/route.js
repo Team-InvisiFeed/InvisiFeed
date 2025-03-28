@@ -8,10 +8,8 @@ export async function POST(req) {
   const { formData, username, invoiceNumber } = await req.json();
 
   const decodedUsername = decodeURIComponent(username);
-  // console.log(decodedUsername);
 
   const decodedInvoiceNumber = decodeURIComponent(invoiceNumber);
-  // console.log(decodedInvoiceNumber);
 
   try {
     const owner = await OwnerModel.findOne({ username: decodedUsername });
@@ -20,30 +18,28 @@ export async function POST(req) {
       throw new ApiError(404, "Organisation not found");
     }
 
+    // Find the invoice index
+    const invoice = owner.invoices.find(
+      (inv) => inv.invoiceId === decodedInvoiceNumber
+    );
+
+    if (!invoice) {
+      throw new ApiError(404, "Invoice not found");
+    }
+
     // Initialize feedbacks array if it doesn't exist
     if (!owner.feedbacks) {
       owner.feedbacks = [];
     }
 
-    // Find the invoice index
-    const invoiceIndex = owner.invoices.findIndex(
-      (inv) => inv.invoiceId === decodedInvoiceNumber
-    );
-
-    if (invoiceIndex === -1) {
-      throw new ApiError(404, "Invoice not found");
-    }
-
-    // Add the new feedback to the top-level feedbacks array
+    // Add the new feedback to the owner's feedbacks array
     owner.feedbacks.push({
       ...formData,
       createdAt: new Date(),
     });
 
-    // Remove the invoice from the invoices array
-    owner.invoices.splice(invoiceIndex, 1);
-
-    // Save the changes
+    // Set the feedback submitted flag on the specific invoice
+    invoice.isFeedbackSubmitted = true;
     await owner.save();
 
     return Response.json(
