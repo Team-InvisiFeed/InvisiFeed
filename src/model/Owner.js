@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const FeedbackSchema = new Schema({
   satisfactionRating: {
@@ -79,6 +79,10 @@ const InvoiceSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  isFeedbackSubmitted: {
+    type: Boolean,
+    default: false,
   },
 });
 
