@@ -29,6 +29,7 @@
     "dotenv": "^16.4.7",
     "embla-carousel-autoplay": "^8.5.2",
     "embla-carousel-react": "^8.5.2",
+    "framer-motion": "^12.6.2",
     "lucide-react": "^0.483.0",
     "mongoose": "^8.12.1",
     "multer": "^1.4.5-lts.1",
