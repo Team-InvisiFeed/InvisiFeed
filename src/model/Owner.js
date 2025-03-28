@@ -66,6 +66,22 @@ const AddressSchema = new Schema({
   },
 });
 
+const InvoiceSchema = new Schema({
+  invoiceId: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  AIuseCount: {
+    type: Number,
+    default: 0,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 const OwnerSchema = new Schema({
   organizationName: {
     type: String,
@@ -109,9 +125,7 @@ const OwnerSchema = new Schema({
     required: [true, "Address is required"],
   },
   feedbacks: [FeedbackSchema],
-  invoiceIds: {
-    type: [String],
-  },
+  invoices: [InvoiceSchema],
 });
 
 const OwnerModel =
