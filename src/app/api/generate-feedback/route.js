@@ -7,16 +7,28 @@ export async function POST(req) {
     const body = await req.json();
     console.log(body);
 
-    const prompt = `
+    let prompt = `
       Overall Satisfaction: ${body.satisfactionRating}/5,
       Communication: ${body.communicationRating}/5,
       Quality of Service: ${body.qualityOfServiceRating}/5,
       Value for Money: ${body.valueForMoneyRating}/5,
-      Likelihood to Recommend: ${body.recommendRating}/5.
+      Likelihood to Recommend: ${body.recommendRating}/5,
       Overall Rating: ${body.overAllRating}/5
-      
-      Based on these ratings, generate a professional 30-word feedback(no need to mention the numbers).
     `;
+
+    // Only add user's feedback to prompt if it exists and is not empty
+    if (body.feedbackContent && body.feedbackContent.trim() !== "") {
+      prompt += `
+      
+      User's Feedback: "${body.feedbackContent}"
+      
+      Based on these ratings and the user's feedback, write a personal 50-word feedback in first person ("I" perspective) that sounds natural and authentic. Include specific details from their feedback while maintaining their tone and sentiment. Make it sound like a real customer sharing their experience.`;
+    } else {
+      prompt += `
+      
+      Write a personal 30-word feedback in first person ("I" perspective) based on these ratings. Make it sound natural and authentic, like a real customer sharing their experience. Include specific details about what they liked or what could be better.`;
+    }
+
     console.log(prompt);
 
     const model = genAI.getGenerativeModel({
