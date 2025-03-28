@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form"; // React Hook Form for handling forms
 import { Form } from "@/components/ui/form"; // Custom Form component
 import Link from "next/link"; // For client-side navigation in Next.js
 import * as z from "zod"; // Zod for schema-based validation
-import React, { useState } from "react"; // React hooks for state and lifecycle
+import React, { useState, useEffect } from "react"; // React hooks for state and lifecycle
 import { useRouter } from "next/navigation"; // Next.js router for navigation
 import {
   FormControl,
@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input"; // Input component
 import { Button } from "@/components/ui/button"; // Button component
 import { signInSchema } from "@/schemas/signinSchema";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, useSession, signOut } from "next-auth/react";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -27,8 +27,24 @@ function Page() {
   const [isSubmitting, setIsSubmitting] = useState(false); // Flag for form submission
   const [showPassword, setShowPassword] = useState(false);
 
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const owner = session?.user;
+
+  // Check for token expiration
+  useEffect(() => {
+    if (session?.accessToken) {
+      const checkTokenExpiry = () => {
+        const now = Date.now();
+        if (now > session.refreshTokenExpiry) {
+          signOut({ redirect: true, callbackUrl: "/sign-in" });
+        }
+      };
+
+      // Check every second
+      const interval = setInterval(checkTokenExpiry, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [session]);
 
   // Next.js router for navigation
   const router = useRouter();
@@ -70,9 +86,7 @@ function Page() {
       {/* Left Section with Gradient */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#000000] p-8 flex-col justify-center items-center text-white">
         <div className="max-w-md space-y-4">
-          <h1 className="text-4xl font-extrabold tracking-tight">
-            InvisiFeed
-          </h1>
+          <h1 className="text-4xl font-extrabold tracking-tight">InvisiFeed</h1>
           <p className="text-lg text-gray-200">
             Welcome back! Sign in to continue your journey
           </p>
@@ -95,7 +109,7 @@ function Page() {
 
       {/* Right Section with Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-[#0A0A0A]">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
