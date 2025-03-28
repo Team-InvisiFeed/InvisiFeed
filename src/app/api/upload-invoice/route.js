@@ -65,8 +65,14 @@ export async function POST(req) {
       return NextResponse.json({ error: "Owner not found" }, { status: 404 });
     }
 
-    const existedInvoice = owner.invoiceIds.some(
-      (invoiceId) => invoiceId === invoiceNumber
+    // Initialize invoices array if it doesn't exist
+    if (!owner.invoices) {
+      owner.invoices = [];
+    }
+
+    // Check if invoice already exists
+    const existedInvoice = owner.invoices.some(
+      (invoice) => invoice.invoiceId === invoiceNumber
     );
 
     if (existedInvoice) {
@@ -76,10 +82,11 @@ export async function POST(req) {
       );
     }
 
-    const newInvoiceId = invoiceNumber;
-
-    // Push the new object into invoiceIds array
-    owner.invoiceIds.push(newInvoiceId);
+    // Add new invoice with initial AIuseCount
+    owner.invoices.push({
+      invoiceId: invoiceNumber,
+      AIuseCount: 0,
+    });
     await owner.save();
 
     // Generate QR Code PDF
@@ -170,7 +177,9 @@ async function generateQrPdf(invoiceNumber, username) {
 
     // Embed fonts
     const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const helveticaBoldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const helveticaBoldFont = await pdfDoc.embedFont(
+      StandardFonts.HelveticaBold
+    );
 
     // Helper function to center text
     const centerText = (text, y, size, font) => {
@@ -202,7 +211,7 @@ async function generateQrPdf(invoiceNumber, username) {
     ];
 
     instructions.forEach((text, index) => {
-      centerText(text, 600 - (index * 25), 14, helveticaFont);
+      centerText(text, 600 - index * 25, 14, helveticaFont);
     });
 
     // Embed the QR Code as an image
@@ -237,7 +246,12 @@ async function generateQrPdf(invoiceNumber, username) {
     });
 
     // Draw footer
-    centerText("© 2024 InvisiFeed. All rights reserved.", 50, 12, helveticaFont);
+    centerText(
+      "© 2024 InvisiFeed. All rights reserved.",
+      50,
+      12,
+      helveticaFont
+    );
 
     // Serialize the PDFDocument to bytes
     return await pdfDoc.save();
