@@ -36,7 +36,8 @@ export default function FeedbackForm() {
   });
 
   const payload = { formData, username, invoiceNumber };
-  const [loading, setLoading] = useState(false);
+  const [loadingFeedback, setLoadingFeedback] = useState(false);
+  const [loadingSuggestion, setLoadingSuggestion] = useState(false);
   const [invalidInvoice, setInvalidInvoice] = useState(null);
 
   const handleChange = (key, value) => {
@@ -75,7 +76,7 @@ export default function FeedbackForm() {
 
   const generateFeedbackAI = async () => {
     try {
-      setLoading(true);
+      setLoadingFeedback(true);
       const response = await fetch("/api/generate-feedback", {
         method: "POST",
         headers: {
@@ -88,6 +89,7 @@ export default function FeedbackForm() {
           valueForMoneyRating: formData.valueForMoneyRating,
           recommendRating: formData.recommendRating,
           overAllRating: formData.overAllRating,
+          feedbackContent: formData.feedbackContent,
         }),
       });
 
@@ -103,13 +105,39 @@ export default function FeedbackForm() {
       console.error("Error generating feedback:", error);
       toast.error("Something went wrong!");
     } finally {
-      setLoading(false);
+      setLoadingFeedback(false);
     }
   };
 
-  const generateSuggestionsAI = () => {
-    handleChange("suggestionContent", "Offer more flexible payment options.");
-    toast.success("AI-generated suggestion added!");
+  const generateSuggestionsAI = async () => {
+    try {
+      setLoadingSuggestion(true);
+      const response = await axios.post("/api/generate-suggestion", {
+        satisfactionRating: formData.satisfactionRating,
+        communicationRating: formData.communicationRating,
+        qualityOfServiceRating: formData.qualityOfServiceRating,
+        valueForMoneyRating: formData.valueForMoneyRating,
+        recommendRating: formData.recommendRating,
+        overAllRating: formData.overAllRating,
+        feedbackContent: formData.feedbackContent,
+      });
+
+      if (
+        response.data &&
+        response.data.data &&
+        response.data.data.suggestion
+      ) {
+        handleChange("suggestionContent", response.data.data.suggestion);
+        toast.success("AI-generated Suggestion added!");
+      } else {
+        toast.error("Failed to generate suggestion");
+      }
+    } catch (error) {
+      console.error("Error generating suggestion:", error);
+      toast.error(error.response?.data?.message || "Something went wrong!");
+    } finally {
+      setLoadingSuggestion(false);
+    }
   };
 
   if (invalidInvoice === null) {
@@ -127,8 +155,12 @@ export default function FeedbackForm() {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-400 mb-2">Invalid Invoice</h2>
-          <p className="text-gray-400">Please check your invoice number and try again.</p>
+          <h2 className="text-2xl font-bold text-red-400 mb-2">
+            Invalid Invoice
+          </h2>
+          <p className="text-gray-400">
+            Please check your invoice number and try again.
+          </p>
         </div>
       </div>
     );
@@ -164,7 +196,9 @@ export default function FeedbackForm() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
-                  <Label className="block mb-2 sm:mb-3 text-base sm:text-lg font-medium text-gray-200">{label}</Label>
+                  <Label className="block mb-2 sm:mb-3 text-base sm:text-lg font-medium text-gray-200">
+                    {label}
+                  </Label>
                   <div className="flex gap-2 sm:gap-4 overflow-x-auto pb-2 -mx-1 px-1 sm:mx-0 sm:px-0">
                     {emojiOptions.map((option) => (
                       <button
@@ -200,7 +234,9 @@ export default function FeedbackForm() {
                 <Textarea
                   placeholder="Share your thoughts here..."
                   value={formData.feedbackContent}
-                  onChange={(e) => handleChange("feedbackContent", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("feedbackContent", e.target.value)
+                  }
                   className="min-h-[100px] sm:min-h-[120px] bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20 text-sm sm:text-base"
                 />
                 <Button
@@ -209,9 +245,9 @@ export default function FeedbackForm() {
                   className="absolute top-1 right-1 p-1.5 sm:p-2 bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 border-yellow-400/20"
                   variant="ghost"
                   title="Generate Feedback using AI"
-                  disabled={loading}
+                  disabled={loadingFeedback}
                 >
-                  {loading ? (
+                  {loadingFeedback ? (
                     <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
                   ) : (
                     <Wand2 size={16} className="sm:w-5 sm:h-5" />
@@ -229,12 +265,13 @@ export default function FeedbackForm() {
                 <Label className="block mb-2 sm:mb-3 text-base sm:text-lg font-medium text-gray-200">
                   Any Suggestions?
                 </Label>
-                <Input
-                  type="text"
+                <Textarea
                   placeholder="Let us know how we can improve..."
                   value={formData.suggestionContent}
-                  onChange={(e) => handleChange("suggestionContent", e.target.value)}
-                  className="bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20 text-sm sm:text-base"
+                  onChange={(e) =>
+                    handleChange("suggestionContent", e.target.value)
+                  }
+                  className="min-h-[100px] sm:min-h-[120px] bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20 text-sm sm:text-base"
                 />
                 <Button
                   type="button"
@@ -242,8 +279,13 @@ export default function FeedbackForm() {
                   className="absolute top-1 right-1 p-1.5 sm:p-2 bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 border-yellow-400/20"
                   variant="ghost"
                   title="Generate Suggestion using AI"
+                  disabled={loadingSuggestion}
                 >
-                  <Sparkles size={16} className="sm:w-5 sm:h-5" />
+                  {loadingSuggestion ? (
+                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                  ) : (
+                    <Sparkles size={16} className="sm:w-5 sm:h-5" />
+                  )}
                 </Button>
               </motion.div>
 

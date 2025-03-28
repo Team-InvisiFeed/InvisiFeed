@@ -22,11 +22,11 @@ export async function POST(req) {
       
       User's Feedback: "${body.feedbackContent}"
       
-      Based on these ratings and the user's feedback, write a personal 50-word feedback in first person ("I" perspective) that sounds natural and authentic. Include specific details from their feedback while maintaining their tone and sentiment. Make it sound like a real customer sharing their experience.`;
+      Based on these ratings and the user's feedback, generate a constructive 30-word suggestion for improvement. Focus on specific, actionable points that could enhance their experience. Keep the tone positive and solution-oriented.`;
     } else {
       prompt += `
       
-      Write a personal 30-word feedback in first person ("I" perspective) based on these ratings. Make it sound natural and authentic, like a real customer sharing their experience. Include specific details about what they liked or what could be better.`;
+      Based on these ratings, generate a constructive 20-word suggestion for improvement. Focus on the areas with lower ratings and provide specific, actionable advice. Keep the tone positive and solution-oriented.`;
     }
 
     console.log(prompt);
@@ -35,13 +35,15 @@ export async function POST(req) {
       model: "gemini-2.0-flash-lite-preview-02-05",
     });
     const result = await model.generateContent(prompt);
-    const feedback = result.response.text();
+    console.log("result : ", result.response.text());
 
-    return Response.json({ feedback });
+    const suggestion = result.response.text();
+
+    return Response.json({ data: { suggestion } });
   } catch (error) {
-    console.error("Error generating feedback:", error);
+    console.error("Error generating suggestion:", error);
     return Response.json(
-      { message: "Failed to generate feedback" },
+      { message: "Failed to generate suggestion" },
       { status: 500 }
     );
   }
