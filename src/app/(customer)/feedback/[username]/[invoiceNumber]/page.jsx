@@ -41,6 +41,10 @@ export default function FeedbackForm() {
   const [invalidInvoice, setInvalidInvoice] = useState(null);
   const [aiUsageCount, setAiUsageCount] = useState(0);
   const [aiLimitReached, setAiLimitReached] = useState(false);
+  const [feedbackAlreadySubmitted, setFeedbackAlreadySubmitted] =
+    useState(false);
+  const [feedbackSubmittedSuccess, setFeedbackSubmittedSuccess] =
+    useState(false);
 
   const handleChange = (key, value) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -52,24 +56,33 @@ export default function FeedbackForm() {
         username,
         invoiceNumber,
       });
+
+      const decodedInvoiceNumber = decodeURIComponent(invoiceNumber);
       setInvalidInvoice(false);
+      setFeedbackAlreadySubmitted(false);
       // Get AI usage count
       const owner = response.data.owner;
+
       if (!owner.invoices) {
         setAiUsageCount(0);
         setAiLimitReached(false);
       } else {
         const invoice = owner.invoices.find(
-          (inv) => inv.invoiceId === invoiceNumber
+          (inv) => inv.invoiceId === decodedInvoiceNumber
         );
         setAiUsageCount(invoice?.AIuseCount || 0);
         setAiLimitReached((invoice?.AIuseCount || 0) >= 3);
       }
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        setInvalidInvoice(true);
+        if (error.response.data.message === "Feedback already submitted") {
+          setFeedbackAlreadySubmitted(true);
+        } else {
+          setInvalidInvoice(true);
+        }
       } else {
         console.error("An unexpected error occurred:", error.message);
+        toast(error.message);
       }
     }
   };
@@ -82,7 +95,7 @@ export default function FeedbackForm() {
     try {
       e.preventDefault();
       const response = await axios.post("/api/submit-feedback", payload);
-      toast.success("Feedback submitted successfully!");
+      setFeedbackSubmittedSuccess(true);
     } catch (error) {
       toast.error("Failed to submit feedback. Please try again.");
     }
@@ -185,6 +198,34 @@ export default function FeedbackForm() {
       setLoadingSuggestion(false);
     }
   };
+
+  if (feedbackSubmittedSuccess) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-yellow-400 mb-2">
+            Feedback Successfully Submitted
+          </h2>
+          <p className="text-gray-400">Thank you for your valuable feedback!</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (feedbackAlreadySubmitted) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-yellow-400 mb-2">
+            Feedback Already Submitted
+          </h2>
+          <p className="text-gray-400">
+            You have already submitted feedback for this invoice.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (invalidInvoice === null) {
     return (
