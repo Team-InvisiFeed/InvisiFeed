@@ -32,8 +32,13 @@ function Navbar() {
     <nav className="p-4 md:p-6 bg-[#0A0A0A] text-white shadow-lg border-b border-yellow-400/10">
       <div className="container mx-auto flex items-center justify-between">
         {/* Logo/Brand Name */}
+<<<<<<< HEAD
         <motion.a
           href="#home"
+=======
+        <motion.a 
+          href="/" 
+>>>>>>> bf52a631a19ae12a3c8b547f6a577c8fd74e8d2b
           className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -107,8 +112,8 @@ function Navbar() {
         {/* Login Button */}
         {!owner ? (
           <Link href={"/sign-in"}>
-            <Button className="bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium shadow-lg shadow-yellow-500/20">
-              Login
+            <Button className="bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium shadow-lg shadow-yellow-500/20 cursor-pointer">
+              Get Started
             </Button>
           </Link>
         ) : (
