@@ -7,7 +7,6 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 export async function POST(req) {
   try {
     const body = await req.json();
-    console.log(body);
 
     // Decode the encoded parameters
     const decodedUsername = decodeURIComponent(body.username);
@@ -60,8 +59,6 @@ export async function POST(req) {
       
       Write a personal 30-word feedback in first person ("I" perspective) based on these ratings. Make it sound natural and authentic, like a real customer sharing their experience. Include specific details about what they liked or what could be better.`;
     }
-
-    console.log(prompt);
 
     const model = genAI.getGenerativeModel({
       model: "gemini-2.0-flash-lite-preview-02-05",

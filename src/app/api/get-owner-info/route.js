@@ -8,7 +8,6 @@ export async function POST(req) {
   const { username } = await req.json();
 
   const decodedUsername = decodeURIComponent(username);
-  console.log(decodedUsername);
 
   try {
     const owner = await OwnerModel.findOne({ username: decodedUsername });

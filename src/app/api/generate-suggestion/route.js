@@ -7,7 +7,6 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 export async function POST(req) {
   try {
     const body = await req.json();
-    console.log(body);
 
     // Decode the encoded parameters
     const decodedUsername = decodeURIComponent(body.username);
@@ -62,13 +61,10 @@ export async function POST(req) {
       Based on these ratings, generate a constructive 20-word suggestion for improvement. Focus on the areas with lower ratings and provide specific, actionable advice. Keep the tone positive and solution-oriented.`;
     }
 
-    console.log(prompt);
-
     const model = genAI.getGenerativeModel({
       model: "gemini-2.0-flash-lite-preview-02-05",
     });
     const result = await model.generateContent(prompt);
-    console.log("result : ", result.response.text());
 
     const suggestion = result.response.text();
 
