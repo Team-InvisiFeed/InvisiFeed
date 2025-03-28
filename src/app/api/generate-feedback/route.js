@@ -5,25 +5,19 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 export async function POST(req) {
   try {
     const body = await req.json();
-    const {
-      overallSatisfaction,
-      communication,
-      qualityOfService,
-      valueForMoney,
-      likelihoodToRecommend,
-      overallRating
-    } = body;
+    console.log(body);
 
     const prompt = `
-      Overall Satisfaction: ${overallSatisfaction}/5,
-      Communication: ${communication}/5,
-      Quality of Service: ${qualityOfService}/5,
-      Value for Money: ${valueForMoney}/5,
-      Likelihood to Recommend: ${likelihoodToRecommend}/5.
-      Overall Rating: ${overallRating}/5
+      Overall Satisfaction: ${body.satisfactionRating}/5,
+      Communication: ${body.communicationRating}/5,
+      Quality of Service: ${body.qualityOfServiceRating}/5,
+      Value for Money: ${body.valueForMoneyRating}/5,
+      Likelihood to Recommend: ${body.recommendRating}/5.
+      Overall Rating: ${body.overAllRating}/5
       
       Based on these ratings, generate a professional 30-word feedback(no need to mention the numbers).
     `;
+    console.log(prompt);
 
     const model = genAI.getGenerativeModel({
       model: "gemini-2.0-flash-lite-preview-02-05",
