@@ -1,4 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import OwnerModel from "@/model/Owner";
+import dbConnect from "@/lib/dbConnect";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -6,6 +8,33 @@ export async function POST(req) {
   try {
     const body = await req.json();
     console.log(body);
+
+    // Connect to database
+    await dbConnect();
+
+    // Find the owner and check AI usage count
+    const owner = await OwnerModel.findOne({
+      username: body.username,
+      "invoices.invoiceId": body.invoiceNumber,
+    });
+
+    if (!owner) {
+      return Response.json(
+        { message: "Owner or invoice not found" },
+        { status: 404 }
+      );
+    }
+
+    const invoice = owner.invoices.find(
+      (inv) => inv.invoiceId === body.invoiceNumber
+    );
+
+    if (invoice.AIuseCount >= 3) {
+      return Response.json(
+        { message: "AI usage limit reached for this invoice" },
+        { status: 429 }
+      );
+    }
 
     let prompt = `
       Overall Satisfaction: ${body.satisfactionRating}/5,
@@ -36,6 +65,10 @@ export async function POST(req) {
     });
     const result = await model.generateContent(prompt);
     const feedback = result.response.text();
+
+    // Update AI usage count
+    invoice.AIuseCount += 1;
+    await owner.save();
 
     return Response.json({ feedback });
   } catch (error) {
