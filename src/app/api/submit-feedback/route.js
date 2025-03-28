@@ -20,32 +20,38 @@ export async function POST(req) {
       throw new ApiError(404, "Organisation not found");
     }
 
-    // Initialize invoices array if it doesn't exist
-    if (!owner.invoices) {
-      owner.invoices = [];
+    // Initialize feedbacks array if it doesn't exist
+    if (!owner.feedbacks) {
+      owner.feedbacks = [];
     }
 
-    // Find the invoice
-    const invoice = owner.invoices.find(
+    // Find the invoice index
+    const invoiceIndex = owner.invoices.findIndex(
       (inv) => inv.invoiceId === decodedInvoiceNumber
     );
 
-    if (invoice) {
-      // Add feedback to the invoice
-      if (!invoice.feedbacks) {
-        invoice.feedbacks = [];
-      }
-      invoice.feedbacks.push(formData);
-      await owner.save();
-    } else {
+    if (invoiceIndex === -1) {
       throw new ApiError(404, "Invoice not found");
     }
+
+    // Add the new feedback to the top-level feedbacks array
+    owner.feedbacks.push({
+      ...formData,
+      createdAt: new Date(),
+    });
+
+    // Remove the invoice from the invoices array
+    owner.invoices.splice(invoiceIndex, 1);
+
+    // Save the changes
+    await owner.save();
 
     return Response.json(
       { message: "Feedback added successfully" },
       { status: 201 }
     );
   } catch (error) {
+    console.error("Error submitting feedback:", error);
     return Response.json({ message: error.message }, { status: 500 });
   }
 }
