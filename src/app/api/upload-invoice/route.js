@@ -221,6 +221,21 @@ async function generateQrPdf(invoiceNumber, username) {
       height,
     });
 
+    // Add clickable link below QR code
+    const linkText = qrData;
+    const linkTextWidth = helveticaFont.widthOfTextAtSize(linkText, 14);
+    const linkX = (page.getWidth() - linkTextWidth) / 2;
+    const linkY = centerY - 30; // Position below QR code
+
+    // Draw the link text in blue to indicate it's clickable
+    page.drawText(linkText, {
+      x: linkX,
+      y: linkY,
+      size: 14,
+      font: helveticaFont,
+      color: rgb(0, 0, 0.8), // Blue color to indicate it's a link
+    });
+
     // Draw footer
     centerText("© 2024 InvisiFeed. All rights reserved.", 50, 12, helveticaFont);
 
