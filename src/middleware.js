@@ -9,11 +9,9 @@ export const config = {
 export async function middleware(request) {
   const token = await getToken({ req: request });
   const url = request.nextUrl;
-  console.log("Middleware triggered for:", request.nextUrl.pathname);
 
   // Check if tokens are expired
   if (token) {
-    console.log("refreshToken: ", token.refreshToken);
     if (Date.now() > token.accessTokenExpiry) {
       const now = Date.now();
       // If refresh token is expired, redirect to login
