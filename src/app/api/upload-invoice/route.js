@@ -151,8 +151,6 @@ async function generateQrPdf(invoiceNumber, username) {
     const encodedUsername = encodeURIComponent(username);
     const encodedInvoiceNumber = encodeURIComponent(invoiceNumber);
     const qrData = `http://localhost:3000/feedback/${encodedUsername}/${encodedInvoiceNumber}`;
-    // console.log(qrData);
-
     const qrBuffer = await QRCode.toBuffer(qrData, { width: 300 });
 
     // Create a new PDF document
@@ -161,29 +159,70 @@ async function generateQrPdf(invoiceNumber, username) {
     // Add a page to the PDF
     const page = pdfDoc.addPage([595.28, 841.89]); // A4 size dimensions
 
-    // Embed the Times Roman font
-    const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+    // Set light cream background
+    page.drawRectangle({
+      x: 0,
+      y: 0,
+      width: page.getWidth(),
+      height: page.getHeight(),
+      color: rgb(0.98, 0.97, 0.95), // Light cream color
+    });
 
-    // Draw the invoice text
-    page.drawText(`Invoice: ${invoiceNumber}`, {
-      x: 50,
-      y: 800,
-      size: 24,
-      font: timesRomanFont,
-      color: rgb(0, 0, 0), // Black color
+    // Embed fonts
+    const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const helveticaBoldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+    // Helper function to center text
+    const centerText = (text, y, size, font) => {
+      const textWidth = font.widthOfTextAtSize(text, size);
+      const x = (page.getWidth() - textWidth) / 2;
+      page.drawText(text, {
+        x,
+        y,
+        size,
+        font,
+        color: rgb(0.2, 0.2, 0.2), // Dark gray, almost black
+      });
+    };
+
+    // Draw header
+    centerText("InvisiFeed", 750, 36, helveticaBoldFont);
+
+    // Draw subtitle
+    centerText("Your Feedback Matters", 700, 20, helveticaFont);
+
+    // Draw invoice number
+    centerText(`Invoice: ${invoiceNumber}`, 650, 16, helveticaFont);
+
+    // Draw instructions
+    const instructions = [
+      "Scan this QR code to provide your valuable feedback",
+      "Your feedback helps us improve our services",
+      "Thank you for choosing InvisiFeed!",
+    ];
+
+    instructions.forEach((text, index) => {
+      centerText(text, 600 - (index * 25), 14, helveticaFont);
     });
 
     // Embed the QR Code as an image
     const qrImage = await pdfDoc.embedPng(qrBuffer);
     const { width, height } = qrImage.scale(0.5);
 
+    // Calculate center position for QR code
+    const centerX = (page.getWidth() - width) / 2;
+    const centerY = 350; // Lowered from 400 to 350 to prevent overlap with text
+
     // Place the QR Code image
     page.drawImage(qrImage, {
-      x: 50,
-      y: 650,
+      x: centerX,
+      y: centerY,
       width,
       height,
     });
+
+    // Draw footer
+    centerText("© 2024 InvisiFeed. All rights reserved.", 50, 12, helveticaFont);
 
     // Serialize the PDFDocument to bytes
     return await pdfDoc.save();
