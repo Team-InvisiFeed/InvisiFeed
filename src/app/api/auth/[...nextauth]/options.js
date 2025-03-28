@@ -61,8 +61,8 @@ export const authOptions = {
         // Set initial tokens
         token.accessToken = generateAccessToken(user);
         token.refreshToken = generateRefreshToken(user);
-        token.accessTokenExpiry = Date.now() + 20 * 10000; // 20 seconds
-        token.refreshTokenExpiry = Date.now() + 60 * 10000; // 60 seconds
+        token.accessTokenExpiry = Date.now() + 15 * 60 * 1000; // 20 seconds
+        token.refreshTokenExpiry = Date.now() + 10 * 24 * 60 * 60 * 1000; // 60 seconds
       }
 
       // Handle token refresh
@@ -76,7 +76,7 @@ export const authOptions = {
             isVerified: token.isVerified,
             organizationName: token.organizationName,
           });
-          token.accessTokenExpiry = Date.now() + 20 * 10000;
+          token.accessTokenExpiry = Date.now() + 15 * 60 * 1000;
           token.refreshToken = generateRefreshToken({
             _id: token._id,
             email: token.email,
@@ -84,7 +84,7 @@ export const authOptions = {
             isVerified: token.isVerified,
             organizationName: token.organizationName,
           });
-          token.refreshTokenExpiry = Date.now() + 60 * 10000;
+          token.refreshTokenExpiry = Date.now() + 10 * 24 * 60 * 60 * 1000;
         }
       } else {
         // Both tokens expired, return null to force logout
@@ -132,7 +132,7 @@ function generateAccessToken(user) {
       organizationName: user.organizationName,
     },
     process.env.NEXTAUTH_SECRET,
-    { expiresIn: "10m" }
+    { expiresIn: "15m" }
   );
 }
 
@@ -146,6 +146,6 @@ function generateRefreshToken(user) {
       organizationName: user.organizationName,
     },
     process.env.NEXTAUTH_SECRET,
-    { expiresIn: "2d" }
+    { expiresIn: "10d" }
   );
 }
