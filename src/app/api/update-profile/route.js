@@ -9,11 +9,25 @@ export async function POST(req) {
   const decodedUsername = decodeURIComponent(username);
 
   try {
-    // Update the existing owner document without replacing it
+    // Handle nested address fields
+    let updateQuery = {};
+    
+    // If the update field contains a dot (.), it's a nested field
+    if (Object.keys(updates)[0].includes('.')) {
+      const [parentField, childField] = Object.keys(updates)[0].split('.');
+      updateQuery = {
+        [`${parentField}.${childField}`]: updates[Object.keys(updates)[0]]
+      };
+    } else {
+      // Handle top-level fields
+      updateQuery = updates;
+    }
+
+    // Update the existing owner document
     const updatedOwner = await OwnerModel.findOneAndUpdate(
-      { username: decodedUsername }, // Match condition
-      { $set: updates }, // Update only the fields provided in `updates`
-      { new: true } // Return the updated document
+      { username: decodedUsername },
+      { $set: updateQuery },
+      { new: true }
     );
 
     if (!updatedOwner) {
@@ -21,10 +35,20 @@ export async function POST(req) {
     }
 
     return Response.json(
-      { message: "Owner updated successfully", updatedOwner },
+      { 
+        message: "Profile updated successfully", 
+        data: updatedOwner 
+      },
       { status: 200 }
     );
   } catch (error) {
-    return Response.json({ message: error.message }, { status: 500 });
+    console.error("Error updating profile:", error);
+    return Response.json(
+      { 
+        message: "Failed to update profile", 
+        error: error.message 
+      }, 
+      { status: 500 }
+    );
   }
 }
