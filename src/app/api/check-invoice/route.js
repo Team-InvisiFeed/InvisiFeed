@@ -24,21 +24,29 @@ export async function POST(req) {
       );
     }
 
-    const invoiceId = await owner.invoiceIds.some(
-      (id) => id === decodedInvoiceNumber
-    );
-    console.log(invoiceId);
+    // Initialize invoices array if it doesn't exist
+    if (!owner.invoices) {
+      owner.invoices = [];
+    }
 
-    if (invoiceId === false) {
-      console.log("Invoice galat");
-      return Response.json(
-        { message: "Invoice Number invalid" },
-        { status: 404 }
-      );
+    // Find or create invoice entry
+    let invoice = owner.invoices.find(
+      (inv) => inv.invoiceId === decodedInvoiceNumber
+    );
+    if (!invoice) {
+      invoice = {
+        invoiceId: decodedInvoiceNumber,
+        AIuseCount: 0,
+      };
+      owner.invoices.push(invoice);
+      await owner.save();
     }
 
     return Response.json(
-      { message: "Invoice Number and Username verified" },
+      {
+        message: "Invoice Number and Username verified",
+        owner: owner,
+      },
       { status: 201 }
     );
   } catch (error) {
