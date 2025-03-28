@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -16,24 +16,26 @@ const InactivityPopup = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Hide popup on route change
+  // Reset hasShown when user returns to home page
   useEffect(() => {
-    setShowPopup(false);
+    if (pathname === "/") {
+      setHasShown(false);
+    }
   }, [pathname]);
 
+  const handleActivity = useCallback(() => {
+    setLastActivity(Date.now());
+  }, []);
+
+  const checkInactivity = useCallback(() => {
+    const inactiveTime = Date.now() - lastActivity;
+    if (inactiveTime >= 5000 && !hasShown && pathname === "/") {
+      setShowPopup(true);
+      setHasShown(true);
+    }
+  }, [lastActivity, hasShown, pathname]);
+
   useEffect(() => {
-    const handleActivity = () => {
-      setLastActivity(Date.now());
-    };
-
-    const checkInactivity = () => {
-      const inactiveTime = Date.now() - lastActivity;
-      if (inactiveTime >= 5000 && !hasShown) { // 15 seconds
-        setShowPopup(true);
-        setHasShown(true);
-      }
-    };
-
     // Add event listeners for user activity
     window.addEventListener("mousemove", handleActivity);
     window.addEventListener("keydown", handleActivity);
@@ -51,7 +53,7 @@ const InactivityPopup = () => {
       window.removeEventListener("scroll", handleActivity);
       clearInterval(interval);
     };
-  }, [lastActivity, hasShown]);
+  }, [handleActivity, checkInactivity]);
 
   const handleRegister = () => {
     setIsRegisterLoading(true);
@@ -64,6 +66,11 @@ const InactivityPopup = () => {
     setShowPopup(false);
     router.push("/sign-in");
   };
+
+  // Don't render the popup if not on home page
+  if (pathname !== "/") {
+    return null;
+  }
 
   return (
     <AnimatePresence>
