@@ -8,14 +8,11 @@ export async function POST(req) {
   const { username, invoiceNumber } = await req.json();
 
   const decodedUsername = decodeURIComponent(username);
-  console.log(decodedUsername);
 
   const decodedInvoiceNumber = decodeURIComponent(invoiceNumber);
-  console.log(decodedInvoiceNumber);
 
   try {
     const owner = await OwnerModel.findOne({ username: decodedUsername });
-    console.log("owner dekh : ", owner);
 
     if (!owner) {
       return Response.json(
@@ -33,6 +30,7 @@ export async function POST(req) {
     let invoice = owner.invoices.find(
       (inv) => inv.invoiceId === decodedInvoiceNumber
     );
+
     if (!invoice) {
       invoice = {
         invoiceId: decodedInvoiceNumber,
@@ -40,6 +38,11 @@ export async function POST(req) {
       };
       owner.invoices.push(invoice);
       await owner.save();
+    } else if (invoice && invoice.isFeedbackSubmitted) {
+      return Response.json(
+        { message: "Feedback already submitted" },
+        { status: 404 }
+      );
     }
 
     return Response.json(
