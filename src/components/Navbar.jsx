@@ -32,8 +32,8 @@ function Navbar() {
     <nav className="p-4 md:p-6 bg-[#0A0A0A] text-white shadow-lg border-b border-yellow-400/10">
       <div className="container mx-auto flex items-center justify-between">
         {/* Logo/Brand Name */}
-        <motion.a 
-          href="#home" 
+        <motion.a
+          href="#home"
           className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -75,13 +75,31 @@ function Navbar() {
               Home
             </Link>
           )}
-          <Link href="#about" className="text-gray-300 hover:text-yellow-400 transition-colors">
+          <Link
+            href="#about"
+            className="text-gray-300 hover:text-yellow-400 transition-colors"
+          >
             AboutUs
           </Link>
-          <Link href="#businesses" className="text-gray-300 hover:text-yellow-400 transition-colors">
-            Businesses
-          </Link>
-          <Link href="#contact" className="text-gray-300 hover:text-yellow-400 transition-colors">
+          {owner ? (
+            <motion.button
+              onClick={() =>
+                handleNavigation(`/user/${owner?.username}/ratings`)
+              }
+              className="text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Ratings
+            </motion.button>
+          ) : (
+            ""
+          )}
+
+          <Link
+            href="#contact"
+            className="text-gray-300 hover:text-yellow-400 transition-colors"
+          >
             ContactUs
           </Link>
         </div>
@@ -101,13 +119,15 @@ function Navbar() {
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Avatar className="cursor-pointer border-2 border-yellow-400 hover:border-yellow-300 transition-colors ring-2 ring-transparent hover:ring-yellow-400/20">
-                  <AvatarImage src={owner?.image || "https://github.com/shadcn.png"} />
+                  <AvatarImage
+                    src={owner?.image || "https://github.com/shadcn.png"}
+                  />
                   <AvatarFallback className="bg-[#0A0A0A] text-yellow-400 font-semibold">
                     {owner?.username?.charAt(0).toUpperCase() || "U"}
                   </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
-              <DropdownMenuContent 
+              <DropdownMenuContent
                 className="w-56 bg-[#0A0A0A] border border-yellow-400/10 rounded-lg shadow-lg shadow-yellow-500/10"
                 align="end"
                 sideOffset={5}
@@ -115,7 +135,9 @@ function Navbar() {
                 <div className="px-2 py-1.5 border-b border-yellow-400/10">
                   <div className="flex items-center space-x-2">
                     <Avatar className="h-8 w-8 border border-yellow-400/30">
-                      <AvatarImage src={owner?.image || "https://github.com/shadcn.png"} />
+                      <AvatarImage
+                        src={owner?.image || "https://github.com/shadcn.png"}
+                      />
                       <AvatarFallback className="bg-[#0A0A0A] text-yellow-400 text-sm">
                         {owner?.username?.charAt(0).toUpperCase() || "U"}
                       </AvatarFallback>
