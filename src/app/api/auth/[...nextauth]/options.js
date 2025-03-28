@@ -2,6 +2,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/dbConnect";
 import OwnerModel from "@/model/Owner";
+import jwt from "jsonwebtoken";
 
 export const authOptions = {
   providers: [
@@ -49,14 +50,47 @@ export const authOptions = {
   ],
 
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token._id = user._id?.toString();
         token.isVerified = user.isVerified;
         token.email = user.email;
         token.organizationName = user.organizationName;
         token.username = user.username;
+
+        // Set initial tokens
+        token.accessToken = generateAccessToken(user);
+        token.refreshToken = generateRefreshToken(user);
+        token.accessTokenExpiry = Date.now() + 20 * 10000; // 20 seconds
+        token.refreshTokenExpiry = Date.now() + 60 * 10000; // 60 seconds
       }
+
+      // Handle token refresh
+      if (Date.now() < token.refreshTokenExpiry) {
+        if (Date.now() > token.accessTokenExpiry) {
+          // Refresh access token
+          token.accessToken = generateAccessToken({
+            _id: token._id,
+            email: token.email,
+            username: token.username,
+            isVerified: token.isVerified,
+            organizationName: token.organizationName,
+          });
+          token.accessTokenExpiry = Date.now() + 20 * 10000;
+          token.refreshToken = generateRefreshToken({
+            _id: token._id,
+            email: token.email,
+            username: token.username,
+            isVerified: token.isVerified,
+            organizationName: token.organizationName,
+          });
+          token.refreshTokenExpiry = Date.now() + 60 * 10000;
+        }
+      } else {
+        // Both tokens expired, return null to force logout
+        return null;
+      }
+
       return token;
     },
 
@@ -67,6 +101,10 @@ export const authOptions = {
         session.user.email = token.email;
         session.user.organizationName = token.organizationName;
         session.user.username = token.username;
+        session.accessToken = token.accessToken;
+        session.refreshToken = token.refreshToken;
+        session.accessTokenExpiry = token.accessTokenExpiry;
+        session.refreshTokenExpiry = token.refreshTokenExpiry;
       }
       return session;
     },
@@ -82,3 +120,32 @@ export const authOptions = {
 
   secret: process.env.NEXTAUTH_SECRET,
 };
+
+// Helper functions to generate tokens
+function generateAccessToken(user) {
+  return jwt.sign(
+    {
+      _id: user._id,
+      email: user.email,
+      username: user.username,
+      isVerified: user.isVerified,
+      organizationName: user.organizationName,
+    },
+    process.env.NEXTAUTH_SECRET,
+    { expiresIn: "10m" }
+  );
+}
+
+function generateRefreshToken(user) {
+  return jwt.sign(
+    {
+      _id: user._id,
+      email: user.email,
+      username: user.username,
+      isVerified: user.isVerified,
+      organizationName: user.organizationName,
+    },
+    process.env.NEXTAUTH_SECRET,
+    { expiresIn: "2d" }
+  );
+}
