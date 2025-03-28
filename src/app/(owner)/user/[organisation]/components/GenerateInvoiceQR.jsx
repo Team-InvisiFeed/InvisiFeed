@@ -1,6 +1,8 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { motion } from "framer-motion";
+import { Upload, FileText, Download } from "lucide-react";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -47,13 +49,22 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <div className="flex flex-col items-center justify-center h-[80vh] w-[95%] max-w-5xl bg-white text-gray-800 shadow-md rounded-lg border border-gray-200 p-8">
-        <h1 className="text-2xl font-bold mb-6 text-center">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#0A0A0A] p-4">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="flex flex-col items-center justify-center w-full max-w-3xl bg-[#0A0A0A]/50 backdrop-blur-sm text-white shadow-xl rounded-xl border border-yellow-400/10 p-8"
+      >
+        <h1 className="text-2xl font-bold mb-2 text-center bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
           Upload PDF & Extract Invoice Number
         </h1>
+        <p className="text-gray-400 text-sm mb-8 text-center">
+          Upload your invoice PDF to generate a QR code and extract the invoice number
+        </p>
+
         {/* File Input Section */}
-        <div className="mb-6 flex flex-col items-center">
+        <div className="mb-8 flex flex-col items-center w-full">
           {/* Hidden File Input */}
           <input
             type="file"
@@ -65,48 +76,77 @@ export default function Home() {
           {/* Custom Button */}
           <label
             htmlFor="file-upload"
-            className="px-6 py-2 bg-blue-500 text-white rounded-lg cursor-pointer hover:bg-blue-600"
+            className="w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-lg cursor-pointer transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30"
           >
-            Choose File
+            <Upload className="h-5 w-5" />
+            <span>Choose PDF File</span>
           </label>
           {/* Display File Name */}
           {file && (
-            <p className="mt-2 text-gray-600 text-sm">
-              Selected File: <span className="font-medium">{file.name}</span>
-            </p>
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4 flex items-center space-x-2 text-gray-300"
+            >
+              <FileText className="h-4 w-4 text-yellow-400" />
+              <span className="text-sm">
+                Selected: <span className="font-medium text-yellow-400">{file.name}</span>
+              </span>
+            </motion.div>
           )}
         </div>
-        <button
+
+        <motion.button
           onClick={handleUpload}
-          className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
-          disabled={loading}
+          disabled={loading || !file}
+          className="w-full max-w-md px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-lg transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
-          {loading ? "Uploading..." : "Upload & Extract"}
-        </button>
+          {loading ? (
+            <div className="flex items-center justify-center space-x-2">
+              <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
+              <span>Processing...</span>
+            </div>
+          ) : (
+            "Upload & Extract"
+          )}
+        </motion.button>
 
         {invoiceNumber && (
-          <div className="mt-6 text-center">
-            <h2 className="text-lg font-bold mb-2">
-              Extracted Invoice Number:
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-8 p-4 bg-[#0A0A0A]/50 backdrop-blur-sm rounded-lg border border-yellow-400/10 w-full max-w-md"
+          >
+            <h2 className="text-lg font-semibold mb-2 text-yellow-400">
+              Extracted Invoice Number
             </h2>
-            <p className="text-green-600 text-xl">{invoiceNumber}</p>
-          </div>
+            <p className="text-2xl font-bold text-white">{invoiceNumber}</p>
+          </motion.div>
         )}
 
         {pdfUrl && (
-          <div className="mt-6 text-center">
-            <h2 className="text-lg font-bold mb-2">Final Processed PDF:</h2>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-8 p-4 bg-[#0A0A0A]/50 backdrop-blur-sm rounded-lg border border-yellow-400/10 w-full max-w-md"
+          >
+            <h2 className="text-lg font-semibold mb-4 text-yellow-400">
+              Processed PDF Ready
+            </h2>
             <a
               href={pdfUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 underline"
+              className="flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-lg transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30"
             >
-              Download PDF with QR Code
+              <Download className="h-5 w-5" />
+              <span>Download PDF with QR Code</span>
             </a>
-          </div>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }
