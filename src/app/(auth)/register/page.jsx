@@ -14,12 +14,13 @@ import { registerSchema } from "@/schemas/registerSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Country, State, City } from "country-state-city";
 import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
 
 function Page() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,6 +40,35 @@ function Page() {
   // Show Password State
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [isCountryOpen, setIsCountryOpen] = useState(false);
+  const [isStateOpen, setIsStateOpen] = useState(false);
+  const [isCityOpen, setIsCityOpen] = useState(false);
+  const countryRef = useRef(null);
+  const stateRef = useRef(null);
+  const cityRef = useRef(null);
+
+  const [searchCountry, setSearchCountry] = useState("");
+  const [searchState, setSearchState] = useState("");
+  const [searchCity, setSearchCity] = useState("");
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (countryRef.current && !countryRef.current.contains(event.target)) {
+        setIsCountryOpen(false);
+      }
+      if (stateRef.current && !stateRef.current.contains(event.target)) {
+        setIsStateOpen(false);
+      }
+      if (cityRef.current && !cityRef.current.contains(event.target)) {
+        setIsCityOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // ✅ Fetch Countries using country-state-city
   useEffect(() => {
@@ -80,6 +110,19 @@ function Page() {
       }
     }
   }, [selectedState, selectedCountry, states]);
+
+  // Filter functions
+  const filteredCountries = countries.filter(country =>
+    country.name.toLowerCase().includes(searchCountry.toLowerCase())
+  );
+
+  const filteredStates = states.filter(state =>
+    state.name.toLowerCase().includes(searchState.toLowerCase())
+  );
+
+  const filteredCities = cities.filter(city =>
+    city.name.toLowerCase().includes(searchCity.toLowerCase())
+  );
 
   // ✅ Form Setup
   const form = useForm({
@@ -145,259 +188,422 @@ function Page() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-white">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6 text-gray-900">
-            Join InvisiFeed
+    <div className="flex h-screen overflow-hidden">
+      {/* Left Section with Gradient */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#000000] p-8 flex-col justify-center items-center text-white">
+        <div className="max-w-md space-y-4">
+          <h1 className="text-4xl font-extrabold tracking-tight">
+            InvisiFeed
           </h1>
-          <p className="mb-4 text-gray-600">
-            Start your journey to honest, anonymous feedback
+          <p className="text-lg text-gray-200">
+            Transform your organization with honest, anonymous feedback
           </p>
+          <div className="space-y-3 mt-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+              <p>Secure and anonymous feedback system</p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+              <p>Real-time insights and analytics</p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+              <p>Build a culture of trust and transparency</p>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Step 1: Organisation Details */}
-            {step === 1 && (
-              <>
-                {/* Organisation Name */}
-                <FormField
-                  control={form.control}
-                  name="organizationName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter Organisation Name"
-                          {...field}
-                          className="bg-white text-gray-900 border-gray-300"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="phoneNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter Phone Number"
-                          {...field}
-                          className="bg-white text-gray-900 border-gray-300"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+      {/* Right Section with Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-[#0A0A0A]">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="w-full max-w-md space-y-4"
+        >
+          <div className="text-center">
+            <h1 className="text-2xl font-bold tracking-tight text-white">
+              Create Account
+            </h1>
+            <p className="mt-1 text-sm text-gray-400">
+              Join InvisiFeed and start your journey
+            </p>
+          </div>
 
-                {/* Country Dropdown */}
-                <select
-                  value={selectedCountry}
-                  onChange={(e) => setSelectedCountry(e.target.value)}
-                  className="w-full p-2 border rounded bg-white text-gray-900 border-gray-300 cursor-pointer"
-                >
-                  <option value="">Select Country</option>
-                  {countries.map((country) => (
-                    <option key={country.isoCode} value={country.name}>
-                      {country.name}
-                    </option>
-                  ))}
-                </select>
-
-                {/* State Dropdown */}
-                <select
-                  value={selectedState}
-                  onChange={(e) => setSelectedState(e.target.value)}
-                  className="w-full p-2 border rounded bg-white text-gray-900 border-gray-300 cursor-pointer"
-                  disabled={!selectedCountry}
-                >
-                  <option value="">Select State</option>
-                  {states.map((state) => (
-                    <option key={state.isoCode} value={state.name}>
-                      {state.name}
-                    </option>
-                  ))}
-                </select>
-
-                {/* City Dropdown */}
-                <select
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.target.value)}
-                  className="w-full p-2 border rounded bg-white text-gray-900 border-gray-300 cursor-pointer"
-                  disabled={!selectedState}
-                >
-                  <option value="">Select City</option>
-                  {cities.map((city) => (
-                    <option key={city.name} value={city.name}>
-                      {city.name}
-                    </option>
-                  ))}
-                </select>
-
-                {/* Local Address */}
-                <Input
-                  value={localAddress}
-                  onChange={(e) => setLocalAddress(e.target.value)}
-                  placeholder="Enter Local Address"
-                  className="w-full p-2 border rounded bg-white text-gray-900 border-gray-300"
-                />
-
-                {/* Pincode */}
-                <Input
-                  value={pincode}
-                  onChange={(e) => setPincode(e.target.value)}
-                  placeholder="Enter Pincode"
-                  className="w-full p-2 border rounded bg-white text-gray-900 border-gray-300"
-                />
-
-                {/* Next Button */}
-                <Button
-                  type="button"
-                  onClick={handleNext}
-                  disabled={isSubmitting}
-                  className="w-full bg-gray-900 hover:bg-gray-700 text-white cursor-pointer"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Please wait
-                    </>
-                  ) : (
-                    "Next"
-                  )}
-                </Button>
-              </>
-            )}
-
-            {/* Step 2: User Credentials */}
-            {step === 2 && (
-              <>
-                <div className="flex justify-start mb-4">
-                  <button
-                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
-                    onClick={() => setStep(1)}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <AnimatePresence mode="wait">
+                {step === 1 && (
+                  <motion.div
+                    key="step1"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-4"
                   >
-                    <IoIosArrowBack className="h-5 w-5 cursor-pointer" />
-                    Back
-                  </button>
-                </div>
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter Email"
-                          {...field}
-                          className="bg-white text-gray-900 border-gray-300"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter Username"
-                          {...field}
-                          className="bg-white text-gray-900 border-gray-300"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <div className="relative">
-                          <Input
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Enter Password"
-                            {...field}
-                            className="bg-white text-gray-900 border-gray-300"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
-                          >
-                            {showPassword ? (
-                              <EyeOff className="h-5 w-5 text-gray-400" />
-                            ) : (
-                              <Eye className="h-5 w-5 text-gray-400" />
-                            )}
-                          </button>
+                    <FormField
+                      control={form.control}
+                      name="organizationName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter Organisation Name"
+                              {...field}
+                              className="bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9"
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="phoneNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter Phone Number"
+                              {...field}
+                              className="bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9"
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs" />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Country Dropdown */}
+                    <div className="relative" ref={countryRef}>
+                      <div
+                        onClick={() => setIsCountryOpen(!isCountryOpen)}
+                        className="w-full p-2 border rounded bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200"
+                      >
+                        <span className={selectedCountry ? "text-white" : "text-gray-400"}>
+                          {selectedCountry || "Select Country"}
+                        </span>
+                        <svg 
+                          className={`w-4 h-4 text-yellow-400/50 transition-transform duration-200 ${isCountryOpen ? 'rotate-180' : ''}`} 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                      {isCountryOpen && (
+                        <div className="absolute z-50 w-full mt-1 bg-[#0A0A0A]/95 backdrop-blur-md border border-yellow-400/10 rounded-md shadow-lg shadow-black/20 max-h-60 overflow-hidden">
+                          <div className="sticky top-0 bg-[#0A0A0A]/95 p-2 border-b border-yellow-400/10">
+                            <input
+                              type="text"
+                              placeholder="Search country..."
+                              value={searchCountry}
+                              onChange={(e) => setSearchCountry(e.target.value)}
+                              className="w-full p-1.5 text-sm bg-[#0A0A0A]/50 border border-yellow-400/10 rounded text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400/30"
+                              autoFocus
+                            />
+                          </div>
+                          <div className="overflow-auto max-h-[200px] scrollbar-thin scrollbar-thumb-yellow-400/20 scrollbar-track-transparent">
+                            {filteredCountries.map((country) => (
+                              <div
+                                key={country.isoCode}
+                                onClick={() => {
+                                  setSelectedCountry(country.name);
+                                  setIsCountryOpen(false);
+                                  setSearchCountry("");
+                                }}
+                                className={`px-3 py-2 cursor-pointer text-white hover:bg-yellow-400/10 transition-all duration-150 border-b border-yellow-400/5 last:border-0 ${
+                                  selectedCountry === country.name ? "bg-yellow-400/20" : ""
+                                }`}
+                              >
+                                {country.name}
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <div className="relative">
-                          <Input
-                            type={showConfirmPassword ? "text" : "password"}
-                            placeholder="Confirm Password"
-                            {...field}
-                            className="bg-white text-gray-900 border-gray-300"
-                          />
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setShowConfirmPassword(!showConfirmPassword)
-                            }
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                      )}
+                    </div>
+
+                    {/* State and City Grid */}
+                    <div className="grid grid-cols-2 gap-4">
+                      {/* State Dropdown */}
+                      <div className="relative" ref={stateRef}>
+                        <div
+                          onClick={() => !selectedCountry || setIsStateOpen(!isStateOpen)}
+                          className={`w-full p-2 border rounded bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200 ${
+                            !selectedCountry ? "opacity-50 cursor-not-allowed" : ""
+                          }`}
+                        >
+                          <span className={selectedState ? "text-white" : "text-gray-400"}>
+                            {selectedState || "Select State"}
+                          </span>
+                          <svg 
+                            className={`w-4 h-4 text-yellow-400/50 transition-transform duration-200 ${isStateOpen ? 'rotate-180' : ''}`} 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
                           >
-                            {showConfirmPassword ? (
-                              <EyeOff className="h-5 w-5 text-gray-400" />
-                            ) : (
-                              <Eye className="h-5 w-5 text-gray-400" />
-                            )}
-                          </button>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
                         </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-gray-900 hover:bg-gray-700 text-white cursor-pointer"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Please wait
-                    </>
-                  ) : (
-                    "Sign Up"
-                  )}
-                </Button>
-              </>
-            )}
-          </form>
-        </Form>
+                        {isStateOpen && selectedCountry && (
+                          <div className="absolute z-50 w-full mt-1 bg-[#0A0A0A]/95 backdrop-blur-md border border-yellow-400/10 rounded-md shadow-lg shadow-black/20 max-h-60 overflow-hidden">
+                            <div className="sticky top-0 bg-[#0A0A0A]/95 p-2 border-b border-yellow-400/10">
+                              <input
+                                type="text"
+                                placeholder="Search state..."
+                                value={searchState}
+                                onChange={(e) => setSearchState(e.target.value)}
+                                className="w-full p-1.5 text-sm bg-[#0A0A0A]/50 border border-yellow-400/10 rounded text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400/30"
+                                autoFocus
+                              />
+                            </div>
+                            <div className="overflow-auto max-h-[200px] scrollbar-thin scrollbar-thumb-yellow-400/20 scrollbar-track-transparent">
+                              {filteredStates.map((state) => (
+                                <div
+                                  key={state.isoCode}
+                                  onClick={() => {
+                                    setSelectedState(state.name);
+                                    setIsStateOpen(false);
+                                    setSearchState("");
+                                  }}
+                                  className={`px-3 py-2 cursor-pointer text-white hover:bg-yellow-400/10 transition-all duration-150 border-b border-yellow-400/5 last:border-0 ${
+                                    selectedState === state.name ? "bg-yellow-400/20" : ""
+                                  }`}
+                                >
+                                  {state.name}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* City Dropdown */}
+                      <div className="relative" ref={cityRef}>
+                        <div
+                          onClick={() => !selectedState || setIsCityOpen(!isCityOpen)}
+                          className={`w-full p-2 border rounded bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200 ${
+                            !selectedState ? "opacity-50 cursor-not-allowed" : ""
+                          }`}
+                        >
+                          <span className={selectedCity ? "text-white" : "text-gray-400"}>
+                            {selectedCity || "Select City"}
+                          </span>
+                          <svg 
+                            className={`w-4 h-4 text-yellow-400/50 transition-transform duration-200 ${isCityOpen ? 'rotate-180' : ''}`} 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
+                        {isCityOpen && selectedState && (
+                          <div className="absolute z-50 w-full mt-1 bg-[#0A0A0A]/95 backdrop-blur-md border border-yellow-400/10 rounded-md shadow-lg shadow-black/20 max-h-60 overflow-hidden">
+                            <div className="sticky top-0 bg-[#0A0A0A]/95 p-2 border-b border-yellow-400/10">
+                              <input
+                                type="text"
+                                placeholder="Search city..."
+                                value={searchCity}
+                                onChange={(e) => setSearchCity(e.target.value)}
+                                className="w-full p-1.5 text-sm bg-[#0A0A0A]/50 border border-yellow-400/10 rounded text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400/30"
+                                autoFocus
+                              />
+                            </div>
+                            <div className="overflow-auto max-h-[200px] scrollbar-thin scrollbar-thumb-yellow-400/20 scrollbar-track-transparent">
+                              {filteredCities.map((city) => (
+                                <div
+                                  key={city.name}
+                                  onClick={() => {
+                                    setSelectedCity(city.name);
+                                    setIsCityOpen(false);
+                                    setSearchCity("");
+                                  }}
+                                  className={`px-3 py-2 cursor-pointer text-white hover:bg-yellow-400/10 transition-all duration-150 border-b border-yellow-400/5 last:border-0 ${
+                                    selectedCity === city.name ? "bg-yellow-400/20" : ""
+                                  }`}
+                                >
+                                  {city.name}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Local Address */}
+                    <Input
+                      value={localAddress}
+                      onChange={(e) => setLocalAddress(e.target.value)}
+                      placeholder="Enter Local Address"
+                      className="w-full p-2 border rounded bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9"
+                    />
+
+                    {/* Pincode */}
+                    <Input
+                      value={pincode}
+                      onChange={(e) => setPincode(e.target.value)}
+                      placeholder="Enter Pincode"
+                      className="w-full p-2 border rounded bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9"
+                    />
+
+                    {/* Next Button */}
+                    <Button
+                      type="button"
+                      onClick={handleNext}
+                      disabled={isSubmitting}
+                      className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium cursor-pointer h-9 shadow-lg shadow-yellow-500/20"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Please wait
+                        </>
+                      ) : (
+                        "Next"
+                      )}
+                    </Button>
+                  </motion.div>
+                )}
+
+                {step === 2 && (
+                  <motion.div
+                    key="step2"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-4"
+                  >
+                    <div className="flex justify-start mb-2">
+                      <button
+                        className="flex items-center gap-2 text-gray-400 hover:text-white text-sm"
+                        onClick={() => setStep(1)}
+                      >
+                        <IoIosArrowBack className="h-4 w-4 cursor-pointer" />
+                        Back
+                      </button>
+                    </div>
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter Email"
+                              {...field}
+                              className="bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9"
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter Username"
+                              {...field}
+                              className="bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9"
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <div className="relative">
+                              <Input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Enter Password"
+                                {...field}
+                                className="bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                              >
+                                {showPassword ? (
+                                  <EyeOff className="h-4 w-4 text-gray-400" />
+                                ) : (
+                                  <Eye className="h-4 w-4 text-gray-400" />
+                                )}
+                              </button>
+                            </div>
+                          </FormControl>
+                          <FormMessage className="text-xs" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="confirmPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <div className="relative">
+                              <Input
+                                type={showConfirmPassword ? "text" : "password"}
+                                placeholder="Confirm Password"
+                                {...field}
+                                className="bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9"
+                              />
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setShowConfirmPassword(!showConfirmPassword)
+                                }
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                              >
+                                {showConfirmPassword ? (
+                                  <EyeOff className="h-4 w-4 text-gray-400" />
+                                ) : (
+                                  <Eye className="h-4 w-4 text-gray-400" />
+                                )}
+                              </button>
+                            </div>
+                          </FormControl>
+                          <FormMessage className="text-xs" />
+                        </FormItem>
+                      )}
+                    />
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium cursor-pointer h-9 shadow-lg shadow-yellow-500/20"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Please wait
+                        </>
+                      ) : (
+                        "Sign Up"
+                      )}
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </form>
+          </Form>
+        </motion.div>
       </div>
     </div>
   );
