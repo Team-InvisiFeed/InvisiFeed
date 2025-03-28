@@ -71,9 +71,8 @@ export async function POST(req) {
         isVerified: false,
         phoneNumber,
         address: { localAddress, city, state, country, pincode },
-
         feedbacks: [],
-        invoiceIds: [],
+        invoices: [], // Initialize empty invoices array instead of invoiceIds
       });
 
       await newUser.save();
