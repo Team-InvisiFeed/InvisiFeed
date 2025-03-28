@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Sparkles, Wand2 } from "lucide-react";
+import { Sparkles, Wand2, Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import axios from "axios";
+import { motion } from "framer-motion";
 
 const emojiOptions = [
   { value: 1, emoji: "😡", label: "Very Dissatisfied" },
@@ -20,7 +21,7 @@ const emojiOptions = [
 ];
 
 export default function FeedbackForm() {
-  const params = useParams(); // Get dynamic params
+  const params = useParams();
   const { username, invoiceNumber } = params;
 
   const [formData, setFormData] = useState({
@@ -48,11 +49,7 @@ export default function FeedbackForm() {
         username,
         invoiceNumber,
       });
-      console.log(response);
       setInvalidInvoice(false);
-      // if (response.status === 404) {
-      //
-      // }
     } catch (error) {
       if (error.response && error.response.status === 404) {
         setInvalidInvoice(true);
@@ -70,17 +67,15 @@ export default function FeedbackForm() {
     try {
       e.preventDefault();
       const response = await axios.post("/api/submit-feedback", payload);
-
-      if (response.status == 400) {
-      }
-      toast("Feedback submitted successfully!");
-    } catch (error) {}
+      toast.success("Feedback submitted successfully!");
+    } catch (error) {
+      toast.error("Failed to submit feedback. Please try again.");
+    }
   };
 
   const generateFeedbackAI = async () => {
     try {
       setLoading(true);
-
       const response = await fetch("/api/generate-feedback", {
         method: "POST",
         headers: {
@@ -100,13 +95,13 @@ export default function FeedbackForm() {
 
       if (response.ok) {
         handleChange("feedbackContent", data.feedback);
-        toast("AI-generated feedback added!");
+        toast.success("AI-generated feedback added!");
       } else {
-        toast(data.message || "Failed to generate feedback");
+        toast.error(data.message || "Failed to generate feedback");
       }
     } catch (error) {
       console.error("Error generating feedback:", error);
-      toast("Something went wrong!");
+      toast.error("Something went wrong!");
     } finally {
       setLoading(false);
     }
@@ -114,22 +109,46 @@ export default function FeedbackForm() {
 
   const generateSuggestionsAI = () => {
     handleChange("suggestionContent", "Offer more flexible payment options.");
-    toast("AI-generated suggestion added!");
+    toast.success("AI-generated suggestion added!");
   };
 
+  if (invalidInvoice === null) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="flex items-center space-x-2 text-yellow-400">
+          <Loader2 className="w-6 h-6 animate-spin" />
+          <span>Checking Invoice...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (invalidInvoice === true) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-400 mb-2">Invalid Invoice</h2>
+          <p className="text-gray-400">Please check your invoice number and try again.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      {invalidInvoice === null && <div>Checking Invoice...</div>}
-      {invalidInvoice === true && <div>Invalid invoice</div>}
-      {invalidInvoice === false && (
-        <Card className="w-full max-w-lg mx-auto p-4">
-          <CardHeader>
-            <CardTitle className="text-xl font-semibold">
+    <div className="min-h-screen bg-[#0A0A0A] py-6 sm:py-12 px-3 sm:px-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Card className="w-full max-w-2xl mx-auto bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/20">
+          <CardHeader className="border-b border-yellow-400/20 px-4 sm:px-6">
+            <CardTitle className="text-xl sm:text-2xl font-bold text-yellow-400">
               Service Feedback
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <CardContent className="p-4 sm:p-6">
+            <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
               {/* Rating Fields */}
               {[
                 { key: "satisfactionRating", label: "Overall Satisfaction" },
@@ -138,92 +157,113 @@ export default function FeedbackForm() {
                 { key: "valueForMoneyRating", label: "Value for Money" },
                 { key: "recommendRating", label: "Likelihood to Recommend" },
                 { key: "overAllRating", label: "Overall Rating" },
-              ].map(({ key, label }) => (
-                <div key={key}>
-                  <Label className="block mb-2 font-medium">{label}</Label>
-                  <div className="flex gap-3">
+              ].map(({ key, label }, index) => (
+                <motion.div
+                  key={key}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Label className="block mb-2 sm:mb-3 text-base sm:text-lg font-medium text-gray-200">{label}</Label>
+                  <div className="flex gap-2 sm:gap-4 overflow-x-auto pb-2 -mx-1 px-1 sm:mx-0 sm:px-0">
                     {emojiOptions.map((option) => (
                       <button
                         key={option.value}
                         type="button"
                         onClick={() => handleChange(key, option.value)}
-                        className={`text-2xl transition-transform duration-200 ${
+                        className={`text-2xl sm:text-3xl transition-all duration-200 flex-shrink-0 ${
                           formData[key] === option.value
-                            ? "scale-125 bg-gray-200 rounded-full"
-                            : "opacity-70 hover:scale-110"
+                            ? "bg-yellow-400/5 rounded-full p-1 border border-yellow-400/10"
+                            : "opacity-80 hover:opacity-100"
                         }`}
                       >
                         {option.emoji}
                       </button>
                     ))}
                   </div>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-xs sm:text-sm text-yellow-400/80 mt-1 sm:mt-2 block">
                     {emojiOptions.find((e) => e.value === formData[key])?.label}
                   </span>
-                </div>
+                </motion.div>
               ))}
 
               {/* Custom Feedback */}
-              <div className="relative">
-                <Label className="block mb-2 font-medium">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.6 }}
+                className="relative"
+              >
+                <Label className="block mb-2 sm:mb-3 text-base sm:text-lg font-medium text-gray-200">
                   Additional Feedback
                 </Label>
                 <Textarea
                   placeholder="Share your thoughts here..."
                   value={formData.feedbackContent}
-                  onChange={(e) =>
-                    handleChange("feedbackContent", e.target.value)
-                  }
-                  className="min-h-[100px]"
+                  onChange={(e) => handleChange("feedbackContent", e.target.value)}
+                  className="min-h-[100px] sm:min-h-[120px] bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20 text-sm sm:text-base"
                 />
                 <Button
                   type="button"
                   onClick={generateFeedbackAI}
-                  className="absolute top-1 right-1 p-2"
+                  className="absolute top-1 right-1 p-1.5 sm:p-2 bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 border-yellow-400/20"
                   variant="ghost"
                   title="Generate Feedback using AI"
                   disabled={loading}
                 >
                   {loading ? (
-                    <div className="animate-spin h-5 w-5 border-t-2 border-gray-500 rounded-full"></div>
+                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
                   ) : (
-                    <Wand2 size={20} />
+                    <Wand2 size={16} className="sm:w-5 sm:h-5" />
                   )}
                 </Button>
-              </div>
+              </motion.div>
 
               {/* Suggestions */}
-              <div className="relative">
-                <Label className="block mb-2 font-medium">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.7 }}
+                className="relative"
+              >
+                <Label className="block mb-2 sm:mb-3 text-base sm:text-lg font-medium text-gray-200">
                   Any Suggestions?
                 </Label>
                 <Input
                   type="text"
                   placeholder="Let us know how we can improve..."
                   value={formData.suggestionContent}
-                  onChange={(e) =>
-                    handleChange("suggestionContent", e.target.value)
-                  }
+                  onChange={(e) => handleChange("suggestionContent", e.target.value)}
+                  className="bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20 text-sm sm:text-base"
                 />
                 <Button
                   type="button"
                   onClick={generateSuggestionsAI}
-                  className="absolute top-1 right-1 p-2"
+                  className="absolute top-1 right-1 p-1.5 sm:p-2 bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 border-yellow-400/20"
                   variant="ghost"
                   title="Generate Suggestion using AI"
                 >
-                  <Sparkles size={20} />
+                  <Sparkles size={16} className="sm:w-5 sm:h-5" />
                 </Button>
-              </div>
+              </motion.div>
 
               {/* Submit Button */}
-              <Button type="submit" className="w-full">
-                Submit Feedback
-              </Button>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.8 }}
+              >
+                <Button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold py-4 sm:py-6 rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 text-sm sm:text-base"
+                >
+                  Submit Feedback
+                </Button>
+              </motion.div>
             </form>
           </CardContent>
         </Card>
-      )}
+      </motion.div>
     </div>
   );
 }
