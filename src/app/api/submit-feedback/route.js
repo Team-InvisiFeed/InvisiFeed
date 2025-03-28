@@ -20,17 +20,25 @@ export async function POST(req) {
       throw new ApiError(404, "Organisation not found");
     }
 
-    const invoiceId = await owner.invoiceIds.some(
-      (id) => id === decodedInvoiceNumber
+    // Initialize invoices array if it doesn't exist
+    if (!owner.invoices) {
+      owner.invoices = [];
+    }
+
+    // Find the invoice
+    const invoice = owner.invoices.find(
+      (inv) => inv.invoiceId === decodedInvoiceNumber
     );
 
-    if (invoiceId) {
-      owner.feedbacks.push(formData);
+    if (invoice) {
+      // Add feedback to the invoice
+      if (!invoice.feedbacks) {
+        invoice.feedbacks = [];
+      }
+      invoice.feedbacks.push(formData);
       await owner.save();
-      await OwnerModel.updateOne(
-        { _id: owner._id },
-        { $pull: { invoiceIds: decodedInvoiceNumber } }
-      );
+    } else {
+      throw new ApiError(404, "Invoice not found");
     }
 
     return Response.json(
