@@ -105,7 +105,7 @@ export async function POST(req) {
           {
             folder: "pdf_uploads",
             resource_type: "raw",
-            public_id: `invoice_with_qr_${sanitizedInvoiceNumber}`,
+            public_id: `invoice_${sanitizedInvoiceNumber}_${username}_${Date.now()}`,
             format: "pdf",
             context: "ttl=20",
           },
