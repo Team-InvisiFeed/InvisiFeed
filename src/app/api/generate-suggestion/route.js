@@ -9,13 +9,17 @@ export async function POST(req) {
     const body = await req.json();
     console.log(body);
 
+    // Decode the encoded parameters
+    const decodedUsername = decodeURIComponent(body.username);
+    const decodedInvoiceNumber = decodeURIComponent(body.invoiceNumber);
+
     // Connect to database
     await dbConnect();
 
     // Find the owner and check AI usage count
     const owner = await OwnerModel.findOne({
-      username: body.username,
-      "invoices.invoiceId": body.invoiceNumber,
+      username: decodedUsername,
+      "invoices.invoiceId": decodedInvoiceNumber,
     });
 
     if (!owner) {
@@ -26,7 +30,7 @@ export async function POST(req) {
     }
 
     const invoice = owner.invoices.find(
-      (inv) => inv.invoiceId === body.invoiceNumber
+      (inv) => inv.invoiceId === decodedInvoiceNumber
     );
 
     if (invoice.AIuseCount >= 3) {
