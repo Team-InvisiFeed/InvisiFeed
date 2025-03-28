@@ -50,7 +50,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#0A0A0A] p-4">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -60,7 +60,8 @@ export default function Home() {
           Upload PDF & Extract Invoice Number
         </h1>
         <p className="text-gray-400 text-sm mb-8 text-center">
-          Upload your invoice PDF to generate a QR code and extract the invoice number
+          Upload your invoice PDF to generate a QR code and extract the invoice
+          number
         </p>
 
         {/* File Input Section */}
@@ -83,14 +84,15 @@ export default function Home() {
           </label>
           {/* Display File Name */}
           {file && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="mt-4 flex items-center space-x-2 text-gray-300"
             >
               <FileText className="h-4 w-4 text-yellow-400" />
               <span className="text-sm">
-                Selected: <span className="font-medium text-yellow-400">{file.name}</span>
+                Selected:{" "}
+                <span className="font-medium text-yellow-400">{file.name}</span>
               </span>
             </motion.div>
           )}
@@ -114,7 +116,7 @@ export default function Home() {
         </motion.button>
 
         {invoiceNumber && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="mt-8 p-4 bg-[#0A0A0A]/50 backdrop-blur-sm rounded-lg border border-yellow-400/10 w-full max-w-md"
@@ -127,7 +129,7 @@ export default function Home() {
         )}
 
         {pdfUrl && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="mt-8 p-4 bg-[#0A0A0A]/50 backdrop-blur-sm rounded-lg border border-yellow-400/10 w-full max-w-md"
