@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -10,7 +10,6 @@ import { useRouter, usePathname } from "next/navigation";
 const InactivityPopup = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [hasShown, setHasShown] = useState(false);
-  const [lastActivity, setLastActivity] = useState(Date.now());
   const [isRegisterLoading, setIsRegisterLoading] = useState(false);
   const [isSignInLoading, setIsSignInLoading] = useState(false);
   const router = useRouter();
@@ -23,37 +22,23 @@ const InactivityPopup = () => {
     }
   }, [pathname]);
 
-  const handleActivity = useCallback(() => {
-    setLastActivity(Date.now());
-  }, []);
-
-  const checkInactivity = useCallback(() => {
-    const inactiveTime = Date.now() - lastActivity;
-    if (inactiveTime >= 5000 && !hasShown && pathname === "/") {
-      setShowPopup(true);
-      setHasShown(true);
-    }
-  }, [lastActivity, hasShown, pathname]);
-
+  // Show popup after 5 seconds on home page
   useEffect(() => {
-    // Add event listeners for user activity
-    window.addEventListener("mousemove", handleActivity);
-    window.addEventListener("keydown", handleActivity);
-    window.addEventListener("click", handleActivity);
-    window.addEventListener("scroll", handleActivity);
+    let timeoutId;
+    
+    if (pathname === "/" && !hasShown) {
+      timeoutId = setTimeout(() => {
+        setShowPopup(true);
+        setHasShown(true);
+      }, 5000);
+    }
 
-    // Check for inactivity every second
-    const interval = setInterval(checkInactivity, 1000);
-
-    // Cleanup
     return () => {
-      window.removeEventListener("mousemove", handleActivity);
-      window.removeEventListener("keydown", handleActivity);
-      window.removeEventListener("click", handleActivity);
-      window.removeEventListener("scroll", handleActivity);
-      clearInterval(interval);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
     };
-  }, [handleActivity, checkInactivity]);
+  }, [pathname, hasShown]);
 
   const handleRegister = () => {
     setIsRegisterLoading(true);
