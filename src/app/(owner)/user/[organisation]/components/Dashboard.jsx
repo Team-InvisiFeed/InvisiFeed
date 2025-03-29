@@ -104,7 +104,7 @@ const Dashboard = () => {
     if (!metrics) return [];
     return [
       {
-        name: "Feedback Ratio",
+        name: "Feedbacks",
         value: metrics.feedbackRatio,
         fill: "#EAB308",
       },
@@ -350,7 +350,7 @@ const Dashboard = () => {
                                       "0 0 10px rgba(234, 179, 8, 0.5)",
                                   }}
                                 >
-                                  {metrics.feedbackRatio}%
+                                  {Math.round(metrics.feedbackRatio * 10) / 10}%
                                 </tspan>
                                 <tspan
                                   x={viewBox.cx}
@@ -392,7 +392,7 @@ const Dashboard = () => {
                 Feedback Sentiment
               </CardTitle>
               <CardDescription className="text-sm">
-                Positive vs Negative Feedback Ratio
+                Positive vs Negative Feedback
               </CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-2">
@@ -436,7 +436,7 @@ const Dashboard = () => {
                                       "0 0 10px rgba(234, 179, 8, 0.5)",
                                   }}
                                 >
-                                  {metrics.positiveNegativeRatio.toFixed(1)}
+                                  {Math.round((metrics.positiveNegativeRatio / (1 + metrics.positiveNegativeRatio)) * 100 * 10) / 10}%
                                 </tspan>
                                 <tspan
                                   x={viewBox.cx}
@@ -627,13 +627,13 @@ const Dashboard = () => {
                 <span className="text-sm text-gray-400">
                   Worst: {metrics.worstPerforming.metric}
                 </span>
-                <span className="text-sm text-red-400">
+                <span className="text-sm text-gray-100">
                   {metrics.worstPerforming.rating}/5
                 </span>
               </div>
               <Progress
                 value={(metrics.worstPerforming.rating / 5) * 100}
-                className="h-2 bg-gray-800 [&>div]:bg-red-400"
+                className="h-2 bg-gray-800 [&>div]:bg-gray-100"
               />
             </div>
           </CardContent>
