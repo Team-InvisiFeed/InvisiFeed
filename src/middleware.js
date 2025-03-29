@@ -28,12 +28,19 @@ export async function middleware(request) {
     }
   }
 
+  // Redirect logged-in users from home page to their user page
+  if (token && url.pathname === "/") {
+    return NextResponse.redirect(
+      new URL(`/user/${token.username}`, request.url)
+    );
+  }
+
   if (
     token &&
     (url.pathname.startsWith("/sign-in") ||
       url.pathname.startsWith("/register") ||
-      url.pathname.startsWith("/verify"))
-  ) {
+      url.pathname.startsWith("/verify")
+   )) {
     return NextResponse.redirect(
       new URL(`/user/${token.username}`, request.url)
     );
