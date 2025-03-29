@@ -101,7 +101,7 @@ export default function UserRatingsGraph() {
                 </div>
                 <Progress
                   value={(ratings.averageRatings[key] / 5) * 100}
-                  className="h-2 bg-gray-800"
+                  className="h-2 bg-gray-300 [&>div]:bg-yellow-400"
                 />
               </div>
             ))}
