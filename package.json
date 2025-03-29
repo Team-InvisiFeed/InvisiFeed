@@ -45,7 +45,7 @@
     "pdf-lib": "^1.17.1",
     "pdf-merger-js": "^5.1.2",
     "pdf-parse": "^1.1.1",
-    "pdfjs-dist": "^2.16.105",
+    "pdfjs-dist": "^4.2.67",
     "pdfkit": "^0.16.0",
     "qrcode": "^1.5.4",
     "react": "^19.0.0",
