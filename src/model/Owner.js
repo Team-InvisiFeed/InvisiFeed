@@ -129,6 +129,24 @@ const OwnerSchema = new Schema({
   },
   feedbacks: [FeedbackSchema],
   invoices: [InvoiceSchema],
+  uploadedInvoiceCount: {
+    count: {
+      type: Number,
+      default: 0
+    },
+    lastUpdated: {
+      type: Date,
+      default: Date.now
+    },
+    dailyUploads: {
+      type: Number,
+      default: 0
+    },
+    lastDailyReset: {
+      type: Date,
+      default: Date.now
+    }
+  },
 });
 
 // Add compound unique index for invoices
