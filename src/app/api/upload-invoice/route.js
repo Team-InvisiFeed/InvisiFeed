@@ -97,7 +97,7 @@ export async function POST(req) {
           {
             folder: "pdf_uploads",
             resource_type: "raw",
-            public_id: file.name.split(".")[0],
+            public_id: `${file.name.split(".")[0]}_${username}_${Date.now()}`,
             format: "pdf",
           },
           (error, result) => (error ? reject(error) : resolve(result))
