@@ -1,6 +1,6 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Upload, FileText, Download } from "lucide-react";
 
@@ -12,6 +12,34 @@ export default function Home() {
   const [pdfUrl, setPdfUrl] = useState("");
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [loading, setLoading] = useState(false);
+  const [dailyUploads, setDailyUploads] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(null);
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  // Fetch initial upload count
+  useEffect(() => {
+    const fetchUploadCount = async () => {
+      if (!owner?.username) return;
+      
+      try {
+        const res = await fetch(`/api/upload-count?username=${owner.username}`);
+        const data = await res.json();
+        
+        if (data.success) {
+          setDailyUploads(data.dailyUploads);
+          if (data.timeLeft) {
+            setTimeLeft(data.timeLeft);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching upload count:", error);
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+
+    fetchUploadCount();
+  }, [owner?.username]);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -36,10 +64,16 @@ export default function Home() {
 
       const data = await res.json();
       if (data.error) {
-        alert(`Error: ${data.error}`);
+        if (res.status === 429) {
+          setTimeLeft(data.timeLeft);
+          alert(`Daily upload limit reached. Please try again after ${data.timeLeft} hours.`);
+        } else {
+          alert(`Error: ${data.error}`);
+        }
       } else {
         setPdfUrl(data.url);
         setInvoiceNumber(data.invoiceNumber);
+        setDailyUploads(prev => prev + 1);
       }
     } catch (error) {
       alert("Something went wrong! Please try again.");
@@ -64,6 +98,27 @@ export default function Home() {
           number
         </p>
 
+        {/* Daily Upload Limit Info */}
+        <div className="mb-4 text-center">
+          {initialLoading ? (
+            <div className="flex items-center justify-center space-x-2">
+              <div className="w-4 h-4 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
+              <span className="text-sm text-gray-400">Loading upload status...</span>
+            </div>
+          ) : (
+            <>
+              <p className="text-sm text-gray-400">
+                Daily Uploads: {dailyUploads}/3
+              </p>
+              {timeLeft && (
+                <p className="text-sm text-yellow-400">
+                  Time remaining: {timeLeft} hours
+                </p>
+              )}
+            </>
+          )}
+        </div>
+
         {/* File Input Section */}
         <div className="mb-8 flex flex-col items-center w-full">
           {/* Hidden File Input */}
@@ -73,11 +128,14 @@ export default function Home() {
             onChange={handleFileChange}
             className="hidden"
             id="file-upload"
+            disabled={initialLoading}
           />
           {/* Custom Button */}
           <label
             htmlFor="file-upload"
-            className="w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-lg cursor-pointer transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30"
+            className={`w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-lg cursor-pointer transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 ${
+              initialLoading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
             <Upload className="h-5 w-5" />
             <span>Choose PDF File</span>
@@ -100,15 +158,22 @@ export default function Home() {
 
         <motion.button
           onClick={handleUpload}
-          disabled={loading || !file}
+          disabled={loading || !file || dailyUploads >= 3 || initialLoading}
           className="w-full max-w-md px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-lg transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+          whileHover={{ scale: dailyUploads < 3 && !initialLoading ? 1.02 : 1 }}
+          whileTap={{ scale: dailyUploads < 3 && !initialLoading ? 0.98 : 1 }}
         >
-          {loading ? (
+          {loading || initialLoading ? (
             <div className="flex items-center justify-center space-x-2">
               <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
-              <span>Processing...</span>
+              <span>{initialLoading ? "Loading..." : "Processing..."}</span>
+            </div>
+          ) : dailyUploads >= 3 ? (
+            <div className="flex items-center justify-center space-x-2">
+              <span>Daily Limit Reached</span>
+              {timeLeft && (
+                <span className="text-sm">({timeLeft}h remaining)</span>
+              )}
             </div>
           ) : (
             "Upload & Extract"
