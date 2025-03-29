@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import UserRatingsGraph from "./components/UserRatingsGraph";
 import LoadingScreen from "@/components/LoadingScreen";
+import CustomerFeedbacks from "./components/CustomerFeedbacks";
 
 const Page = () => {
   const { data: session, status } = useSession();
@@ -18,7 +19,10 @@ const Page = () => {
 
   // Handle authentication redirect
   useEffect(() => {
-    if (status === "unauthenticated" || (!owner && status === "authenticated")) {
+    if (
+      status === "unauthenticated" ||
+      (!owner && status === "authenticated")
+    ) {
       router.push("/sign-in");
     }
   }, [router, owner, status]);
@@ -30,7 +34,7 @@ const Page = () => {
       if (hash) {
         const element = document.getElementById(hash);
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
+          element.scrollIntoView({ behavior: "smooth" });
         }
       }
     };
@@ -39,10 +43,10 @@ const Page = () => {
     handleHashChange();
 
     // Handle hash changes
-    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener("hashchange", handleHashChange);
 
     return () => {
-      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener("hashchange", handleHashChange);
     };
   }, []);
 
@@ -61,17 +65,15 @@ const Page = () => {
       <div id="dashboard">
         <Dashboard />
       </div>
-      <div id="generate">
-        <GenerateInvoiceQR />
-      </div>
+
       <div id="ratings">
         <UserRatingsGraph />
       </div>
-      <div id="feedbacks" className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-yellow-400 mb-2">Feedbacks</h2>
-          <p className="text-gray-400">Your feedbacks will appear here.</p>
-        </div>
+      <div id="feedbacks">
+        <CustomerFeedbacks />
+      </div>
+      <div id="generate">
+        <GenerateInvoiceQR />
       </div>
     </>
   );
