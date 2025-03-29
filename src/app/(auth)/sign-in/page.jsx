@@ -26,6 +26,7 @@ import { toast } from "sonner";
 function Page() {
   const [isSubmitting, setIsSubmitting] = useState(false); // Flag for form submission
   const [showPassword, setShowPassword] = useState(false);
+  const [isNavigatingToRegister, setIsNavigatingToRegister] = useState(false);
 
   const { data: session, status } = useSession();
   const owner = session?.user;
@@ -194,12 +195,23 @@ function Page() {
           <div className="text-center mt-4">
             <p className="text-gray-400 text-sm">
               Don't have an account?{" "}
-              <Link
-                href="/register"
-                className="text-yellow-400 hover:text-yellow-300 font-medium"
+              <button
+                onClick={() => {
+                  setIsNavigatingToRegister(true);
+                  router.push('/register');
+                }}
+                disabled={isNavigatingToRegister}
+                className="text-yellow-400 hover:text-yellow-300 font-medium inline-flex items-center cursor-pointer"
               >
-                Register
-              </Link>
+                {isNavigatingToRegister ? (
+                  <>
+                    <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  "Register"
+                )}
+              </button>
             </p>
           </div>
         </motion.div>
