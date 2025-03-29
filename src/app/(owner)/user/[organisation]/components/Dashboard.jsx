@@ -2,13 +2,48 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { LayoutDashboard, Activity, FileText, Users, Settings, TrendingUp, TrendingDown, Lightbulb, Star } from "lucide-react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  LayoutDashboard,
+  Activity,
+  FileText,
+  Users,
+  Settings,
+  TrendingUp,
+  TrendingDown,
+  Lightbulb,
+  Star,
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useSession } from "next-auth/react";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
-import { Label, Pie, PieChart, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LabelList, LineChart, Line } from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import {
+  Label,
+  Pie,
+  PieChart,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+  LabelList,
+  LineChart,
+  Line,
+} from "recharts";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import { Progress } from "@/components/ui/progress";
 
 const chartConfig = {
@@ -107,7 +142,7 @@ const Dashboard = () => {
     return Object.entries(metrics.averageRatings)
       .filter(([key]) => key !== "overAllRating")
       .map(([key, value]) => ({
-        name: key.replace("Rating", ""),
+        name: metrics.apiMetrics[key],
         value: value,
         fill: "#FACC15",
       }));
@@ -170,7 +205,8 @@ const Dashboard = () => {
             Dashboard
           </h1>
           <p className="text-gray-400 mt-2">
-            Comprehensive overview of your service performance and customer feedback
+            Comprehensive overview of your service performance and customer
+            feedback
           </p>
         </motion.div>
 
@@ -185,8 +221,12 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Feedback Ratio</p>
-                <h3 className="text-2xl font-bold text-white mt-1">{metrics.feedbackRatio}%</h3>
-                <p className="text-gray-500 text-sm mt-1">Feedbacks per 100 invoices</p>
+                <h3 className="text-2xl font-bold text-white mt-1">
+                  {metrics.feedbackRatio}%
+                </h3>
+                <p className="text-gray-500 text-sm mt-1">
+                  Feedbacks per 100 invoices
+                </p>
               </div>
               <div className="p-3 bg-[#0A0A0A]/50 rounded-lg group-hover:bg-yellow-400/10 transition-colors">
                 <FileText className="h-6 w-6 text-yellow-400" />
@@ -203,8 +243,12 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Average Rating</p>
-                <h3 className="text-2xl font-bold text-white mt-1">{metrics.averageOverallRating.toFixed(1)}</h3>
-                <p className="text-gray-500 text-sm mt-1">Overall satisfaction</p>
+                <h3 className="text-2xl font-bold text-white mt-1">
+                  {metrics.averageOverallRating.toFixed(1)}
+                </h3>
+                <p className="text-gray-500 text-sm mt-1">
+                  Overall satisfaction
+                </p>
               </div>
               <div className="p-3 bg-[#0A0A0A]/50 rounded-lg group-hover:bg-yellow-400/10 transition-colors">
                 <Star className="h-6 w-6 text-yellow-400" />
@@ -221,7 +265,9 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Total Feedbacks</p>
-                <h3 className="text-2xl font-bold text-white mt-1">{metrics.totalFeedbacks}</h3>
+                <h3 className="text-2xl font-bold text-white mt-1">
+                  {metrics.totalFeedbacks}
+                </h3>
                 <p className="text-gray-500 text-sm mt-1">Total received</p>
               </div>
               <div className="p-3 bg-[#0A0A0A]/50 rounded-lg group-hover:bg-yellow-400/10 transition-colors">
@@ -239,7 +285,9 @@ const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Positive/Negative</p>
-                <h3 className="text-2xl font-bold text-white mt-1">{metrics.positiveNegativeRatio.toFixed(1)}</h3>
+                <h3 className="text-2xl font-bold text-white mt-1">
+                  {metrics.positiveNegativeRatio.toFixed(1)}
+                </h3>
                 <p className="text-gray-500 text-sm mt-1">Feedback ratio</p>
               </div>
               <div className="p-3 bg-[#0A0A0A]/50 rounded-lg group-hover:bg-yellow-400/10 transition-colors">
@@ -429,17 +477,18 @@ const Dashboard = () => {
           {/* Service Ratings */}
           <Card className="bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10">
             <CardHeader className="items-center pb-2">
-              <CardTitle className="text-yellow-400 text-base">Service Ratings</CardTitle>
-              <CardDescription className="text-xs">Average ratings across aspects</CardDescription>
+              <CardTitle className="text-yellow-400 text-base">
+                Service Ratings
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Average ratings across aspects
+              </CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-2">
               <div className="h-[300px]">
-                <ChartContainer
-                  config={chartConfig}
-                  className="h-full"
-                >
+                <ChartContainer config={chartConfig} className="h-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart 
+                    <BarChart
                       data={ratingData}
                       layout="vertical"
                       margin={{
@@ -455,17 +504,13 @@ const Dashboard = () => {
                         axisLine={false}
                         hide
                       />
-                      <XAxis 
-                        type="number" 
-                        domain={[0, 5]}
-                        hide
-                      />
+                      <XAxis type="number" domain={[0, 5]} hide />
                       <ChartTooltip
                         cursor={false}
                         content={<ChartTooltipContent indicator="line" />}
                       />
-                      <Bar 
-                        dataKey="value" 
+                      <Bar
+                        dataKey="value"
                         layout="vertical"
                         fill="#FACC15"
                         radius={4}
@@ -474,15 +519,15 @@ const Dashboard = () => {
                           dataKey="name"
                           position="insideLeft"
                           offset={8}
-                          className="fill-[#000000]"
-                          fontSize={12}
+                          className="fill-[#000000] font-medium"
+                          fontSize={14}
                         />
                         <LabelList
                           dataKey="value"
                           position="right"
                           offset={8}
-                          className="fill-[#000000]"
-                          fontSize={12}
+                          className="fill-[#facc15] font-bold "
+                          fontSize={14}
                         />
                       </Bar>
                     </BarChart>
@@ -495,35 +540,36 @@ const Dashboard = () => {
           {/* Rating Trend Chart */}
           <Card className="bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10">
             <CardHeader className="items-center pb-2">
-              <CardTitle className="text-yellow-400 text-base">Rating Trend</CardTitle>
-              <CardDescription className="text-xs">Overall rating over time</CardDescription>
+              <CardTitle className="text-yellow-400 text-base">
+                Rating Trend
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Overall rating over time
+              </CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-2">
               <div className="h-[300px]">
-                <ChartContainer
-                  config={chartConfig}
-                  className="h-full"
-                >
+                <ChartContainer config={chartConfig} className="h-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart 
+                    <LineChart
                       data={historicalData}
                       margin={{
                         top: 20,
                         right: 20,
                         left: 20,
-                        bottom: 40
+                        bottom: 40,
                       }}
                     >
                       <CartesianGrid vertical={false} stroke="#374151" />
-                      <XAxis 
-                        dataKey="date" 
+                      <XAxis
+                        dataKey="date"
                         stroke="#9CA3AF"
                         tickLine={false}
                         tickMargin={10}
                         axisLine={false}
                         interval={0}
                       />
-                      <YAxis 
+                      <YAxis
                         stroke="#9CA3AF"
                         domain={[0, 5]}
                         tickLine={false}
@@ -533,9 +579,9 @@ const Dashboard = () => {
                         cursor={false}
                         content={<ChartTooltipContent hideLabel />}
                       />
-                      <Line 
+                      <Line
                         type="monotone"
-                        dataKey="rating" 
+                        dataKey="rating"
                         stroke="#FACC15"
                         strokeWidth={2}
                         dot={{ fill: "#FACC15", r: 4 }}
@@ -551,30 +597,42 @@ const Dashboard = () => {
         {/* Performance Metrics */}
         <Card className="bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 mb-8">
           <CardHeader className="items-center pb-2">
-            <CardTitle className="text-yellow-400 text-base">Performance Metrics</CardTitle>
-            <CardDescription className="text-xs">Best & Worst Areas</CardDescription>
+            <CardTitle className="text-yellow-400 text-base">
+              Performance Metrics
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Best & Worst Areas
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Best Performing */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-400">Best: {metrics.bestPerforming.metric}</span>
-                <span className="text-sm text-yellow-400">{metrics.bestPerforming.rating}/5</span>
+                <span className="text-sm text-gray-400">
+                  Best: {metrics.bestPerforming.metric}
+                </span>
+                <span className="text-sm text-yellow-400">
+                  {metrics.bestPerforming.rating}/5
+                </span>
               </div>
-              <Progress 
-                value={(metrics.bestPerforming.rating / 5) * 100} 
+              <Progress
+                value={(metrics.bestPerforming.rating / 5) * 100}
                 className="h-2 bg-gray-800 [&>div]:bg-yellow-400"
               />
             </div>
-            
+
             {/* Worst Performing */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-400">Worst: {metrics.worstPerforming.metric}</span>
-                <span className="text-sm text-red-400">{metrics.worstPerforming.rating}/5</span>
+                <span className="text-sm text-gray-400">
+                  Worst: {metrics.worstPerforming.metric}
+                </span>
+                <span className="text-sm text-red-400">
+                  {metrics.worstPerforming.rating}/5
+                </span>
               </div>
-              <Progress 
-                value={(metrics.worstPerforming.rating / 5) * 100} 
+              <Progress
+                value={(metrics.worstPerforming.rating / 5) * 100}
                 className="h-2 bg-gray-800 [&>div]:bg-red-400"
               />
             </div>
@@ -588,9 +646,13 @@ const Dashboard = () => {
             <CardHeader>
               <div className="flex items-center space-x-2">
                 <Lightbulb className="h-5 w-5 text-yellow-400" />
-                <CardTitle className="text-yellow-400">Areas for Improvement</CardTitle>
+                <CardTitle className="text-yellow-400">
+                  Areas for Improvement
+                </CardTitle>
               </div>
-              <CardDescription>AI-generated insights for better performance</CardDescription>
+              <CardDescription>
+                AI-generated insights for better performance
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <ul className="space-y-3">
@@ -611,7 +673,9 @@ const Dashboard = () => {
                 <Star className="h-5 w-5 text-yellow-400" />
                 <CardTitle className="text-yellow-400">Key Strengths</CardTitle>
               </div>
-              <CardDescription>AI-identified areas of excellence</CardDescription>
+              <CardDescription>
+                AI-identified areas of excellence
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <ul className="space-y-3">
