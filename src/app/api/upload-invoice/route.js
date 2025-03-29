@@ -32,6 +32,61 @@ export async function POST(req) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
+    // Check daily upload limit first
+    const owner = await OwnerModel.findOne({ username });
+    if (!owner) {
+      return NextResponse.json({ error: "Owner not found" }, { status: 404 });
+    }
+
+    // Check daily upload limit
+    const now = new Date();
+    const lastReset = new Date(owner.uploadedInvoiceCount.lastDailyReset);
+    const hoursSinceLastReset = (now - lastReset) / (1000 * 60 * 60);
+
+    // Reset daily uploads if 24 hours have passed
+    if (hoursSinceLastReset >= 24) {
+      owner.uploadedInvoiceCount.dailyUploads = 0;
+      owner.uploadedInvoiceCount.lastDailyReset = now;
+    }
+
+    // Check if daily limit reached
+    if (owner.uploadedInvoiceCount.dailyUploads >= 3) {
+      const timeLeft = 24 - hoursSinceLastReset;
+      const hoursLeft = Math.ceil(timeLeft);
+      return NextResponse.json(
+        { 
+          error: `Daily upload limit reached. Please try again after ${hoursLeft} hours.`,
+          timeLeft: hoursLeft
+        }, 
+        { status: 429 }
+      );
+    }
+
+    // Check if invoice already exists
+    if (!owner.invoices) {
+      owner.invoices = [];
+    }
+
+    const invoiceNumber = await extractInvoiceNumberFromPdf(file);
+    if (!invoiceNumber || invoiceNumber === "Not Found") {
+      return NextResponse.json(
+        { error: "Invoice number not found" },
+        { status: 400 }
+      );
+    }
+
+    const existedInvoice = owner.invoices.some(
+      (invoice) => invoice.invoiceId === invoiceNumber
+    );
+
+    if (existedInvoice) {
+      return NextResponse.json(
+        { error: "Invoice already exists" },
+        { status: 400 }
+      );
+    }
+
+    // If all checks pass, proceed with Cloudinary upload
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
@@ -51,42 +106,18 @@ export async function POST(req) {
     });
 
     const pdfUrl = uploadResult.secure_url;
-    const invoiceNumber = await extractInvoiceNumberFromPdf(pdfUrl);
-
-    if (!invoiceNumber || invoiceNumber === "Not Found") {
-      return NextResponse.json(
-        { error: "Invoice number not found" },
-        { status: 400 }
-      );
-    }
-
-    const owner = await OwnerModel.findOne({ username });
-    if (!owner) {
-      return NextResponse.json({ error: "Owner not found" }, { status: 404 });
-    }
-
-    // Initialize invoices array if it doesn't exist
-    if (!owner.invoices) {
-      owner.invoices = [];
-    }
-
-    // Check if invoice already exists
-    const existedInvoice = owner.invoices.some(
-      (invoice) => invoice.invoiceId === invoiceNumber
-    );
-
-    if (existedInvoice) {
-      return NextResponse.json(
-        { error: "Invoice already exists" },
-        { status: 400 }
-      );
-    }
 
     // Add new invoice with initial AIuseCount
     owner.invoices.push({
       invoiceId: invoiceNumber,
       AIuseCount: 0,
     });
+
+    // Update upload counts
+    owner.uploadedInvoiceCount.count += 1;
+    owner.uploadedInvoiceCount.dailyUploads += 1;
+    owner.uploadedInvoiceCount.lastUpdated = now;
+
     await owner.save();
 
     // Generate QR Code PDF
@@ -125,18 +156,19 @@ export async function POST(req) {
   }
 }
 
-async function extractInvoiceNumberFromPdf(pdfUrl) {
+async function extractInvoiceNumberFromPdf(file) {
   try {
     const model = genAI.getGenerativeModel({
       model: "gemini-2.0-flash-lite-preview-02-05",
     });
-    const response = await axios.get(pdfUrl, { responseType: "arraybuffer" });
-    const pdfBuffer = response.data;
+
+    const bytes = await file.arrayBuffer();
+    const pdfBuffer = Buffer.from(bytes);
 
     const result = await model.generateContent([
       {
         inlineData: {
-          data: Buffer.from(pdfBuffer).toString("base64"),
+          data: pdfBuffer.toString("base64"),
           mimeType: "application/pdf",
         },
       },
