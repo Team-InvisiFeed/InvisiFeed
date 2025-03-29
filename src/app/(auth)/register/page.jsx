@@ -52,6 +52,8 @@ function Page() {
   const [searchState, setSearchState] = useState("");
   const [searchCity, setSearchCity] = useState("");
 
+  const [isNavigatingToSignIn, setIsNavigatingToSignIn] = useState(false);
+
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -469,6 +471,30 @@ function Page() {
                         "Next"
                       )}
                     </Button>
+
+                    {/* Login Link */}
+                    <div className="text-center mt-4">
+                      <p className="text-gray-400 text-sm">
+                        Already a user?{" "}
+                        <button
+                          onClick={() => {
+                            setIsNavigatingToSignIn(true);
+                            router.push('/sign-in');
+                          }}
+                          disabled={isNavigatingToSignIn}
+                          className="text-yellow-400 hover:text-yellow-300 font-medium inline-flex items-center cursor-pointer"
+                        >
+                          {isNavigatingToSignIn ? (
+                            <>
+                              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                              Loading...
+                            </>
+                          ) : (
+                            "Login"
+                          )}
+                        </button>
+                      </p>
+                    </div>
                   </motion.div>
                 )}
 
@@ -598,6 +624,30 @@ function Page() {
                         "Sign Up"
                       )}
                     </Button>
+
+                    {/* Login Link */}
+                    <div className="text-center mt-4">
+                      <p className="text-gray-400 text-sm">
+                        Already a user?{" "}
+                        <button
+                          onClick={() => {
+                            setIsNavigatingToSignIn(true);
+                            router.push('/sign-in');
+                          }}
+                          disabled={isNavigatingToSignIn}
+                          className="text-yellow-400 hover:text-yellow-300 font-medium inline-flex items-center cursor-pointer"
+                        >
+                          {isNavigatingToSignIn ? (
+                            <>
+                              <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                              Loading...
+                            </>
+                          ) : (
+                            "Login"
+                          )}
+                        </button>
+                      </p>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
