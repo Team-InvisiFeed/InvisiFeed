@@ -47,7 +47,7 @@ We are actively working on building the core functionality, including invoice pr
 | **qrcode** | Generating QR codes |  
 | **PDFKit** | Injecting QR codes into invoices |  
 | **Gemini API** | AI-generated feedback suggestions |  
-| **Socket.IO** | Real-time notifications |  
+
 
 ---
 
