@@ -7,8 +7,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useSession } from "next-auth/react";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
-import { Label, Pie, PieChart, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
+import { Label, Pie, PieChart, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LabelList, LineChart, Line } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Progress } from "@/components/ui/progress";
 
 const chartConfig = {
   feedbackRatio: {
@@ -31,6 +32,9 @@ const chartConfig = {
     label: "Rating",
     color: "#FACC15",
   },
+  label: {
+    color: "#FFFFFF",
+  },
 };
 
 const Dashboard = () => {
@@ -46,6 +50,7 @@ const Dashboard = () => {
         const response = await axios.post("/api/get-dashboard-metrics", {
           username: owner.username,
         });
+        console.log(response.data.data);
         setMetrics(response.data.data);
       } catch (error) {
         setError("Failed to fetch dashboard metrics");
@@ -71,7 +76,8 @@ const Dashboard = () => {
       {
         name: "Remaining",
         value: 100 - metrics.feedbackRatio,
-        fill: "#1F2937",
+        fill: "#FFFFFF",
+        style: { filter: "drop-shadow(inset 0 0 8px rgba(0, 0, 0, 0.2))" },
       },
     ];
   }, [metrics]);
@@ -81,13 +87,17 @@ const Dashboard = () => {
     return [
       {
         name: "Positive",
-        value: (metrics.positiveNegativeRatio / (1 + metrics.positiveNegativeRatio)) * 100,
-        fill: "#22C55E",
+        value:
+          (metrics.positiveNegativeRatio /
+            (1 + metrics.positiveNegativeRatio)) *
+          100,
+        fill: "#EAB308",
       },
       {
         name: "Negative",
         value: (1 / (1 + metrics.positiveNegativeRatio)) * 100,
-        fill: "#EF4444",
+        fill: "#FFFFFF",
+        style: { filter: "drop-shadow(inset 0 0 8px rgba(0, 0, 0, 0.2))" },
       },
     ];
   }, [metrics]);
@@ -117,6 +127,11 @@ const Dashboard = () => {
         fill: "#EF4444",
       },
     ];
+  }, [metrics]);
+
+  const historicalData = useMemo(() => {
+    if (!metrics?.historicalRatings) return [];
+    return metrics.historicalRatings;
   }, [metrics]);
 
   if (loading) {
@@ -235,150 +250,241 @@ const Dashboard = () => {
         </div>
 
         {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mb-8">
           {/* Feedback Ratio Chart */}
           <Card className="bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10">
             <CardHeader className="items-center pb-2">
-              <CardTitle className="text-yellow-400 text-lg">Feedback Ratio</CardTitle>
-              <CardDescription className="text-sm">Percentage of invoices with feedback</CardDescription>
+              <CardTitle className="text-yellow-400 text-lg">
+                Feedback Ratio
+              </CardTitle>
+              <CardDescription className="text-sm">
+                Percentage of invoices with feedback
+              </CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-2">
-              <ChartContainer
-                config={chartConfig}
-                className="mx-auto aspect-square max-h-[200px]"
-              >
-                <PieChart>
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent hideLabel />}
-                  />
-                  <Pie
-                    data={feedbackRatioData}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={45}
-                    outerRadius={60}
-                    strokeWidth={4}
-                  >
-                    <Label
-                      content={({ viewBox }) => {
-                        if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                          return (
-                            <text
-                              x={viewBox.cx}
-                              y={viewBox.cy}
-                              textAnchor="middle"
-                              dominantBaseline="middle"
-                            >
-                              <tspan
+              <div className="flex items-center justify-between">
+                <ChartContainer
+                  config={chartConfig}
+                  className="mx-auto aspect-square max-h-[200px] w-[60%]"
+                >
+                  <PieChart>
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent hideLabel />}
+                    />
+                    <Pie
+                      data={feedbackRatioData}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={60}
+                      outerRadius={80}
+                      strokeWidth={4}
+                      style={{
+                        filter: "drop-shadow(0 0 8px rgba(234, 179, 8, 0.3))",
+                      }}
+                    >
+                      <Label
+                        content={({ viewBox }) => {
+                          if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                            return (
+                              <text
                                 x={viewBox.cx}
                                 y={viewBox.cy}
-                                className="fill-foreground text-3xl font-bold"
+                                textAnchor="middle"
+                                dominantBaseline="middle"
                               >
-                                {metrics.feedbackRatio}%
-                              </tspan>
-                              <tspan
-                                x={viewBox.cx}
-                                y={(viewBox.cy || 0) + 24}
-                                className="fill-muted-foreground"
-                              >
-                                Feedback Rate
-                              </tspan>
-                            </text>
-                          );
-                        }
-                      }}
-                    />
-                  </Pie>
-                </PieChart>
-              </ChartContainer>
+                                <tspan
+                                  x={viewBox.cx}
+                                  y={viewBox.cy}
+                                  className="text-3xl font-bold text-yellow-400 fill-yellow-400"
+                                  style={{
+                                    textShadow:
+                                      "0 0 10px rgba(234, 179, 8, 0.5)",
+                                  }}
+                                >
+                                  {metrics.feedbackRatio}%
+                                </tspan>
+                                <tspan
+                                  x={viewBox.cx}
+                                  y={(viewBox.cy || 0) + 24}
+                                  className="fill-muted-foreground"
+                                >
+                                  Feedback Rate
+                                </tspan>
+                              </text>
+                            );
+                          }
+                        }}
+                      />
+                    </Pie>
+                  </PieChart>
+                </ChartContainer>
+                <div className="w-[40%] space-y-4">
+                  <div className="text-right">
+                    <p className="text-gray-400 text-sm">Total Invoices</p>
+                    <p className="text-2xl font-bold text-white">
+                      {metrics.totalInvoices}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-gray-400 text-sm">Total Feedbacks</p>
+                    <p className="text-2xl font-bold text-white">
+                      {metrics.totalFeedbacks}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
           {/* Positive/Negative Ratio Chart */}
           <Card className="bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10">
             <CardHeader className="items-center pb-2">
-              <CardTitle className="text-yellow-400 text-lg">Feedback Sentiment</CardTitle>
-              <CardDescription className="text-sm">Positive vs Negative Feedback Ratio</CardDescription>
+              <CardTitle className="text-yellow-400 text-lg">
+                Feedback Sentiment
+              </CardTitle>
+              <CardDescription className="text-sm">
+                Positive vs Negative Feedback Ratio
+              </CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-2">
-              <ChartContainer
-                config={chartConfig}
-                className="mx-auto aspect-square max-h-[200px]"
-              >
-                <PieChart>
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent hideLabel />}
-                  />
-                  <Pie
-                    data={positiveNegativeData}
-                    dataKey="value"
-                    nameKey="name"
-                    innerRadius={45}
-                    outerRadius={60}
-                    strokeWidth={4}
-                  >
-                    <Label
-                      content={({ viewBox }) => {
-                        if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                          return (
-                            <text
-                              x={viewBox.cx}
-                              y={viewBox.cy}
-                              textAnchor="middle"
-                              dominantBaseline="middle"
-                            >
-                              <tspan
+              <div className="flex items-center justify-between">
+                <ChartContainer
+                  config={chartConfig}
+                  className="mx-auto aspect-square max-h-[200px] w-[60%]"
+                >
+                  <PieChart>
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent hideLabel />}
+                    />
+                    <Pie
+                      data={positiveNegativeData}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={60}
+                      outerRadius={80}
+                      strokeWidth={4}
+                      style={{
+                        filter: "drop-shadow(0 0 8px rgba(34, 197, 94, 0.3))",
+                      }}
+                    >
+                      <Label
+                        content={({ viewBox }) => {
+                          if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                            return (
+                              <text
                                 x={viewBox.cx}
                                 y={viewBox.cy}
-                                className="fill-foreground text-3xl font-bold"
+                                textAnchor="middle"
+                                dominantBaseline="middle"
                               >
-                                {metrics.positiveNegativeRatio.toFixed(1)}
-                              </tspan>
-                              <tspan
-                                x={viewBox.cx}
-                                y={(viewBox.cy || 0) + 24}
-                                className="fill-muted-foreground"
-                              >
-                                Pos/Neg Ratio
-                              </tspan>
-                            </text>
-                          );
-                        }
-                      }}
-                    />
-                  </Pie>
-                </PieChart>
-              </ChartContainer>
+                                <tspan
+                                  x={viewBox.cx}
+                                  y={viewBox.cy}
+                                  className="text-3xl font-bold text-yellow-400 fill-yellow-400"
+                                  style={{
+                                    textShadow:
+                                      "0 0 10px rgba(234, 179, 8, 0.5)",
+                                  }}
+                                >
+                                  {metrics.positiveNegativeRatio.toFixed(1)}
+                                </tspan>
+                                <tspan
+                                  x={viewBox.cx}
+                                  y={(viewBox.cy || 0) + 24}
+                                  className="fill-muted-foreground"
+                                >
+                                  Pos/Neg Ratio
+                                </tspan>
+                              </text>
+                            );
+                          }
+                        }}
+                      />
+                    </Pie>
+                  </PieChart>
+                </ChartContainer>
+                <div className="w-[40%] space-y-4">
+                  <div className="text-right">
+                    <p className="text-gray-400 text-sm">Positive Feedbacks</p>
+                    <p className="text-2xl font-bold text-white">
+                      {metrics.positiveFeedbacks}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-gray-400 text-sm">Negative Feedbacks</p>
+                    <p className="text-2xl font-bold text-white">
+                      {metrics.negativeFeedbacks}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Ratings and Performance Section */}
+        {/* Bar Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Service Ratings */}
           <Card className="bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10">
             <CardHeader className="items-center pb-2">
-              <CardTitle className="text-yellow-400 text-lg">Service Ratings</CardTitle>
-              <CardDescription className="text-sm">Average ratings across different aspects</CardDescription>
+              <CardTitle className="text-yellow-400 text-base">Service Ratings</CardTitle>
+              <CardDescription className="text-xs">Average ratings across aspects</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-2">
-              <div className="h-[250px]">
+              <div className="h-[300px]">
                 <ChartContainer
                   config={chartConfig}
                   className="h-full"
                 >
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={ratingData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                      <XAxis dataKey="name" stroke="#9CA3AF" />
-                      <YAxis stroke="#9CA3AF" domain={[0, 5]} />
+                    <BarChart 
+                      data={ratingData}
+                      layout="vertical"
+                      margin={{
+                        right: 16,
+                      }}
+                    >
+                      <CartesianGrid horizontal={false} stroke="#374151" />
+                      <YAxis
+                        dataKey="name"
+                        type="category"
+                        tickLine={false}
+                        tickMargin={10}
+                        axisLine={false}
+                        hide
+                      />
+                      <XAxis 
+                        type="number" 
+                        domain={[0, 5]}
+                        hide
+                      />
                       <ChartTooltip
                         cursor={false}
-                        content={<ChartTooltipContent />}
+                        content={<ChartTooltipContent indicator="line" />}
                       />
-                      <Bar dataKey="value" fill="#FACC15" />
+                      <Bar 
+                        dataKey="value" 
+                        layout="vertical"
+                        fill="#FACC15"
+                        radius={4}
+                      >
+                        <LabelList
+                          dataKey="name"
+                          position="insideLeft"
+                          offset={8}
+                          className="fill-[#000000]"
+                          fontSize={12}
+                        />
+                        <LabelList
+                          dataKey="value"
+                          position="right"
+                          offset={8}
+                          className="fill-[#000000]"
+                          fontSize={12}
+                        />
+                      </Bar>
                     </BarChart>
                   </ResponsiveContainer>
                 </ChartContainer>
@@ -386,35 +492,94 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Performance Chart */}
+          {/* Rating Trend Chart */}
           <Card className="bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10">
             <CardHeader className="items-center pb-2">
-              <CardTitle className="text-yellow-400 text-lg">Performance Metrics</CardTitle>
-              <CardDescription className="text-sm">Best and Worst Performing Areas</CardDescription>
+              <CardTitle className="text-yellow-400 text-base">Rating Trend</CardTitle>
+              <CardDescription className="text-xs">Overall rating over time</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-2">
-              <div className="h-[250px]">
+              <div className="h-[300px]">
                 <ChartContainer
                   config={chartConfig}
                   className="h-full"
                 >
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={performanceData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                      <XAxis dataKey="name" stroke="#9CA3AF" />
-                      <YAxis stroke="#9CA3AF" domain={[0, 5]} />
+                    <LineChart 
+                      data={historicalData}
+                      margin={{
+                        top: 20,
+                        right: 20,
+                        left: 20,
+                        bottom: 40
+                      }}
+                    >
+                      <CartesianGrid vertical={false} stroke="#374151" />
+                      <XAxis 
+                        dataKey="date" 
+                        stroke="#9CA3AF"
+                        tickLine={false}
+                        tickMargin={10}
+                        axisLine={false}
+                        interval={0}
+                      />
+                      <YAxis 
+                        stroke="#9CA3AF"
+                        domain={[0, 5]}
+                        tickLine={false}
+                        axisLine={false}
+                      />
                       <ChartTooltip
                         cursor={false}
-                        content={<ChartTooltipContent />}
+                        content={<ChartTooltipContent hideLabel />}
                       />
-                      <Bar dataKey="value" fill="#22C55E" />
-                    </BarChart>
+                      <Line 
+                        type="monotone"
+                        dataKey="rating" 
+                        stroke="#FACC15"
+                        strokeWidth={2}
+                        dot={{ fill: "#FACC15", r: 4 }}
+                      />
+                    </LineChart>
                   </ResponsiveContainer>
                 </ChartContainer>
               </div>
             </CardContent>
           </Card>
         </div>
+
+        {/* Performance Metrics */}
+        <Card className="bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 mb-8">
+          <CardHeader className="items-center pb-2">
+            <CardTitle className="text-yellow-400 text-base">Performance Metrics</CardTitle>
+            <CardDescription className="text-xs">Best & Worst Areas</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Best Performing */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-400">Best: {metrics.bestPerforming.metric}</span>
+                <span className="text-sm text-yellow-400">{metrics.bestPerforming.rating}/5</span>
+              </div>
+              <Progress 
+                value={(metrics.bestPerforming.rating / 5) * 100} 
+                className="h-2 bg-gray-800 [&>div]:bg-yellow-400"
+              />
+            </div>
+            
+            {/* Worst Performing */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-400">Worst: {metrics.worstPerforming.metric}</span>
+                <span className="text-sm text-red-400">{metrics.worstPerforming.rating}/5</span>
+              </div>
+              <Progress 
+                value={(metrics.worstPerforming.rating / 5) * 100} 
+                className="h-2 bg-gray-800 [&>div]:bg-red-400"
+              />
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Insights Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
