@@ -13,7 +13,7 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import LoadingScreen from "./LoadingScreen";
-import { Loader2 } from "lucide-react";
+import { Loader2, UserCircle2 } from "lucide-react";
 
 function Navbar() {
   const { data: session, status } = useSession();
@@ -200,11 +200,8 @@ function Navbar() {
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Avatar className="cursor-pointer border-2 border-yellow-400 hover:border-yellow-300 transition-colors ring-2 ring-transparent hover:ring-yellow-400/20">
-                  <AvatarImage
-                    src={owner?.image || "https://github.com/shadcn.png"}
-                  />
-                  <AvatarFallback className="bg-[#0A0A0A] text-yellow-400 font-semibold">
-                    {owner?.username?.charAt(0).toUpperCase() || "U"}
+                  <AvatarFallback className="bg-[#0A0A0A] text-yellow-400">
+                    <UserCircle2 className="h-6 w-6" />
                   </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
@@ -216,11 +213,8 @@ function Navbar() {
                 <div className="px-2 py-1.5 border-b border-yellow-400/10">
                   <div className="flex items-center space-x-2">
                     <Avatar className="h-8 w-8 border border-yellow-400/30">
-                      <AvatarImage
-                        src={owner?.image || "https://github.com/shadcn.png"}
-                      />
-                      <AvatarFallback className="bg-[#0A0A0A] text-yellow-400 text-sm">
-                        {owner?.username?.charAt(0).toUpperCase() || "U"}
+                      <AvatarFallback className="bg-[#0A0A0A] text-yellow-400">
+                        <UserCircle2 className="h-5 w-5" />
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
