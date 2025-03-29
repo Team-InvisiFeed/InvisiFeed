@@ -73,7 +73,6 @@ const Page = () => {
           <p className="text-gray-400">Your feedbacks will appear here.</p>
         </div>
       </div>
-      <Footer />
     </>
   );
 };
