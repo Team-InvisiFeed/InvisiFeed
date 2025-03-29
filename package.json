@@ -27,6 +27,8 @@
     "cloudinary": "^2.6.0",
     "clsx": "^2.1.1",
     "country-state-city": "^3.2.1",
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "dotenv": "^16.4.7",
     "embla-carousel-autoplay": "^8.5.2",
     "embla-carousel-react": "^8.5.2",
