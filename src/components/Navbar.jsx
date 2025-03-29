@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
@@ -12,105 +12,186 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import LoadingScreen from "./LoadingScreen";
+import { Loader2 } from "lucide-react";
 
 function Navbar() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const owner = session?.user;
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isNavigatingToSignIn, setIsNavigatingToSignIn] = useState(false);
+  const [isNavigatingToProfile, setIsNavigatingToProfile] = useState(false);
 
   const pathname = usePathname();
   const router = useRouter();
+
+  // Reset navigation states when pathname changes
+  useEffect(() => {
+    if (pathname.includes('/update-profile')) {
+      setIsNavigatingToProfile(false);
+    }
+  }, [pathname]);
+
+  // Show loading screen while checking authentication, signing out, or navigating to profile
+  if (status === "loading" || isSigningOut || isNavigatingToProfile) {
+    return <LoadingScreen />;
+  }
 
   const handleNavigation = (route) => {
     router.push(route);
   };
 
   const onManageProfile = () => {
+    setIsNavigatingToProfile(true);
     router.push(`/user/${owner?.username}/update-profile`);
+  };
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    await signOut({ redirect: true, callbackUrl: '/sign-in' });
+  };
+
+  const handleGetStarted = () => {
+    setIsNavigatingToSignIn(true);
+    router.push('/sign-in');
   };
 
   return (
     <nav className="p-4 md:p-6 bg-[#0A0A0A] text-white shadow-lg border-b border-yellow-400/10">
       <div className="container mx-auto flex items-center justify-between">
         {/* Logo/Brand Name */}
-        <motion.a
-          href="/"
+        <motion.button
+          onClick={() => {
+            if (owner) {
+              handleNavigation(`/user/${owner?.username}`);
+            } else {
+              handleNavigation('/');
+            }
+          }}
           className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
           InvisiFeed
-        </motion.a>
+        </motion.button>
 
         {/* Navigation Links */}
         <div className="hidden md:flex space-x-6">
           {owner ? (
             <>
-              {pathname === "/" ? (
-                <motion.button
-                  onClick={() => handleNavigation(`/user/${owner?.username}`)}
-                  className="text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Dashboard
-                </motion.button>
-              ) : (
-                <motion.button
-                  onClick={() => handleNavigation("/")}
-                  className="text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Home
-                </motion.button>
-              )}
+              <motion.button
+                onClick={() => {
+                  handleNavigation(`/user/${owner?.username}#dashboard`);
+                  document.getElementById('dashboard')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
+                  pathname === `/user/${owner?.username}` && window.location.hash === '#dashboard' ? "font-bold text-yellow-400" : ""
+                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Dashboard
+              </motion.button>
+              <motion.button
+                onClick={() => {
+                  handleNavigation(`/user/${owner?.username}#generate`);
+                  document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
+                  pathname === `/user/${owner?.username}` && window.location.hash === '#generate' ? "font-bold text-yellow-400" : ""
+                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Generate
+              </motion.button>
+              <motion.button
+                onClick={() => {
+                  handleNavigation(`/user/${owner?.username}#ratings`);
+                  document.getElementById('ratings')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
+                  pathname === `/user/${owner?.username}` && window.location.hash === '#ratings' ? "font-bold text-yellow-400" : ""
+                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Ratings
+              </motion.button>
+              <motion.button
+                onClick={() => {
+                  handleNavigation(`/user/${owner?.username}#feedbacks`);
+                  document.getElementById('feedbacks')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
+                  pathname === `/user/${owner?.username}` && window.location.hash === '#feedbacks' ? "font-bold text-yellow-400" : ""
+                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Feedbacks
+              </motion.button>
+              <motion.button
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavigation(`/user/${owner?.username}#contact`);
+                  document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
+                  pathname === `/user/${owner?.username}` && window.location.hash === '#contact' ? "font-bold text-yellow-400" : ""
+                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Contact
+              </motion.button>
             </>
           ) : (
-            <Link
-              href="/"
-              className={`text-gray-300 hover:text-yellow-400 transition-colors ${
-                pathname === "/" ? "font-bold text-yellow-400" : ""
-              }`}
-            >
-              Home
-            </Link>
+            <>
+              <Link
+                href="/"
+                className={`text-gray-300 hover:text-yellow-400 transition-colors ${
+                  pathname === "/" ? "font-bold text-yellow-400" : ""
+                }`}
+              >
+                Home
+              </Link>
+              <Link
+                href="#about"
+                className="text-gray-300 hover:text-yellow-400 transition-colors"
+              >
+                About
+              </Link>
+              <Link
+                href="#contact"
+                className="text-gray-300 hover:text-yellow-400 transition-colors"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                Contact
+              </Link>
+            </>
           )}
-          <Link
-            href="#about"
-            className="text-gray-300 hover:text-yellow-400 transition-colors"
-          >
-            AboutUs
-          </Link>
-          {owner ? (
-            <motion.button
-              onClick={() =>
-                handleNavigation(`/user/${owner?.username}/ratings`)
-              }
-              className="text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Ratings
-            </motion.button>
-          ) : (
-            ""
-          )}
-
-          <Link
-            href="#contact"
-            className="text-gray-300 hover:text-yellow-400 transition-colors"
-          >
-            ContactUs
-          </Link>
         </div>
 
         {/* Login Button */}
         {!owner ? (
-          <Link href={"/sign-in"}>
-            <Button className="bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium shadow-lg shadow-yellow-500/20 cursor-pointer">
-              Get Started
-            </Button>
-          </Link>
+          <Button 
+            onClick={handleGetStarted}
+            disabled={isNavigatingToSignIn}
+            className="bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium shadow-lg shadow-yellow-500/20 cursor-pointer min-w-[120px]"
+          >
+            {isNavigatingToSignIn ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              "Get Started"
+            )}
+          </Button>
         ) : (
           <div className="flex items-center space-x-4">
             <span className="text-sm md:text-base text-gray-300">
@@ -155,6 +236,7 @@ function Navbar() {
                 <DropdownMenuItem
                   className="text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 cursor-pointer focus:bg-yellow-400/5 focus:text-yellow-400"
                   onClick={onManageProfile}
+                  disabled={isNavigatingToProfile}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -174,7 +256,7 @@ function Navbar() {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 cursor-pointer focus:bg-yellow-400/5 focus:text-yellow-400"
-                  onClick={signOut}
+                  onClick={handleSignOut}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
