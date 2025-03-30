@@ -1,11 +1,11 @@
-import sendOTP from "@/utils/otpMailer";
+import sendEmail from "@/utils/nodemailerUtility";
 
 const sendVerificationEmail = async (email, otp) => {
   try {
     const subject = "Verify your email";
     const message = `Your verification code is: ${otp}. It will expire in 1 hour.`;
 
-    await sendOTP(email, subject, message);
+    await sendEmail(email, subject, message);
 
     return {
       success: true,
