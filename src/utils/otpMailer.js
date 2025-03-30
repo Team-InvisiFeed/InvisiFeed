@@ -16,7 +16,7 @@ const sendOTP = async (email, subject, message) => {
   });
 
   const mailOptions = {
-    from: process.env.SMTP_EMAIL,
+    from: `"InvisiFeed" <${process.env.SMTP_EMAIL}>`,
     to: email,
     subject: subject,
     text: message,
