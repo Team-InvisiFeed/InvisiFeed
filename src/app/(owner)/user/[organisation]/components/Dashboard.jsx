@@ -102,16 +102,19 @@ const StatCard = ({ title, value, subtitle, icon: Icon, delay }) => (
   <motion.div
     {...ANIMATION_CONFIG}
     transition={{ ...ANIMATION_CONFIG.transition, delay }}
-    className="bg-[#0A0A0A]/50 backdrop-blur-sm rounded-xl p-6 border border-yellow-400/10 hover:border-yellow-400/30 transition-colors group"
+    className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm rounded-xl p-6 border border-yellow-400/10 hover:border-yellow-400/30 transition-colors group relative overflow-hidden"
   >
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-gray-400 text-sm">{title}</p>
-        <h3 className="text-2xl font-bold text-white mt-1">{value}</h3>
-        <p className="text-gray-500 text-sm mt-1">{subtitle}</p>
-      </div>
-      <div className="p-3 bg-[#0A0A0A]/50 rounded-lg group-hover:bg-yellow-400/10 transition-colors">
-        <Icon className="h-6 w-6 text-yellow-400" />
+    <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+    <div className="relative">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-gray-400 text-sm">{title}</p>
+          <h3 className="text-2xl font-bold text-white mt-1">{value}</h3>
+          <p className="text-gray-500 text-sm mt-1">{subtitle}</p>
+        </div>
+        <div className="p-3 bg-gradient-to-br from-yellow-400/10 to-yellow-400/5 rounded-lg group-hover:from-yellow-400/20 group-hover:to-yellow-400/10 transition-colors">
+          <Icon className="h-6 w-6 text-yellow-400" />
+        </div>
       </div>
     </div>
   </motion.div>
@@ -172,7 +175,7 @@ const Dashboard = () => {
       },
       {
         name: "Negative",
-        value: metrics.negativePercentage,
+        value: 100 - metrics.positivePercentage,
         fill: "#FFFFFF",
         style: { filter: "drop-shadow(inset 0 0 8px rgba(0, 0, 0, 0.2))" },
       },
@@ -263,393 +266,422 @@ const Dashboard = () => {
         {/* Charts Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mb-8">
           {/* Feedback Ratio Chart */}
-          <Card className="bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10">
-            <CardHeader className="items-center pb-2">
-              <CardTitle className="text-yellow-400 text-lg">
-                Feedback Ratio
-              </CardTitle>
-              <CardDescription className="text-sm">
-                Percentage of invoices with feedback
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 pb-2">
-              <div className="flex items-center justify-between">
-                <ChartContainer
-                  config={CHART_CONFIG}
-                  className="mx-auto aspect-square max-h-[200px] w-[60%]"
-                >
-                  <PieChart>
-                    <ChartTooltip
-                      cursor={false}
-                      content={<ChartTooltipContent hideLabel />}
-                    />
-                    <Pie
-                      data={feedbackRatioData}
-                      dataKey="value"
-                      nameKey="name"
-                      innerRadius={60}
-                      outerRadius={80}
-                      strokeWidth={4}
-                      style={{
-                        filter: "drop-shadow(0 0 8px rgba(234, 179, 8, 0.3))",
-                      }}
-                    >
-                      <Label
-                        content={({ viewBox }) => {
-                          if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                            return (
-                              <text
-                                x={viewBox.cx}
-                                y={viewBox.cy}
-                                textAnchor="middle"
-                                dominantBaseline="middle"
-                              >
-                                <tspan
+          <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative">
+              <CardHeader className="items-center pb-2">
+                <CardTitle className="text-yellow-400 text-lg">
+                  Feedback Ratio
+                </CardTitle>
+                <CardDescription className="text-sm">
+                  Percentage of invoices with feedback
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 pb-2">
+                <div className="flex items-center justify-between">
+                  <ChartContainer
+                    config={CHART_CONFIG}
+                    className="mx-auto aspect-square max-h-[200px] w-[60%]"
+                  >
+                    <PieChart>
+                      <ChartTooltip
+                        cursor={false}
+                        content={<ChartTooltipContent hideLabel />}
+                      />
+                      <Pie
+                        data={feedbackRatioData}
+                        dataKey="value"
+                        nameKey="name"
+                        innerRadius={60}
+                        outerRadius={80}
+                        strokeWidth={4}
+                        style={{
+                          filter: "drop-shadow(0 0 8px rgba(234, 179, 8, 0.3))",
+                        }}
+                      >
+                        <Label
+                          content={({ viewBox }) => {
+                            if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                              return (
+                                <text
                                   x={viewBox.cx}
                                   y={viewBox.cy}
-                                  className="text-3xl font-bold text-yellow-400 fill-yellow-400"
-                                  style={{
-                                    textShadow:
-                                      "0 0 10px rgba(234, 179, 8, 0.5)",
-                                  }}
+                                  textAnchor="middle"
+                                  dominantBaseline="middle"
                                 >
-                                  {Math.round(metrics.feedbackRatio * 10) / 10}%
-                                </tspan>
-                                <tspan
-                                  x={viewBox.cx}
-                                  y={(viewBox.cy || 0) + 24}
-                                  className="fill-muted-foreground"
-                                >
-                                  Feedback Rate
-                                </tspan>
-                              </text>
-                            );
-                          }
-                        }}
-                      />
-                    </Pie>
-                  </PieChart>
-                </ChartContainer>
-                <div className="w-[40%] space-y-4">
-                  <div className="text-right">
-                    <p className="text-gray-400 text-sm">Total Invoices</p>
-                    <p className="text-2xl font-bold text-white">
-                      {metrics.totalInvoices}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-gray-400 text-sm">Total Feedbacks</p>
-                    <p className="text-2xl font-bold text-white">
-                      {metrics.totalFeedbacks}
-                    </p>
+                                  <tspan
+                                    x={viewBox.cx}
+                                    y={viewBox.cy}
+                                    className="text-3xl font-bold text-yellow-400 fill-yellow-400"
+                                    style={{
+                                      textShadow:
+                                        "0 0 10px rgba(234, 179, 8, 0.5)",
+                                    }}
+                                  >
+                                    {Math.round(metrics.feedbackRatio * 10) /
+                                      10}
+                                    %
+                                  </tspan>
+                                  <tspan
+                                    x={viewBox.cx}
+                                    y={(viewBox.cy || 0) + 24}
+                                    className="fill-muted-foreground"
+                                  >
+                                    Feedback Rate
+                                  </tspan>
+                                </text>
+                              );
+                            }
+                          }}
+                        />
+                      </Pie>
+                    </PieChart>
+                  </ChartContainer>
+                  <div className="w-[40%] space-y-4">
+                    <div className="text-right">
+                      <p className="text-gray-400 text-sm">Total Invoices</p>
+                      <p className="text-2xl font-bold text-white">
+                        {metrics.totalInvoices}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-gray-400 text-sm">Total Feedbacks</p>
+                      <p className="text-2xl font-bold text-white">
+                        {metrics.totalFeedbacks}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
+              </CardContent>
+            </div>
           </Card>
 
           {/* Positive/Negative Ratio Chart */}
-          <Card className="bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10">
-            <CardHeader className="items-center pb-2">
-              <CardTitle className="text-yellow-400 text-lg">
-                Feedback Sentiment
-              </CardTitle>
-              <CardDescription className="text-sm">
-                Positive vs Negative Feedback
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 pb-2">
-              <div className="flex items-center justify-between">
-                <ChartContainer
-                  config={CHART_CONFIG}
-                  className="mx-auto aspect-square max-h-[200px] w-[60%]"
-                >
-                  <PieChart>
-                    <ChartTooltip
-                      cursor={false}
-                      content={<ChartTooltipContent hideLabel />}
-                    />
-                    <Pie
-                      data={positiveNegativeData}
-                      dataKey="value"
-                      nameKey="name"
-                      innerRadius={60}
-                      outerRadius={80}
-                      strokeWidth={4}
-                      style={{
-                        filter: "drop-shadow(0 0 8px rgba(34, 197, 94, 0.3))",
-                      }}
-                    >
-                      <Label
-                        content={({ viewBox }) => {
-                          if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                            return (
-                              <text
-                                x={viewBox.cx}
-                                y={viewBox.cy}
-                                textAnchor="middle"
-                                dominantBaseline="middle"
-                              >
-                                <tspan
+          <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative">
+              <CardHeader className="items-center pb-2">
+                <CardTitle className="text-yellow-400 text-lg">
+                  Feedback Sentiment
+                </CardTitle>
+                <CardDescription className="text-sm">
+                  Positive vs Negative Feedback
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 pb-2">
+                <div className="flex items-center justify-between">
+                  <ChartContainer
+                    config={CHART_CONFIG}
+                    className="mx-auto aspect-square max-h-[200px] w-[60%]"
+                  >
+                    <PieChart>
+                      <ChartTooltip
+                        cursor={false}
+                        content={<ChartTooltipContent hideLabel />}
+                      />
+                      <Pie
+                        data={positiveNegativeData}
+                        dataKey="value"
+                        nameKey="name"
+                        innerRadius={60}
+                        outerRadius={80}
+                        strokeWidth={4}
+                        style={{
+                          filter: "drop-shadow(0 0 8px rgba(34, 197, 94, 0.3))",
+                        }}
+                      >
+                        <Label
+                          content={({ viewBox }) => {
+                            if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                              return (
+                                <text
                                   x={viewBox.cx}
                                   y={viewBox.cy}
-                                  className="text-3xl font-bold text-yellow-400 fill-yellow-400"
-                                  style={{
-                                    textShadow:
-                                      "0 0 10px rgba(234, 179, 8, 0.5)",
-                                  }}
+                                  textAnchor="middle"
+                                  dominantBaseline="middle"
                                 >
-                                  {metrics.positivePercentage.toFixed(1)}%
-                                </tspan>
-                                <tspan
-                                  x={viewBox.cx}
-                                  y={(viewBox.cy || 0) + 24}
-                                  className="fill-muted-foreground"
-                                >
-                                  Pos/Neg Ratio
-                                </tspan>
-                              </text>
-                            );
-                          }
-                        }}
-                      />
-                    </Pie>
-                  </PieChart>
-                </ChartContainer>
-                <div className="w-[40%] space-y-4">
-                  <div className="text-right">
-                    <p className="text-gray-400 text-sm">Positive Feedbacks</p>
-                    <p className="text-2xl font-bold text-white">
-                      {metrics.positiveFeedbacks}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-gray-400 text-sm">Negative Feedbacks</p>
-                    <p className="text-2xl font-bold text-white">
-                      {metrics.negativeFeedbacks}
-                    </p>
+                                  <tspan
+                                    x={viewBox.cx}
+                                    y={viewBox.cy}
+                                    className="text-3xl font-bold text-yellow-400 fill-yellow-400"
+                                    style={{
+                                      textShadow:
+                                        "0 0 10px rgba(234, 179, 8, 0.5)",
+                                    }}
+                                  >
+                                    {metrics.positivePercentage.toFixed(1)}%
+                                  </tspan>
+                                  <tspan
+                                    x={viewBox.cx}
+                                    y={(viewBox.cy || 0) + 24}
+                                    className="fill-muted-foreground"
+                                  >
+                                    Pos/Neg Ratio
+                                  </tspan>
+                                </text>
+                              );
+                            }
+                          }}
+                        />
+                      </Pie>
+                    </PieChart>
+                  </ChartContainer>
+                  <div className="w-[40%] space-y-4">
+                    <div className="text-right">
+                      <p className="text-gray-400 text-sm">
+                        Positive Feedbacks
+                      </p>
+                      <p className="text-2xl font-bold text-white">
+                        {metrics.positiveFeedbacks}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-gray-400 text-sm">
+                        Negative Feedbacks
+                      </p>
+                      <p className="text-2xl font-bold text-white">
+                        {metrics.negativeFeedbacks}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
+              </CardContent>
+            </div>
           </Card>
         </div>
 
         {/* Bar Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Service Ratings */}
-          <Card className="bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10">
-            <CardHeader className="items-center pb-2">
-              <CardTitle className="text-yellow-400 text-base">
-                Service Ratings
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Average ratings across aspects
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 pb-2">
-              <div className="h-[300px]">
-                <ChartContainer config={CHART_CONFIG} className="h-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      data={ratingData}
-                      layout="vertical"
-                      margin={{
-                        right: 16,
-                      }}
-                    >
-                      <CartesianGrid horizontal={false} stroke="#374151" />
-                      <YAxis
-                        dataKey="name"
-                        type="category"
-                        tickLine={false}
-                        tickMargin={10}
-                        axisLine={false}
-                        hide
-                      />
-                      <XAxis type="number" domain={[0, 5]} hide />
-                      <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent indicator="line" />}
-                      />
-                      <Bar
-                        dataKey="value"
+          <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative">
+              <CardHeader className="items-center pb-2">
+                <CardTitle className="text-yellow-400 text-base">
+                  Service Ratings
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Average ratings across aspects
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 pb-2">
+                <div className="h-[300px]">
+                  <ChartContainer config={CHART_CONFIG} className="h-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={ratingData}
                         layout="vertical"
-                        fill="#FACC15"
-                        radius={4}
+                        margin={{
+                          right: 16,
+                        }}
                       >
-                        <LabelList
+                        <CartesianGrid horizontal={false} stroke="#374151" />
+                        <YAxis
                           dataKey="name"
-                          position="insideLeft"
-                          offset={8}
-                          className="fill-[#000000] font-medium"
-                          fontSize={14}
+                          type="category"
+                          tickLine={false}
+                          tickMargin={10}
+                          axisLine={false}
+                          hide
                         />
-                        <LabelList
+                        <XAxis type="number" domain={[0, 5]} hide />
+                        <ChartTooltip
+                          cursor={false}
+                          content={<ChartTooltipContent indicator="line" />}
+                        />
+                        <Bar
                           dataKey="value"
-                          position="right"
-                          offset={8}
-                          className="fill-[#facc15] font-bold "
-                          fontSize={14}
-                        />
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-              </div>
-            </CardContent>
+                          layout="vertical"
+                          fill="#FACC15"
+                          radius={4}
+                        >
+                          <LabelList
+                            dataKey="name"
+                            position="insideLeft"
+                            offset={8}
+                            className="fill-[#000000] font-medium"
+                            fontSize={14}
+                          />
+                          <LabelList
+                            dataKey="value"
+                            position="right"
+                            offset={8}
+                            className="fill-[#facc15] font-bold"
+                            fontSize={14}
+                          />
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                </div>
+              </CardContent>
+            </div>
           </Card>
 
           {/* Rating Trend Chart */}
-          <Card className="bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10">
-            <CardHeader className="items-center pb-2">
-              <CardTitle className="text-yellow-400 text-base">
-                Rating Trend
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Overall rating over time
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 pb-2">
-              <div className="h-[300px]">
-                <ChartContainer config={CHART_CONFIG} className="h-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart
-                      data={historicalData}
-                      margin={{
-                        top: 20,
-                        right: 20,
-                        left: 20,
-                        bottom: 40,
-                      }}
-                    >
-                      <CartesianGrid vertical={false} stroke="#374151" />
-                      <XAxis
-                        dataKey="date"
-                        stroke="#9CA3AF"
-                        tickLine={false}
-                        tickMargin={10}
-                        axisLine={false}
-                        interval={0}
-                      />
-                      <YAxis
-                        stroke="#9CA3AF"
-                        domain={[0, 5]}
-                        tickLine={false}
-                        axisLine={false}
-                      />
-                      <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent hideLabel />}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="rating"
-                        stroke="#FACC15"
-                        strokeWidth={2}
-                        dot={{ fill: "#FACC15", r: 4 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-              </div>
-            </CardContent>
+          <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative">
+              <CardHeader className="items-center pb-2">
+                <CardTitle className="text-yellow-400 text-base">
+                  Rating Trend
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Overall rating over time
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 pb-2">
+                <div className="h-[300px]">
+                  <ChartContainer config={CHART_CONFIG} className="h-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        data={historicalData}
+                        margin={{
+                          top: 20,
+                          right: 20,
+                          left: 20,
+                          bottom: 40,
+                        }}
+                      >
+                        <CartesianGrid vertical={false} stroke="#374151" />
+                        <XAxis
+                          dataKey="date"
+                          stroke="#9CA3AF"
+                          tickLine={false}
+                          tickMargin={10}
+                          axisLine={false}
+                          interval={0}
+                        />
+                        <YAxis
+                          stroke="#9CA3AF"
+                          domain={[0, 5]}
+                          tickLine={false}
+                          axisLine={false}
+                        />
+                        <ChartTooltip
+                          cursor={false}
+                          content={<ChartTooltipContent hideLabel />}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="rating"
+                          stroke="#FACC15"
+                          strokeWidth={2}
+                          dot={{ fill: "#FACC15", r: 4 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                </div>
+              </CardContent>
+            </div>
           </Card>
         </div>
 
         {/* Performance Metrics */}
-        <Card className="bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 mb-8">
-          <CardHeader className="items-center pb-2">
-            <CardTitle className="text-yellow-400 text-base">
-              Performance Metrics
-            </CardTitle>
-            <CardDescription className="text-xs">
-              Best & Worst Areas
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Best Performing */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-400">
-                  Best: {metrics.bestPerforming.metric}
-                </span>
-                <span className="text-sm text-yellow-400">
-                  {metrics.bestPerforming.rating}/5
-                </span>
+        <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden mb-8">
+          <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="relative">
+            <CardHeader className="items-center pb-2">
+              <CardTitle className="text-yellow-400 text-base">
+                Performance Metrics
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Best & Worst Areas
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Best Performing */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-400">
+                    Best: {metrics.bestPerforming.metric}
+                  </span>
+                  <span className="text-sm text-yellow-400">
+                    {metrics.bestPerforming.rating}/5
+                  </span>
+                </div>
+                <Progress
+                  value={(metrics.bestPerforming.rating / 5) * 100}
+                  className="h-2 bg-gradient-to-r from-gray-800 to-gray-700 [&>div]:bg-gradient-to-r [&>div]:from-yellow-500 [&>div]:to-yellow-400"
+                />
               </div>
-              <Progress
-                value={(metrics.bestPerforming.rating / 5) * 100}
-                className="h-2 bg-gray-800 [&>div]:bg-yellow-400"
-              />
-            </div>
 
-            {/* Worst Performing */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-400">
-                  Worst: {metrics.worstPerforming.metric}
-                </span>
-                <span className="text-sm text-gray-100">
-                  {metrics.worstPerforming.rating}/5
-                </span>
+              {/* Worst Performing */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-400">
+                    Worst: {metrics.worstPerforming.metric}
+                  </span>
+                  <span className="text-sm text-gray-100">
+                    {metrics.worstPerforming.rating}/5
+                  </span>
+                </div>
+                <Progress
+                  value={(metrics.worstPerforming.rating / 5) * 100}
+                  className="h-2 bg-gradient-to-r from-gray-800 to-gray-700 [&>div]:bg-gradient-to-r [&>div]:from-gray-100 [&>div]:to-gray-200"
+                />
               </div>
-              <Progress
-                value={(metrics.worstPerforming.rating / 5) * 100}
-                className="h-2 bg-gray-800 [&>div]:bg-gray-100"
-              />
-            </div>
-          </CardContent>
+            </CardContent>
+          </div>
         </Card>
 
         {/* Insights Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Improvements */}
-          <Card className="bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10">
-            <CardHeader>
-              <div className="flex items-center space-x-2">
-                <Lightbulb className="h-5 w-5 text-yellow-400" />
-                <CardTitle className="text-yellow-400">
-                  Areas for Improvement
-                </CardTitle>
-              </div>
-              <CardDescription>
-                AI-generated insights for better performance
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                {metrics.improvements.map((improvement, index) => (
-                  <li key={index} className="flex items-start space-x-2">
-                    <span className="text-yellow-400">•</span>
-                    <span className="text-gray-300">{improvement}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
+          <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative">
+              <CardHeader>
+                <div className="flex items-center space-x-2">
+                  <Lightbulb className="h-5 w-5 text-yellow-400" />
+                  <CardTitle className="text-yellow-400">
+                    Areas for Improvement
+                  </CardTitle>
+                </div>
+                <CardDescription>
+                  AI-generated insights for better performance
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  {metrics.improvements.map((improvement, index) => (
+                    <li key={index} className="flex items-start space-x-2">
+                      <span className="text-yellow-400">•</span>
+                      <span className="text-gray-300">{improvement}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </div>
           </Card>
 
           {/* Strengths */}
-          <Card className="bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10">
-            <CardHeader>
-              <div className="flex items-center space-x-2">
-                <Star className="h-5 w-5 text-yellow-400" />
-                <CardTitle className="text-yellow-400">Key Strengths</CardTitle>
-              </div>
-              <CardDescription>
-                AI-identified areas of excellence
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                {metrics.strengths.map((strength, index) => (
-                  <li key={index} className="flex items-start space-x-2">
-                    <span className="text-yellow-400">•</span>
-                    <span className="text-gray-300">{strength}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
+          <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative">
+              <CardHeader>
+                <div className="flex items-center space-x-2">
+                  <Star className="h-5 w-5 text-yellow-400" />
+                  <CardTitle className="text-yellow-400">
+                    Key Strengths
+                  </CardTitle>
+                </div>
+                <CardDescription>
+                  AI-identified areas of excellence
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  {metrics.strengths.map((strength, index) => (
+                    <li key={index} className="flex items-start space-x-2">
+                      <span className="text-yellow-400">•</span>
+                      <span className="text-gray-300">{strength}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </div>
           </Card>
         </div>
       </div>
