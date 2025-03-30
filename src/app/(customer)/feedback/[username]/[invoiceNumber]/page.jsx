@@ -168,6 +168,7 @@ export default function FeedbackForm() {
         recommendRating: formData.recommendRating,
         overAllRating: formData.overAllRating,
         feedbackContent: formData.feedbackContent,
+        suggestionContent: formData.suggestionContent,
         username,
         invoiceNumber,
       });
