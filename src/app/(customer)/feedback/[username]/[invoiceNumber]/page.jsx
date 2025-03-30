@@ -96,6 +96,10 @@ export default function FeedbackForm() {
       e.preventDefault();
       const response = await axios.post("/api/submit-feedback", payload);
       setFeedbackSubmittedSuccess(true);
+      if (response.status == 201) {
+        const result = await axios.post("/api/set-recommended-actions", {username});
+        console.log(result);
+      }
     } catch (error) {
       toast.error("Failed to submit feedback. Please try again.");
     }
