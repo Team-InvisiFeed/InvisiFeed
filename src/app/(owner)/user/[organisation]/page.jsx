@@ -62,6 +62,9 @@ const Page = () => {
 
   return (
     <>
+    <div id="generate">
+        <GenerateInvoiceQR />
+      </div>
       <div id="dashboard">
         <Dashboard />
       </div>
@@ -72,9 +75,7 @@ const Page = () => {
       <div id="feedbacks">
         <CustomerFeedbacks />
       </div>
-      <div id="generate">
-        <GenerateInvoiceQR />
-      </div>
+      
     </>
   );
 };
