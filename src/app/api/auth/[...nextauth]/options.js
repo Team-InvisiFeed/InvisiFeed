@@ -41,7 +41,21 @@ export const authOptions = {
             throw new Error("Incorrect password");
           }
 
-          return user;
+          // Generate tokens
+          const accessToken = generateAccessToken(user);
+          const refreshToken = generateRefreshToken(user);
+
+          // Store refresh token in database
+          user.refreshToken = refreshToken;
+          await user.save();
+
+          return {
+            ...user.toObject(),
+            accessToken,
+            refreshToken,
+            accessTokenExpiry: Date.now() + 20 * 1000, // 20 seconds
+            refreshTokenExpiry: Date.now() + 60 * 1000, // 60 seconds
+          };
         } catch (err) {
           throw new Error(err.message);
         }
@@ -57,34 +71,46 @@ export const authOptions = {
         token.email = user.email;
         token.organizationName = user.organizationName;
         token.username = user.username;
-
-        // Set initial tokens
-        token.accessToken = generateAccessToken(user);
-        token.refreshToken = generateRefreshToken(user);
-        token.accessTokenExpiry = Date.now() + 15 * 60 * 1000; // 20 seconds
-        token.refreshTokenExpiry = Date.now() + 10 * 24 * 60 * 60 * 1000; // 60 seconds
+        token.accessToken = user.accessToken;
+        token.refreshToken = user.refreshToken;
+        token.accessTokenExpiry = user.accessTokenExpiry;
+        token.refreshTokenExpiry = user.refreshTokenExpiry;
       }
 
       // Handle token refresh
       if (Date.now() < token.refreshTokenExpiry) {
         if (Date.now() > token.accessTokenExpiry) {
-          // Refresh access token
-          token.accessToken = generateAccessToken({
-            _id: token._id,
-            email: token.email,
-            username: token.username,
-            isVerified: token.isVerified,
-            organizationName: token.organizationName,
-          });
-          token.accessTokenExpiry = Date.now() + 15 * 60 * 1000;
-          token.refreshToken = generateRefreshToken({
-            _id: token._id,
-            email: token.email,
-            username: token.username,
-            isVerified: token.isVerified,
-            organizationName: token.organizationName,
-          });
-          token.refreshTokenExpiry = Date.now() + 10 * 24 * 60 * 60 * 1000;
+          try {
+            // Generate new tokens
+            const newAccessToken = generateAccessToken({
+              _id: token._id,
+              email: token.email,
+              username: token.username,
+              isVerified: token.isVerified,
+              organizationName: token.organizationName,
+            });
+            const newRefreshToken = generateRefreshToken({
+              _id: token._id,
+              email: token.email,
+              username: token.username,
+              isVerified: token.isVerified,
+              organizationName: token.organizationName,
+            });
+
+            // Update refresh token in database
+            await OwnerModel.findByIdAndUpdate(token._id, {
+              refreshToken: newRefreshToken,
+            });
+
+            // Update token object
+            token.accessToken = newAccessToken;
+            token.refreshToken = newRefreshToken;
+            token.accessTokenExpiry = Date.now() + 20 * 1000; // 20 seconds
+            token.refreshTokenExpiry = Date.now() + 60 * 1000; // 60 seconds
+          } catch (error) {
+            console.error("Error refreshing token:", error);
+            return null; // Force logout on error
+          }
         }
       } else {
         // Both tokens expired, return null to force logout
@@ -110,6 +136,20 @@ export const authOptions = {
     },
   },
 
+  events: {
+    async signOut({ token }) {
+      try {
+        await dbConnect();
+        // Delete refresh token from database
+        await OwnerModel.findByIdAndUpdate(token._id, {
+          refreshToken: null,
+        });
+      } catch (error) {
+        console.error("Error deleting refresh token:", error);
+      }
+    },
+  },
+
   pages: {
     signIn: "/sign-in",
   },
@@ -132,7 +172,7 @@ function generateAccessToken(user) {
       organizationName: user.organizationName,
     },
     process.env.NEXTAUTH_SECRET,
-    { expiresIn: "15m" }
+    { expiresIn: "20s" }
   );
 }
 
@@ -146,6 +186,6 @@ function generateRefreshToken(user) {
       organizationName: user.organizationName,
     },
     process.env.NEXTAUTH_SECRET,
-    { expiresIn: "10d" }
+    { expiresIn: "60s" }
   );
 }
