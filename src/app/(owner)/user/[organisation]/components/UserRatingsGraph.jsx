@@ -83,36 +83,39 @@ export default function UserRatingsGraph() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] py-6 sm:py-12 px-3 sm:px-4">
-      <Card className="w-full max-w-4xl mx-auto bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/20">
-        <CardHeader className="border-b border-yellow-400/20 px-4 sm:px-6">
-          <CardTitle className="text-xl sm:text-2xl font-bold text-yellow-400">
-            Average Ratings for {owner.organizationName}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4 sm:p-6">
-          <div className="space-y-6">
-            {Object.entries(ratingLabels).map(([key, label]) => (
-              <div key={key} className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300">{label}</span>
-                  <span className="text-yellow-400 font-semibold">
-                    {ratings.averageRatings[key].toFixed(1)}/5
-                  </span>
+      <Card className="w-full max-w-4xl mx-auto bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="relative">
+          <CardHeader className="border-b border-yellow-400/20 px-4 sm:px-6">
+            <CardTitle className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
+              Average Ratings for {owner.organizationName}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6">
+            <div className="space-y-6">
+              {Object.entries(ratingLabels).map(([key, label]) => (
+                <div key={key} className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-300">{label}</span>
+                    <span className="text-yellow-400 font-semibold">
+                      {ratings.averageRatings[key].toFixed(1)}/5
+                    </span>
+                  </div>
+                  <Progress
+                    value={(ratings.averageRatings[key] / 5) * 100}
+                    className="h-2 bg-gradient-to-r from-gray-800 to-gray-700 [&>div]:bg-gradient-to-r [&>div]:from-yellow-500 [&>div]:to-yellow-400"
+                  />
                 </div>
-                <Progress
-                  value={(ratings.averageRatings[key] / 5) * 100}
-                  className="h-2 bg-gray-300 [&>div]:bg-yellow-400"
-                />
+              ))}
+              <div className="mt-6 pt-4 border-t border-yellow-400/20">
+                <p className="text-gray-400 text-center">
+                  Based on {ratings.totalFeedbacks} feedback
+                  {ratings.totalFeedbacks !== 1 ? "s" : ""}
+                </p>
               </div>
-            ))}
-            <div className="mt-6 pt-4 border-t border-yellow-400/20">
-              <p className="text-gray-400 text-center">
-                Based on {ratings.totalFeedbacks} feedback
-                {ratings.totalFeedbacks !== 1 ? "s" : ""}
-              </p>
             </div>
-          </div>
-        </CardContent>
+          </CardContent>
+        </div>
       </Card>
     </div>
   );
