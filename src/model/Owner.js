@@ -119,6 +119,10 @@ const OwnerSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  refreshToken: {
+    type: String,
+    default: null,
+  },
   phoneNumber: {
     type: String,
     required: [true, "Phone Number is required"],
@@ -148,7 +152,7 @@ const OwnerSchema = new Schema({
     },
   },
 
-  currentRecommendedActions : {
+  currentRecommendedActions: {
     improvements: {
       type: [String],
       default: [],
