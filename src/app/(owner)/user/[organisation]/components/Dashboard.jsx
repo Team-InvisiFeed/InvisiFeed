@@ -87,6 +87,8 @@ const Dashboard = () => {
         });
         console.log(response.data.data);
         setMetrics(response.data.data);
+        //console.log(metrics);
+
       } catch (error) {
         setError("Failed to fetch dashboard metrics");
         console.error("Error fetching metrics:", error);
@@ -169,6 +171,8 @@ const Dashboard = () => {
     return metrics.historicalRatings;
   }, [metrics]);
 
+  
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
@@ -184,7 +188,7 @@ const Dashboard = () => {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-400 mb-2">Error</h2>
+          <h2 className="text-2xl font-bold text-yellow-400 mb-2">No data found</h2>
           <p className="text-gray-400">{error}</p>
         </div>
       </div>
