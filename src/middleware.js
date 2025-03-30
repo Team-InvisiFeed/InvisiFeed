@@ -39,8 +39,8 @@ export async function middleware(request) {
     token &&
     (url.pathname.startsWith("/sign-in") ||
       url.pathname.startsWith("/register") ||
-      url.pathname.startsWith("/verify")
-   )) {
+      url.pathname.startsWith("/verify"))
+  ) {
     return NextResponse.redirect(
       new URL(`/user/${token.username}`, request.url)
     );
