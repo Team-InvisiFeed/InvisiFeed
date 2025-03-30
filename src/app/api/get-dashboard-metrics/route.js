@@ -1,9 +1,6 @@
 import dbConnect from "@/lib/dbConnect";
 import OwnerModel from "@/model/Owner";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { ApiError } from "@/utils/ApiError";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export async function POST(req) {
   await dbConnect();
@@ -84,39 +81,6 @@ export async function POST(req) {
     const bestPerforming = sortedMetrics[0];
     const worstPerforming = sortedMetrics[sortedMetrics.length - 1];
 
-    // Generate AI insights for improvements and strengths
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash-lite-preview-02-05",
-    });
-
-    const ratingsPrompt = `
-      Satisfaction: ${averageRatings.satisfactionRating}/5,
-      Communication: ${averageRatings.communicationRating}/5,
-      Quality of Service: ${averageRatings.qualityOfServiceRating}/5,
-      Value for Money: ${averageRatings.valueForMoneyRating}/5,
-      Recommendation: ${averageRatings.recommendRating}/5,
-      Overall Rating: ${averageRatings.overAllRating}/5
-    `;
-
-    // Generate improvement suggestions
-    const improvementsPrompt = `${ratingsPrompt}\n\nBased on these ratings, provide exactly 3 specific, actionable improvement points. Each point should be a single line without any special characters or formatting. Focus on areas with lower ratings. Keep each point concise and practical.`;
-    const improvementsResult = await model.generateContent(improvementsPrompt);
-    const improvements = improvementsResult.response
-      .text()
-      .split("\n")
-      .filter((point) => point.trim())
-      .map((point) => point.replace(/[*#\-•]/g, "").trim())
-      .slice(0, 3);
-
-    // Generate strengths
-    const strengthsPrompt = `${ratingsPrompt}\n\nBased on these ratings, provide exactly 3 key strengths. Each point should be a single line without any special characters or formatting. Focus on areas with higher ratings. Keep each point concise and impactful.`;
-    const strengthsResult = await model.generateContent(strengthsPrompt);
-    const strengths = strengthsResult.response
-      .text()
-      .split("\n")
-      .filter((point) => point.trim())
-      .map((point) => point.replace(/[*#\-•]/g, "").trim())
-      .slice(0, 3);
 
     return Response.json(
       {
@@ -136,10 +100,10 @@ export async function POST(req) {
             metric: metrics[worstPerforming[0]],
             rating: Number(worstPerforming[1].toFixed(2)),
           },
+          improvements: owner.currentRecommendedActions.improvements,
+          strengths: owner.currentRecommendedActions.strengths,
           positiveFeedbacks,
           negativeFeedbacks,
-          improvements,
-          strengths,
           averageRatings: Object.fromEntries(
             Object.entries(averageRatings).map(([key, value]) => [
               key,
