@@ -132,20 +132,31 @@ const OwnerSchema = new Schema({
   uploadedInvoiceCount: {
     count: {
       type: Number,
-      default: 0
+      default: 0,
     },
     lastUpdated: {
       type: Date,
-      default: Date.now
+      default: Date.now,
     },
     dailyUploads: {
       type: Number,
-      default: 0
+      default: 0,
     },
     lastDailyReset: {
       type: Date,
-      default: Date.now
-    }
+      default: Date.now,
+    },
+  },
+
+  currentRecommendedActions : {
+    improvements: {
+      type: [String],
+      default: [],
+    },
+    strengths: {
+      type: [String],
+      default: [],
+    },
   },
 });
 
