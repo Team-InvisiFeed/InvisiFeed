@@ -3,7 +3,6 @@ import cloudinary from "cloudinary";
 import axios from "axios";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import QRCode from "qrcode";
-import { writeFile } from "fs/promises";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import dotenv from "dotenv";
 import OwnerModel from "@/model/Owner";
