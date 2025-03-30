@@ -45,6 +45,9 @@ export const authOptions = {
           const accessToken = generateAccessToken(user);
           const refreshToken = generateRefreshToken(user);
 
+          const decodedAccessToken = jwt.decode(accessToken, process.env.ACCESS_TOKEN_SECRET);
+          const decodedRefreshToken = jwt.decode(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
           // Store refresh token in database
           user.refreshToken = refreshToken;
           await user.save();
@@ -53,8 +56,8 @@ export const authOptions = {
             ...user.toObject(),
             accessToken,
             refreshToken,
-            accessTokenExpiry: Date.now() + process.env.ACCESS_TOKEN_EXPIRY * 1000, // 20 seconds
-            refreshTokenExpiry: Date.now() + process.env.REFRESH_TOKEN_EXPIRY * 1000, // 60 seconds
+            accessTokenExpiry: decodedAccessToken.exp * 1000, // 20 seconds
+            refreshTokenExpiry: decodedRefreshToken.exp * 1000, // 60 seconds
           };
         } catch (err) {
           throw new Error(err.message);
@@ -97,6 +100,10 @@ export const authOptions = {
               organizationName: token.organizationName,
             });
 
+            const decodedNewAccessToken = jwt.decode(newAccessToken, process.env.ACCESS_TOKEN_SECRET);
+            const decodedNewRefreshToken = jwt.decode(newRefreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+
             // Update refresh token in database
             await OwnerModel.findByIdAndUpdate(token._id, {
               refreshToken: newRefreshToken,
@@ -105,8 +112,8 @@ export const authOptions = {
             // Update token object
             token.accessToken = newAccessToken;
             token.refreshToken = newRefreshToken;
-            token.accessTokenExpiry = Date.now() + process.env.ACCESS_TOKEN_EXPIRY * 1000; // 20 seconds
-            token.refreshTokenExpiry = Date.now() + process.env.REFRESH_TOKEN_EXPIRY * 1000; // 60 seconds
+            token.accessTokenExpiry = decodedNewAccessToken.exp * 1000; // 20 seconds
+            token.refreshTokenExpiry = decodedNewRefreshToken.exp * 1000; // 60 seconds
           } catch (error) {
             console.error("Error refreshing token:", error);
             return null; // Force logout on error
@@ -171,7 +178,7 @@ function generateAccessToken(user) {
       isVerified: user.isVerified,
       organizationName: user.organizationName,
     },
-    process.env.NEXTAUTH_SECRET,
+    process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
   );
 }
@@ -185,7 +192,7 @@ function generateRefreshToken(user) {
       isVerified: user.isVerified,
       organizationName: user.organizationName,
     },
-    process.env.NEXTAUTH_SECRET,
+    process.env.REFRESH_TOKEN_SECRET,
     { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
   );
 }
