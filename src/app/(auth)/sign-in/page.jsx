@@ -198,7 +198,7 @@ function Page() {
               <button
                 onClick={() => {
                   setIsNavigatingToRegister(true);
-                  router.push('/register');
+                  router.push("/register");
                 }}
                 disabled={isNavigatingToRegister}
                 className="text-yellow-400 hover:text-yellow-300 font-medium inline-flex items-center cursor-pointer"
