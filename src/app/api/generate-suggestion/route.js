@@ -49,12 +49,31 @@ export async function POST(req) {
     `;
 
     // Only add user's feedback to prompt if it exists and is not empty
-    if (body.feedbackContent && body.feedbackContent.trim() !== "") {
+    if (
+      body.feedbackContent &&
+      body.feedbackContent.trim() !== "" &&
+      body.suggestionContent &&
+      body.suggestionContent.trim() !== ""
+    ) {
+      prompt += `
+      
+      User's Feedback: "${body.feedbackContent}"
+      
+      User's Suggestion: "${body.suggestionContent}"
+      
+      Based on these ratings, the user's feedback, and suggestion, generate a constructive 30-word suggestion for improvement. Focus on specific, actionable points that could enhance their experience. Keep the tone positive and solution-oriented.`;
+    } else if (body.feedbackContent && body.feedbackContent.trim() !== "") {
       prompt += `
       
       User's Feedback: "${body.feedbackContent}"
       
       Based on these ratings and the user's feedback, generate a constructive 30-word suggestion for improvement. Focus on specific, actionable points that could enhance their experience. Keep the tone positive and solution-oriented.`;
+    } else if (body.suggestionContent && body.suggestionContent.trim() !== "") {
+      prompt += `
+      
+      User's Suggestion: "${body.suggestionContent}"
+      
+      Based on these ratings and the user's suggestion, generate a constructive 20-word suggestion for improvement. Focus on specific, actionable points that could enhance their experience. Keep the tone positive and solution-oriented.`;
     } else {
       prompt += `
       
