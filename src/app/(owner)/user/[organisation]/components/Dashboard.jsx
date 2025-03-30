@@ -12,6 +12,7 @@ import {
   TrendingDown,
   Lightbulb,
   Star,
+  Calendar,
 } from "lucide-react";
 import {
   Card,
@@ -45,6 +46,13 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Constants
 const CHART_CONFIG = {
@@ -126,11 +134,17 @@ const Dashboard = () => {
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedYear, setSelectedYear] = useState(
+    new Date().getFullYear().toString()
+  );
+  const [viewType, setViewType] = useState("currentYear");
 
   const fetchMetrics = useCallback(async () => {
     try {
       const response = await axios.post("/api/get-dashboard-metrics", {
         username: owner.username,
+        year: selectedYear,
+        viewType,
       });
       setMetrics(response.data.data);
     } catch (error) {
@@ -139,7 +153,7 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, [owner?.username]);
+  }, [owner?.username, selectedYear, viewType]);
 
   useEffect(() => {
     if (owner?.username) {
@@ -523,12 +537,71 @@ const Dashboard = () => {
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative">
               <CardHeader className="items-center pb-2">
-                <CardTitle className="text-yellow-400 text-base">
-                  Rating Trend
-                </CardTitle>
-                <CardDescription className="text-xs">
-                  Overall rating over time
-                </CardDescription>
+                <div className="flex items-center justify-between w-full">
+                  <div>
+                    <CardTitle className="text-yellow-400 text-base">
+                      Rating Trend
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      Overall rating over time
+                    </CardDescription>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <Select
+                      value={viewType}
+                      onValueChange={(value) => {
+                        setViewType(value);
+                        setSelectedYear(""); // Clear year selection when changing view type
+                      }}
+                    >
+                      <SelectTrigger className="w-[120px] bg-[#0A0A0A] border-yellow-400/20 text-yellow-400">
+                        <SelectValue placeholder="Select Time Period" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
+                        <SelectItem
+                          value="currentMonth"
+                          className="text-yellow-400 hover:bg-yellow-400/10"
+                        >
+                          Current Month
+                        </SelectItem>
+                        <SelectItem
+                          value="currentWeek"
+                          className="text-yellow-400 hover:bg-yellow-400/10"
+                        >
+                          Current Week
+                        </SelectItem>
+                        <SelectItem
+                          value="currentYear"
+                          className="text-yellow-400 hover:bg-yellow-400/10"
+                        >
+                          Current Year
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={selectedYear}
+                      onValueChange={(value) => {
+                        setSelectedYear(value);
+                        setViewType(""); // Clear view type when selecting a year
+                      }}
+                    >
+                      <SelectTrigger className="w-[120px] bg-[#0A0A0A] border-yellow-400/20 text-yellow-400">
+                        <SelectValue placeholder="Select Year" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
+                        {metrics?.availableYears?.map((year) => (
+                          <SelectItem
+                            key={year}
+                            value={year.toString()}
+                            className="text-yellow-400 hover:bg-yellow-400/10"
+                          >
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent className="flex-1 pb-2">
                 <div className="h-[300px]">
@@ -551,12 +624,17 @@ const Dashboard = () => {
                           tickMargin={10}
                           axisLine={false}
                           interval={0}
+                          angle={-45}
+                          textAnchor="end"
+                          height={60}
+                          tick={{ fill: "#9CA3AF" }}
                         />
                         <YAxis
                           stroke="#9CA3AF"
                           domain={[0, 5]}
                           tickLine={false}
                           axisLine={false}
+                          tick={{ fill: "#9CA3AF" }}
                         />
                         <ChartTooltip
                           cursor={false}
