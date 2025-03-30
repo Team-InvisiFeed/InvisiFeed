@@ -15,6 +15,9 @@ export default function Home() {
   const [dailyUploads, setDailyUploads] = useState(0);
   const [timeLeft, setTimeLeft] = useState(null);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
   // Fetch initial upload count
   useEffect(() => {
@@ -43,6 +46,9 @@ export default function Home() {
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
+    // Reset email states when new file is selected
+    setEmailSent(false);
+    setCustomerEmail("");
   };
 
   const handleUpload = async () => {
@@ -76,12 +82,51 @@ export default function Home() {
         setPdfUrl(data.url);
         setInvoiceNumber(data.invoiceNumber);
         setDailyUploads((prev) => prev + 1);
+        // Reset email states when new invoice is uploaded successfully
+        setEmailSent(false);
+        setCustomerEmail("");
       }
     } catch (error) {
       alert("Something went wrong! Please try again.");
     }
 
     setLoading(false);
+  };
+
+  const handleSendEmail = async () => {
+    if (!customerEmail) {
+      alert("Please enter customer email");
+      return;
+    }
+
+    setSendingEmail(true);
+    try {
+      const response = await fetch('/api/send-invoice-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customerEmail,
+          invoiceNumber,
+          pdfUrl,
+          companyName: owner?.organizationName || 'Your Company'
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setEmailSent(true);
+        setCustomerEmail(""); // Clear the email field
+      } else {
+        alert(data.error || "Failed to send email. Please try again.");
+      }
+    } catch (error) {
+      alert("Something went wrong while sending the email. Please try again.");
+    } finally {
+      setSendingEmail(false);
+    }
   };
 
   return (
@@ -217,10 +262,53 @@ export default function Home() {
               className="mt-8 p-4 bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm rounded-lg border border-yellow-400/10 w-full max-w-md mx-auto group relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative">
+              <div className="relative space-y-4">
                 <h2 className="text-lg font-semibold mb-4 text-yellow-400">
                   Processed PDF Ready
                 </h2>
+                
+                {/* Email Input */}
+                <div className="w-full">
+                  <input
+                    type="email"
+                    placeholder="Enter Customer Email"
+                    value={customerEmail}
+                    onChange={(e) => setCustomerEmail(e.target.value)}
+                    className="w-full px-4 py-2 bg-[#0A0A0A]/50 border border-yellow-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+                    disabled={sendingEmail || emailSent}
+                  />
+                </div>
+
+                {/* Email Button */}
+                <button
+                  onClick={handleSendEmail}
+                  disabled={sendingEmail || emailSent || !customerEmail}
+                  className="cursor-pointer w-full px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-lg transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {sendingEmail ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Sending...</span>
+                    </>
+                  ) : emailSent ? (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span>Email Sent Successfully!</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                      </svg>
+                      <span>Send Invoice via Email</span>
+                    </>
+                  )}
+                </button>
+
+                {/* Download Button */}
                 <a
                   href={pdfUrl}
                   target="_blank"
