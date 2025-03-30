@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   LayoutDashboard,
@@ -46,7 +46,8 @@ import {
 } from "@/components/ui/chart";
 import { Progress } from "@/components/ui/progress";
 
-const chartConfig = {
+// Constants
+const CHART_CONFIG = {
   feedbackRatio: {
     label: "Feedback Ratio",
     color: "#EAB308",
@@ -72,6 +73,50 @@ const chartConfig = {
   },
 };
 
+const ANIMATION_CONFIG = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.3 },
+};
+
+// Memoized Components
+const LoadingState = () => (
+  <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+    <div className="flex items-center space-x-2 text-yellow-400">
+      <Loader2 className="w-6 h-6 animate-spin" />
+      <span>Loading dashboard...</span>
+    </div>
+  </div>
+);
+
+const ErrorState = ({ error }) => (
+  <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+    <div className="text-center">
+      <h2 className="text-2xl font-bold text-yellow-400 mb-2">No data found</h2>
+      <p className="text-gray-400">{error}</p>
+    </div>
+  </div>
+);
+
+const StatCard = ({ title, value, subtitle, icon: Icon, delay }) => (
+  <motion.div
+    {...ANIMATION_CONFIG}
+    transition={{ ...ANIMATION_CONFIG.transition, delay }}
+    className="bg-[#0A0A0A]/50 backdrop-blur-sm rounded-xl p-6 border border-yellow-400/10 hover:border-yellow-400/30 transition-colors group"
+  >
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-gray-400 text-sm">{title}</p>
+        <h3 className="text-2xl font-bold text-white mt-1">{value}</h3>
+        <p className="text-gray-500 text-sm mt-1">{subtitle}</p>
+      </div>
+      <div className="p-3 bg-[#0A0A0A]/50 rounded-lg group-hover:bg-yellow-400/10 transition-colors">
+        <Icon className="h-6 w-6 text-yellow-400" />
+      </div>
+    </div>
+  </motion.div>
+);
+
 const Dashboard = () => {
   const { data: session } = useSession();
   const owner = session?.user;
@@ -79,36 +124,34 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const fetchMetrics = useCallback(async () => {
+    try {
+      const response = await axios.post("/api/get-dashboard-metrics", {
+        username: owner.username,
+      });
+      setMetrics(response.data.data);
+    } catch (error) {
+      setError("Failed to fetch dashboard metrics");
+      console.error("Error fetching metrics:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [owner?.username]);
+
   useEffect(() => {
-    const fetchMetrics = async () => {
-      try {
-        const response = await axios.post("/api/get-dashboard-metrics", {
-          username: owner.username,
-        });
-        console.log(response.data.data);
-        setMetrics(response.data.data);
-        //console.log(metrics);
-
-      } catch (error) {
-        setError("Failed to fetch dashboard metrics");
-        console.error("Error fetching metrics:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (owner?.username) {
       fetchMetrics();
     }
-  }, [owner]);
+  }, [owner?.username, fetchMetrics]);
 
+  // Memoized data calculations
   const feedbackRatioData = useMemo(() => {
     if (!metrics) return [];
     return [
       {
         name: "Feedbacks",
         value: metrics.feedbackRatio,
-        fill: "#EAB308",
+        fill: CHART_CONFIG.feedbackRatio.color,
       },
       {
         name: "Remaining",
@@ -124,15 +167,12 @@ const Dashboard = () => {
     return [
       {
         name: "Positive",
-        value:
-          (metrics.positiveNegativeRatio /
-            (1 + metrics.positiveNegativeRatio)) *
-          100,
-        fill: "#EAB308",
+        value: metrics.positivePercentage,
+        fill: CHART_CONFIG.feedbackRatio.color,
       },
       {
         name: "Negative",
-        value: (1 / (1 + metrics.positiveNegativeRatio)) * 100,
+        value: metrics.negativePercentage,
         fill: "#FFFFFF",
         style: { filter: "drop-shadow(inset 0 0 8px rgba(0, 0, 0, 0.2))" },
       },
@@ -146,7 +186,7 @@ const Dashboard = () => {
       .map(([key, value]) => ({
         name: metrics.apiMetrics[key],
         value: value,
-        fill: "#FACC15",
+        fill: CHART_CONFIG.ratings.color,
       }));
   }, [metrics]);
 
@@ -156,12 +196,12 @@ const Dashboard = () => {
       {
         name: metrics.bestPerforming.metric,
         value: metrics.bestPerforming.rating,
-        fill: "#22C55E",
+        fill: CHART_CONFIG.positive.color,
       },
       {
         name: metrics.worstPerforming.metric,
         value: metrics.worstPerforming.rating,
-        fill: "#EF4444",
+        fill: CHART_CONFIG.negative.color,
       },
     ];
   }, [metrics]);
@@ -171,40 +211,14 @@ const Dashboard = () => {
     return metrics.historicalRatings;
   }, [metrics]);
 
-  
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <div className="flex items-center space-x-2 text-yellow-400">
-          <Loader2 className="w-6 h-6 animate-spin" />
-          <span>Loading dashboard...</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-yellow-400 mb-2">No data found</h2>
-          <p className="text-gray-400">{error}</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingState />;
+  if (error) return <ErrorState error={error} />;
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="mb-8"
-        >
+        <motion.div {...ANIMATION_CONFIG} className="mb-8">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
             Dashboard
           </h1>
@@ -216,89 +230,34 @@ const Dashboard = () => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-            className="bg-[#0A0A0A]/50 backdrop-blur-sm rounded-xl p-6 border border-yellow-400/10 hover:border-yellow-400/30 transition-colors group"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm">Feedback Ratio</p>
-                <h3 className="text-2xl font-bold text-white mt-1">
-                  {metrics.feedbackRatio}%
-                </h3>
-                <p className="text-gray-500 text-sm mt-1">
-                  Feedbacks per 100 invoices
-                </p>
-              </div>
-              <div className="p-3 bg-[#0A0A0A]/50 rounded-lg group-hover:bg-yellow-400/10 transition-colors">
-                <FileText className="h-6 w-6 text-yellow-400" />
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
-            className="bg-[#0A0A0A]/50 backdrop-blur-sm rounded-xl p-6 border border-yellow-400/10 hover:border-yellow-400/30 transition-colors group"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm">Average Rating</p>
-                <h3 className="text-2xl font-bold text-white mt-1">
-                  {metrics.averageOverallRating.toFixed(1)}
-                </h3>
-                <p className="text-gray-500 text-sm mt-1">
-                  Overall satisfaction
-                </p>
-              </div>
-              <div className="p-3 bg-[#0A0A0A]/50 rounded-lg group-hover:bg-yellow-400/10 transition-colors">
-                <Star className="h-6 w-6 text-yellow-400" />
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.3 }}
-            className="bg-[#0A0A0A]/50 backdrop-blur-sm rounded-xl p-6 border border-yellow-400/10 hover:border-yellow-400/30 transition-colors group"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm">Total Feedbacks</p>
-                <h3 className="text-2xl font-bold text-white mt-1">
-                  {metrics.totalFeedbacks}
-                </h3>
-                <p className="text-gray-500 text-sm mt-1">Total received</p>
-              </div>
-              <div className="p-3 bg-[#0A0A0A]/50 rounded-lg group-hover:bg-yellow-400/10 transition-colors">
-                <Users className="h-6 w-6 text-yellow-400" />
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.4 }}
-            className="bg-[#0A0A0A]/50 backdrop-blur-sm rounded-xl p-6 border border-yellow-400/10 hover:border-yellow-400/30 transition-colors group"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400 text-sm">Positive/Negative</p>
-                <h3 className="text-2xl font-bold text-white mt-1">
-                  {metrics.positiveNegativeRatio.toFixed(1)}
-                </h3>
-                <p className="text-gray-500 text-sm mt-1">Feedback ratio</p>
-              </div>
-              <div className="p-3 bg-[#0A0A0A]/50 rounded-lg group-hover:bg-yellow-400/10 transition-colors">
-                <Activity className="h-6 w-6 text-yellow-400" />
-              </div>
-            </div>
-          </motion.div>
+          <StatCard
+            title="Feedback Ratio"
+            value={`${metrics.feedbackRatio}%`}
+            subtitle="Feedbacks per 100 invoices"
+            icon={FileText}
+            delay={0.1}
+          />
+          <StatCard
+            title="Average Rating"
+            value={metrics.averageOverallRating.toFixed(1)}
+            subtitle="Overall satisfaction"
+            icon={Star}
+            delay={0.2}
+          />
+          <StatCard
+            title="Total Feedbacks"
+            value={metrics.totalFeedbacks}
+            subtitle="Total received"
+            icon={Users}
+            delay={0.3}
+          />
+          <StatCard
+            title="Positive Feedback %"
+            value={`${metrics.positivePercentage.toFixed(1)}%`}
+            subtitle="Positive feedbacks"
+            icon={Activity}
+            delay={0.4}
+          />
         </div>
 
         {/* Charts Section */}
@@ -316,7 +275,7 @@ const Dashboard = () => {
             <CardContent className="flex-1 pb-2">
               <div className="flex items-center justify-between">
                 <ChartContainer
-                  config={chartConfig}
+                  config={CHART_CONFIG}
                   className="mx-auto aspect-square max-h-[200px] w-[60%]"
                 >
                   <PieChart>
@@ -402,7 +361,7 @@ const Dashboard = () => {
             <CardContent className="flex-1 pb-2">
               <div className="flex items-center justify-between">
                 <ChartContainer
-                  config={chartConfig}
+                  config={CHART_CONFIG}
                   className="mx-auto aspect-square max-h-[200px] w-[60%]"
                 >
                   <PieChart>
@@ -440,7 +399,7 @@ const Dashboard = () => {
                                       "0 0 10px rgba(234, 179, 8, 0.5)",
                                   }}
                                 >
-                                  {Math.round((metrics.positiveNegativeRatio / (1 + metrics.positiveNegativeRatio)) * 100 * 10) / 10}%
+                                  {metrics.positivePercentage.toFixed(1)}%
                                 </tspan>
                                 <tspan
                                   x={viewBox.cx}
@@ -490,7 +449,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent className="flex-1 pb-2">
               <div className="h-[300px]">
-                <ChartContainer config={chartConfig} className="h-full">
+                <ChartContainer config={CHART_CONFIG} className="h-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={ratingData}
@@ -553,7 +512,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent className="flex-1 pb-2">
               <div className="h-[300px]">
-                <ChartContainer config={chartConfig} className="h-full">
+                <ChartContainer config={CHART_CONFIG} className="h-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                       data={historicalData}
