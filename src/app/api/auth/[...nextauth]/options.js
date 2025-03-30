@@ -53,8 +53,8 @@ export const authOptions = {
             ...user.toObject(),
             accessToken,
             refreshToken,
-            accessTokenExpiry: Date.now() + 20 * 1000, // 20 seconds
-            refreshTokenExpiry: Date.now() + 60 * 1000, // 60 seconds
+            accessTokenExpiry: Date.now() + process.env.ACCESS_TOKEN_EXPIRY * 1000, // 20 seconds
+            refreshTokenExpiry: Date.now() + process.env.REFRESH_TOKEN_EXPIRY * 1000, // 60 seconds
           };
         } catch (err) {
           throw new Error(err.message);
@@ -105,8 +105,8 @@ export const authOptions = {
             // Update token object
             token.accessToken = newAccessToken;
             token.refreshToken = newRefreshToken;
-            token.accessTokenExpiry = Date.now() + 20 * 1000; // 20 seconds
-            token.refreshTokenExpiry = Date.now() + 60 * 1000; // 60 seconds
+            token.accessTokenExpiry = Date.now() + process.env.ACCESS_TOKEN_EXPIRY * 1000; // 20 seconds
+            token.refreshTokenExpiry = Date.now() + process.env.REFRESH_TOKEN_EXPIRY * 1000; // 60 seconds
           } catch (error) {
             console.error("Error refreshing token:", error);
             return null; // Force logout on error
@@ -172,7 +172,7 @@ function generateAccessToken(user) {
       organizationName: user.organizationName,
     },
     process.env.NEXTAUTH_SECRET,
-    { expiresIn: "20s" }
+    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
   );
 }
 
@@ -186,6 +186,6 @@ function generateRefreshToken(user) {
       organizationName: user.organizationName,
     },
     process.env.NEXTAUTH_SECRET,
-    { expiresIn: "60s" }
+    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
   );
 }
