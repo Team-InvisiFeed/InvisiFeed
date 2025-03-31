@@ -120,7 +120,8 @@ export async function POST(req) {
     // Handle coupon data if provided
     let modifiedCouponCode = null;
     const expiryDate = new Date();
-    const dbCouponCode = `${couponData.couponCode}${owner.invoices.length + 1}`;
+    let dbCouponCode = null;
+
     if (couponData) {
       // Generate 4 random characters
       const randomChars = Array.from(
@@ -129,7 +130,7 @@ export async function POST(req) {
       ).join("");
 
       // Modify coupon code by adding random chars at start and invoice count
-
+      dbCouponCode = `${couponData.couponCode}${owner.invoices.length + 1}`;
       modifiedCouponCode = `${randomChars}${couponData.couponCode}${
         owner.invoices.length + 1
       }`;
@@ -137,7 +138,7 @@ export async function POST(req) {
       // Calculate expiry date
       expiryDate.setDate(expiryDate.getDate() + Number(couponData.expiryDays));
     }
-    console.log(modifiedCouponCode);
+    // console.log(modifiedCouponCode);
     // Add new invoice with initial AIuseCount and coupon if provided
     owner.invoices.push({
       invoiceId: invoiceNumber,
