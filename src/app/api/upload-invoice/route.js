@@ -7,6 +7,7 @@ import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import dotenv from "dotenv";
 import OwnerModel from "@/model/Owner";
 import dbConnect from "@/lib/dbConnect";
+import crypto from "crypto";
 
 dotenv.config();
 
@@ -26,6 +27,12 @@ export async function POST(req) {
     const formData = await req.formData();
     const file = formData.get("file");
     const username = formData.get("username");
+    const couponDataStr = formData.get("couponData");
+
+    let couponData = null;
+    if (couponDataStr) {
+      couponData = JSON.parse(couponDataStr);
+    }
 
     if (!file) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
@@ -53,10 +60,10 @@ export async function POST(req) {
       const timeLeft = 24 - hoursSinceLastReset;
       const hoursLeft = Math.ceil(timeLeft);
       return NextResponse.json(
-        { 
+        {
           error: `Daily upload limit reached. Please try again after ${hoursLeft} hours.`,
-          timeLeft: hoursLeft
-        }, 
+          timeLeft: hoursLeft,
+        },
         { status: 429 }
       );
     }
@@ -67,7 +74,11 @@ export async function POST(req) {
     }
 
     const invoiceNumber = await extractInvoiceNumberFromPdf(file);
-    if (!invoiceNumber || invoiceNumber === "Not Found") {
+    if (
+      !invoiceNumber ||
+      invoiceNumber === "Not Found" ||
+      invoiceNumber === "Extraction Failed"
+    ) {
       return NextResponse.json(
         { error: "Invoice number not found" },
         { status: 400 }
@@ -106,10 +117,39 @@ export async function POST(req) {
 
     const pdfUrl = uploadResult.secure_url;
 
-    // Add new invoice with initial AIuseCount
+    // Handle coupon data if provided
+    let modifiedCouponCode = null;
+    const expiryDate = new Date();
+    const dbCouponCode = `${couponData.couponCode}${owner.invoices.length + 1}`;
+    if (couponData) {
+      // Generate 4 random characters
+      const randomChars = Array.from(
+        { length: 4 },
+        () => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[crypto.randomInt(0, 36)]
+      ).join("");
+
+      // Modify coupon code by adding random chars at start and invoice count
+
+      modifiedCouponCode = `${randomChars}${couponData.couponCode}${
+        owner.invoices.length + 1
+      }`;
+
+      // Calculate expiry date
+      expiryDate.setDate(expiryDate.getDate() + Number(couponData.expiryDays));
+    }
+    console.log(modifiedCouponCode);
+    // Add new invoice with initial AIuseCount and coupon if provided
     owner.invoices.push({
       invoiceId: invoiceNumber,
       AIuseCount: 0,
+      couponAttached: couponData
+        ? {
+            couponCode: dbCouponCode,
+            couponDescription: couponData.description,
+            couponExpiryDate: expiryDate,
+            isCouponUsed: false,
+          }
+        : null,
     });
 
     // Update upload counts
@@ -119,8 +159,12 @@ export async function POST(req) {
 
     await owner.save();
 
-    // Generate QR Code PDF
-    const qrPdfBuffer = await generateQrPdf(invoiceNumber, username);
+    // Generate QR Code PDF with modified coupon code if provided
+    const qrPdfBuffer = await generateQrPdf(
+      invoiceNumber,
+      username,
+      modifiedCouponCode
+    );
     const mergedPdfBuffer = await mergePdfs(pdfUrl, qrPdfBuffer);
 
     // Upload Final Merged PDF to Cloudinary
@@ -158,7 +202,7 @@ export async function POST(req) {
 async function extractInvoiceNumberFromPdf(file) {
   try {
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash-lite-preview-02-05",
+      model: "gemini-2.0-flash",
     });
 
     const bytes = await file.arrayBuffer();
@@ -182,12 +226,22 @@ async function extractInvoiceNumberFromPdf(file) {
   }
 }
 
-async function generateQrPdf(invoiceNumber, username) {
+async function generateQrPdf(
+  invoiceNumber,
+  username,
+  modifiedCouponCode = null
+) {
   try {
     // Create QR Code buffer
     const encodedUsername = encodeURIComponent(username);
     const encodedInvoiceNumber = encodeURIComponent(invoiceNumber);
-    const qrData = `http://localhost:3000/feedback/${encodedUsername}/${encodedInvoiceNumber}`;
+    let qrData = `http://localhost:3000/feedback/${encodedUsername}?invoiceNo=${encodedInvoiceNumber}`;
+
+    // Add modified coupon code to QR data if provided
+    if (modifiedCouponCode) {
+      qrData += `&cpcd=${modifiedCouponCode}`;
+    }
+
     const qrBuffer = await QRCode.toBuffer(qrData, { width: 300 });
 
     // Create a new PDF document
