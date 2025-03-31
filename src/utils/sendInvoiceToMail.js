@@ -1,40 +1,52 @@
-import sendEmail from './nodemailerUtility';
+import sendEmail from "./nodemailerUtility";
 
-const sendInvoiceToMail = async (customerEmail, invoiceNumber, pdfUrl, companyName) => {
+const sendInvoiceToMail = async (
+  customerEmail,
+  invoiceNumber,
+  pdfUrl,
+  companyName
+) => {
   const subject = `Invoice from ${companyName} - #${invoiceNumber}`;
-  
+
   // HTML email template with styling
   const htmlMessage = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
       <div style="text-align: center; margin-bottom: 30px;">
-        <h1 style="color: #333333; font-size: 24px; margin-bottom: 10px;">Invoice from ${companyName}</h1>
-        <p style="color: #666666; font-size: 16px;">Invoice #${invoiceNumber}</p>
+        <h1 style="color: #0A0A0A; font-size: 24px; margin-bottom: 10px;">Invoice from ${companyName}</h1>
       </div>
       
-      <div style="background-color: #f8f9fa; padding: 20px; border-radius: 6px; margin-bottom: 30px;">
-        <p style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+      <div style="background-color: #0A0A0A; padding: 20px; border-radius: 6px; margin-bottom: 30px;">
+        <p style="color: #F3F4F6; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
           Dear Customer,
         </p>
-        <p style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+        <p style="color: #F3F4F6; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
           Thank you for your business. Please find your invoice attached to this email.
         </p>
-        <div style="background-color: #ffffff; padding: 15px; border-radius: 4px; border: 1px solid #e9ecef; margin-bottom: 20px;">
-          <p style="color: #333333; font-size: 16px; margin: 0;">
+        <div style="background-color: #1D1D1D; padding: 15px; border-radius: 4px; border: 1px solid #4B5563; margin-bottom: 20px;">
+          <p style="color: #F3F4F6; font-size: 16px; margin: 0;">
             <strong>Invoice Number:</strong> ${invoiceNumber}
           </p>
         </div>
+
+        <div style="background-color: #FACC15; padding: 20px; border-radius: 4px; margin-bottom: 20px;">
+          <p style="color: #000000; font-size: 16px; line-height: 1.6; margin: 0;">
+            <strong>🎁 Special Offer!</strong><br>
+            Submit your feedback for this invoice and get a chance to win an exclusive discount coupon for your next purchase. Your valuable feedback helps us serve you better!
+          </p>
+        </div>
+
         <div style="text-align: center; margin-top: 30px;">
           <a href="${pdfUrl}" 
-             style="display: inline-block; padding: 12px 24px; background-color: #4CAF50; color: #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold; transition: background-color 0.3s;">
+             style="display: inline-block; padding: 12px 24px; background-color: #FACC15; color: #000000; text-decoration: none; border-radius: 4px; font-weight: bold; transition: background-color 0.3s;">
             View Invoice Online
           </a>
         </div>
       </div>
       
-      <div style="border-top: 1px solid #e9ecef; padding-top: 20px; margin-top: 30px;">
-        <p style="color: #666666; font-size: 14px; margin: 0;">
+      <div style="border-top: 1px solid #374151; padding-top: 20px; margin-top: 30px;">
+        <p style="color: #9CA3AF; font-size: 14px; margin: 0;">
           Best regards,<br>
-          <strong>${companyName}</strong>
+          <strong style="color: #0A0A0A">${companyName}</strong>
         </p>
       </div>
     </div>
@@ -48,9 +60,13 @@ const sendInvoiceToMail = async (customerEmail, invoiceNumber, pdfUrl, companyNa
 
     Invoice Number: ${invoiceNumber}
 
+    🎁 Special Offer!
+    Submit your feedback for this service and get a chance to win an exclusive discount coupon for your next service. Your valuable feedback helps us serve you better!
+
     You can also view your invoice online at: ${pdfUrl}
 
     Best regards,
+
     ${companyName}
   `;
 
@@ -58,7 +74,7 @@ const sendInvoiceToMail = async (customerEmail, invoiceNumber, pdfUrl, companyNa
     // Fetch the PDF file
     const pdfResponse = await fetch(pdfUrl);
     const pdfBuffer = await pdfResponse.arrayBuffer();
-    
+
     // Create attachment object
     const attachment = {
       filename: `Invoice_${invoiceNumber}.pdf`,
@@ -68,9 +84,9 @@ const sendInvoiceToMail = async (customerEmail, invoiceNumber, pdfUrl, companyNa
     await sendEmail(customerEmail, subject, htmlMessage, attachment);
     return { success: true };
   } catch (error) {
-    console.error('Error sending invoice email:', error);
+    console.error("Error sending invoice email:", error);
     return { success: false, error: error.message };
   }
 };
 
-export default sendInvoiceToMail; 
+export default sendInvoiceToMail;
