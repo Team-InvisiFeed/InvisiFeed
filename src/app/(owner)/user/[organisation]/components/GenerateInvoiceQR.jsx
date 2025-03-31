@@ -18,6 +18,13 @@ export default function Home() {
   const [customerEmail, setCustomerEmail] = useState("");
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [showCouponForm, setShowCouponForm] = useState(false);
+  const [couponData, setCouponData] = useState({
+    couponCode: "",
+    description: "",
+    expiryDays: "30",
+  });
+  const [couponSaved, setCouponSaved] = useState(false);
 
   // Fetch initial upload count
   useEffect(() => {
@@ -51,6 +58,19 @@ export default function Home() {
     setCustomerEmail("");
   };
 
+  const handleCouponSave = () => {
+    if (
+      !couponData.couponCode ||
+      !couponData.description ||
+      !couponData.expiryDays
+    ) {
+      alert("Please fill all coupon fields");
+      return;
+    }
+    setCouponSaved(true);
+    setShowCouponForm(false);
+  };
+
   const handleUpload = async () => {
     if (!file) {
       alert("Please select a PDF file.");
@@ -61,6 +81,9 @@ export default function Home() {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("username", owner.username);
+    if (couponSaved) {
+      formData.append("couponData", JSON.stringify(couponData));
+    }
 
     try {
       const res = await fetch("/api/upload-invoice", {
@@ -82,9 +105,14 @@ export default function Home() {
         setPdfUrl(data.url);
         setInvoiceNumber(data.invoiceNumber);
         setDailyUploads((prev) => prev + 1);
-        // Reset email states when new invoice is uploaded successfully
         setEmailSent(false);
         setCustomerEmail("");
+        setCouponSaved(false);
+        setCouponData({
+          couponCode: "",
+          description: "",
+          expiryDays: 30,
+        });
       }
     } catch (error) {
       alert("Something went wrong! Please try again.");
@@ -101,16 +129,16 @@ export default function Home() {
 
     setSendingEmail(true);
     try {
-      const response = await fetch('/api/send-invoice-email', {
-        method: 'POST',
+      const response = await fetch("/api/send-invoice-email", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           customerEmail,
           invoiceNumber,
           pdfUrl,
-          companyName: owner?.organizationName || 'Your Company'
+          companyName: owner?.organizationName || "Your Company",
         }),
       });
 
@@ -191,6 +219,47 @@ export default function Home() {
               <Upload className="h-5 w-5" />
               <span>Choose PDF File</span>
             </label>
+
+            {/* Create Coupon Button */}
+            {file && !couponSaved && (
+              <button
+                onClick={() => setShowCouponForm(true)}
+                className="w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-400 hover:from-green-600 hover:to-green-500 text-white font-medium rounded-lg cursor-pointer transition-all duration-200 shadow-lg shadow-green-500/20 hover:shadow-green-500/30"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span>Create Coupon for this Customer</span>
+              </button>
+            )}
+
+            {couponSaved && (
+              <div className="w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-green-500 text-white font-medium rounded-lg">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span>Coupon Saved</span>
+              </div>
+            )}
+
             {/* Display File Name */}
             {file && (
               <motion.div
@@ -266,7 +335,7 @@ export default function Home() {
                 <h2 className="text-lg font-semibold mb-4 text-yellow-400">
                   Processed PDF Ready
                 </h2>
-                
+
                 {/* Email Input */}
                 <div className="w-full">
                   <input
@@ -292,14 +361,28 @@ export default function Home() {
                     </>
                   ) : emailSent ? (
                     <>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                       <span>Email Sent Successfully!</span>
                     </>
                   ) : (
                     <>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
                         <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                         <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                       </svg>
@@ -323,6 +406,92 @@ export default function Home() {
           )}
         </div>
       </motion.div>
+
+      {/* Coupon Form Modal */}
+      {showCouponForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-[#1A1A1A] p-6 rounded-lg w-full max-w-md border border-yellow-400/20"
+          >
+            <h2 className="text-xl font-bold mb-4 text-yellow-400">
+              Create Coupon
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Coupon Code
+                </label>
+                <input
+                  type="text"
+                  value={couponData.couponCode}
+                  onChange={(e) =>
+                    setCouponData({
+                      ...couponData,
+                      couponCode: e.target.value.toUpperCase(),
+                    })
+                  }
+                  className="w-full px-4 py-2 bg-[#0A0A0A] border border-yellow-400/20 rounded-lg text-white focus:outline-none focus:border-yellow-400"
+                  placeholder="Enter coupon code"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  This coupon code will go under slight modification for
+                  security purposes
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Description
+                </label>
+                <textarea
+                  value={couponData.description}
+                  onChange={(e) =>
+                    setCouponData({
+                      ...couponData,
+                      description: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-2 bg-[#0A0A0A] border border-yellow-400/20 rounded-lg text-white focus:outline-none focus:border-yellow-400"
+                  placeholder="Enter coupon description"
+                  rows="3"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Expiry (in days)
+                </label>
+                <input
+                  type="number"
+                  value={couponData.expiryDays}
+                  onChange={(e) =>
+                    setCouponData({
+                      ...couponData,
+                      expiryDays: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-2 bg-[#0A0A0A] border border-yellow-400/20 rounded-lg text-white focus:outline-none focus:border-yellow-400"
+                  min="1"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowCouponForm(false)}
+                className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCouponSave}
+                className="px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg hover:bg-yellow-500 transition-colors"
+              >
+                Save
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
