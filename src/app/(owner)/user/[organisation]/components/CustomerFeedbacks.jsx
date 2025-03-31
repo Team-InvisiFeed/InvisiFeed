@@ -118,52 +118,52 @@ const CustomerFeedbacks = () => {
   return (
     <div className="min-h-screen bg-[#0A0A0A] py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
-            Customer Feedbacks
-          </h2>
-          <div className="flex items-center space-x-2">
-            <ArrowUpDown className="w-4 h-4 text-yellow-400" />
-            <Select value={sortBy} onValueChange={handleSortChange}>
-              <SelectTrigger className="w-[180px] bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 border-yellow-400/20 text-yellow-400">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
-                <SelectItem
-                  value="newest"
-                  className="text-yellow-400 hover:bg-yellow-400/10"
-                >
-                  Newest First
-                </SelectItem>
-                <SelectItem
-                  value="oldest"
-                  className="text-yellow-400 hover:bg-yellow-400/10"
-                >
-                  Oldest First
-                </SelectItem>
-                <SelectItem
-                  value="highest"
-                  className="text-yellow-400 hover:bg-yellow-400/10"
-                >
-                  Highest Rated
-                </SelectItem>
-                <SelectItem
-                  value="lowest"
-                  className="text-yellow-400 hover:bg-yellow-400/10"
-                >
-                  Lowest Rated
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
         {feedbacks.length === 0 ? (
-          <div className="text-center">
-            <p className="text-gray-400">No feedbacks available yet.</p>
+          <div className="flex justify-center items-center min-h-[50vh]">
+            <p className="text-gray-400 text-lg">No feedbacks available yet.</p>
           </div>
         ) : (
           <>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
+                Customer Feedbacks
+              </h2>
+              <div className="flex items-center space-x-2">
+                <ArrowUpDown className="w-4 h-4 text-yellow-400" />
+                <Select value={sortBy} onValueChange={handleSortChange}>
+                  <SelectTrigger className="w-[180px] bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 border-yellow-400/20 text-yellow-400">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
+                    <SelectItem
+                      value="newest"
+                      className="text-yellow-400 hover:bg-yellow-400/10"
+                    >
+                      Newest First
+                    </SelectItem>
+                    <SelectItem
+                      value="oldest"
+                      className="text-yellow-400 hover:bg-yellow-400/10"
+                    >
+                      Oldest First
+                    </SelectItem>
+                    <SelectItem
+                      value="highest"
+                      className="text-yellow-400 hover:bg-yellow-400/10"
+                    >
+                      Highest Rated
+                    </SelectItem>
+                    <SelectItem
+                      value="lowest"
+                      className="text-yellow-400 hover:bg-yellow-400/10"
+                    >
+                      Lowest Rated
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
             <div className="space-y-6">
               {feedbacks.map((feedback, index) => (
                 <motion.div
