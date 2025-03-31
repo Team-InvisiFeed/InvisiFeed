@@ -71,7 +71,6 @@ const CouponSchema = new Schema({
     type: String,
     required: true,
     trim: true,
-    unique: true,
     match: [
       /^[A-Z0-9]+$/,
       "Coupon code must contain only uppercase letters and numbers",
