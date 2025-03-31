@@ -66,6 +66,36 @@ const AddressSchema = new Schema({
   },
 });
 
+const CouponSchema = new Schema({
+  couponCode: {
+    type: String,
+    required: true,
+    trim: true,
+    unique: true,
+    match: [
+      /^[A-Z0-9]+$/,
+      "Coupon code must contain only uppercase letters and numbers",
+    ],
+  },
+  couponDescription: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  couponExpiryDate: {
+    type: Date,
+    required: true,
+  },
+  isCouponUsed: {
+    type: Boolean,
+    default: false,
+  },
+  couponCreatedAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 const InvoiceSchema = new Schema({
   invoiceId: {
     type: String,
@@ -83,6 +113,10 @@ const InvoiceSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  couponAttached: {
+    type: CouponSchema,
+    default: null,
+  },
 });
 
 const OwnerSchema = new Schema({
@@ -91,48 +125,60 @@ const OwnerSchema = new Schema({
     required: [true, "Organization Name is required"],
     trim: true,
   },
+
   email: {
     type: String,
     required: [true, "Email is required"],
     unique: true,
     match: [/.+\@.+\..+/, "Please use a valid email address"],
   },
+
   username: {
     type: String,
     required: [true, "Username is required"],
     trim: true,
     unique: true,
   },
+
   password: {
     type: String,
     required: [true, "Password is required"],
   },
+
   verifyCode: {
     type: String,
     required: [true, "Verify code is required"],
   },
+
   verifyCodeExpiry: {
     type: Date,
     required: [true, "Verify code expiry is required"],
   },
+
   isVerified: {
     type: Boolean,
     default: false,
   },
+
   refreshToken: {
     type: String,
     default: null,
   },
+
   phoneNumber: {
     type: String,
     required: [true, "Phone Number is required"],
   },
+
   address: {
     type: AddressSchema,
     required: [true, "Address is required"],
   },
+
   feedbacks: [FeedbackSchema],
+
   invoices: [InvoiceSchema],
+
   uploadedInvoiceCount: {
     count: {
       type: Number,
