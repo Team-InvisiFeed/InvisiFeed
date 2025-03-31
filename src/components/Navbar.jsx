@@ -33,6 +33,12 @@ function Navbar() {
     }
   }, [pathname]);
 
+  useEffect(() => {
+    if (pathname.includes("/manage-coupons")) {
+      setIsNavigatingToCoupons(false);
+    }
+  }, [pathname]);
+
   // Show loading screen while checking authentication, signing out, or navigating to profile
   if (status === "loading" || isSigningOut || isNavigatingToProfile || isNavigatingToCoupons) {
     return <LoadingScreen />;
