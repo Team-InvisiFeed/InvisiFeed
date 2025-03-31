@@ -54,6 +54,9 @@ function Page() {
 
   const [isNavigatingToSignIn, setIsNavigatingToSignIn] = useState(false);
 
+  const [usernameStatus, setUsernameStatus] = useState({ isChecking: false, isAvailable: true, message: '' });
+  const usernameCheckTimeout = useRef(null);
+
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -188,6 +191,49 @@ function Page() {
       setIsSubmitting(false);
     }
   };
+
+  // Add username availability check function
+  const checkUsernameAvailability = async (username) => {
+    if (!username) {
+      setUsernameStatus({ isChecking: false, isAvailable: true, message: '' });
+      return;
+    }
+
+    try {
+      const response = await axios.get(`/api/check-username-unique?username=${encodeURIComponent(username)}`);
+      setUsernameStatus({
+        isChecking: false,
+        isAvailable: response.data.success,
+        message: response.data.message
+      });
+    } catch (error) {
+      setUsernameStatus({
+        isChecking: false,
+        isAvailable: false,
+        message: error.response?.data?.message || 'Username not available'
+      });
+    }
+  };
+
+  // Add debounced username check
+  const debouncedUsernameCheck = (username) => {
+    setUsernameStatus(prev => ({ ...prev, isChecking: true }));
+    if (usernameCheckTimeout.current) {
+      clearTimeout(usernameCheckTimeout.current);
+    }
+    usernameCheckTimeout.current = setTimeout(() => {
+      checkUsernameAvailability(username);
+    }, 1000); // 1 second delay
+  };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (usernameCheckTimeout.current) {
+        clearTimeout(usernameCheckTimeout.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -538,11 +584,34 @@ function Page() {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Input
-                              placeholder="Enter Username"
-                              {...field}
-                              className="bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9"
-                            />
+                            <div className="relative">
+                              <Input
+                                placeholder="Enter Username"
+                                {...field}
+                                onChange={(e) => {
+                                  field.onChange(e);
+                                  debouncedUsernameCheck(e.target.value);
+                                }}
+                                className={`bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9 ${
+                                  !usernameStatus.isAvailable && field.value ? 'border-red-400' : ''
+                                }`}
+                              />
+                              {field.value && (
+                                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center">
+                                  {usernameStatus.isChecking ? (
+                                    <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                                  ) : !usernameStatus.isAvailable ? (
+                                    <span className="text-xs text-red-400">
+                                      {usernameStatus.message}
+                                    </span>
+                                  ) : (
+                                    <span className="text-xs text-green-400">
+                                      Username available
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
                           </FormControl>
                           <FormMessage className="text-xs" />
                         </FormItem>
