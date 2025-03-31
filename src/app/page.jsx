@@ -1,18 +1,21 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
-
+import React from "react";
 import HeroSection from "@/components/HeroSection";
+import FeaturesSection from "@/components/FeaturesSection";
+import FAQSection from "@/components/FAQSection";
+import CTASection from "@/components/CTASection";
+import InactivityPopup from "@/components/InactivityPopup";
 
 const Page = () => {
-  // Dummy data for the carousel messages
-
-  const [isLoading, setIsLoading] = useState(false);
-
   return (
-    <>
+    <main className="bg-[#0A0A0A]">
       <HeroSection />
-    </>
+      <FeaturesSection />
+      <FAQSection />
+      <CTASection />
+      <InactivityPopup />
+    </main>
   );
 };
 
