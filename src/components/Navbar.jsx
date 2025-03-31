@@ -21,6 +21,7 @@ function Navbar() {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isNavigatingToSignIn, setIsNavigatingToSignIn] = useState(false);
   const [isNavigatingToProfile, setIsNavigatingToProfile] = useState(false);
+  const [isNavigatingToCoupons, setIsNavigatingToCoupons] = useState(false);
 
   const pathname = usePathname();
   const router = useRouter();
@@ -33,7 +34,7 @@ function Navbar() {
   }, [pathname]);
 
   // Show loading screen while checking authentication, signing out, or navigating to profile
-  if (status === "loading" || isSigningOut || isNavigatingToProfile) {
+  if (status === "loading" || isSigningOut || isNavigatingToProfile || isNavigatingToCoupons) {
     return <LoadingScreen />;
   }
 
@@ -44,6 +45,11 @@ function Navbar() {
   const onManageProfile = () => {
     setIsNavigatingToProfile(true);
     router.push(`/user/${owner?.username}/update-profile`);
+  };
+
+  const onManageCoupons = () => {
+    setIsNavigatingToCoupons(true);
+    router.push(`/user/${owner?.username}/manage-coupons`);
   };
 
   const handleSignOut = async () => {
@@ -247,6 +253,27 @@ function Navbar() {
                     />
                   </svg>
                   Manage Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 cursor-pointer focus:bg-yellow-400/5 focus:text-yellow-400"
+                  onClick={onManageCoupons}
+                  disabled={isNavigatingToCoupons}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-2 text-yellow-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                  Manage Coupons
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 cursor-pointer focus:bg-yellow-400/5 focus:text-yellow-400"
