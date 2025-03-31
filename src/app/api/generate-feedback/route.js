@@ -61,7 +61,7 @@ export async function POST(req) {
     }
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash-lite-preview-02-05",
+      model: "gemini-2.0-flash",
     });
     const result = await model.generateContent(prompt);
     const feedback = result.response.text();
