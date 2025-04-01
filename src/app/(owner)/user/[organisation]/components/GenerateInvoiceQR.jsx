@@ -2,7 +2,7 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Upload, FileText, Download } from "lucide-react";
+import { Upload, FileText, Download, Share2 } from "lucide-react";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -224,7 +224,7 @@ export default function Home() {
             {file && !couponSaved && (
               <button
                 onClick={() => setShowCouponForm(true)}
-                className="w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-400 hover:from-green-600 hover:to-green-500 text-white font-medium rounded-lg cursor-pointer transition-all duration-200 shadow-lg shadow-green-500/20 hover:shadow-green-500/30"
+                className="w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-lg transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -243,7 +243,7 @@ export default function Home() {
             )}
 
             {couponSaved && (
-              <div className="w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-green-500 text-white font-medium rounded-lg">
+              <div className="w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-lg transition-all duration-200 shadow-lg  ">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"
@@ -332,9 +332,41 @@ export default function Home() {
             >
               <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative space-y-4">
-                <h2 className="text-lg font-semibold mb-4 text-yellow-400">
-                  Processed PDF Ready
-                </h2>
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-semibold text-yellow-400">
+                    Processed PDF Ready
+                  </h2>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const response = await fetch(pdfUrl);
+                        const blob = await response.blob();
+                        const file = new File([blob], "Invoice.pdf", {
+                          type: "application/pdf",
+                        });
+
+                        if (
+                          navigator.canShare &&
+                          navigator.canShare({ files: [file] })
+                        ) {
+                          await navigator.share({
+                            title: "Invoice PDF",
+                            text: "Here's your invoice PDF.",
+                            files: [file],
+                          });
+                        } else {
+                          alert("Sharing not supported on this device.");
+                        }
+                      } catch (error) {
+                        console.error("Error sharing PDF:", error);
+                        alert("Failed to share PDF. Please try again.");
+                      }
+                    }}
+                    className="p-2 hover:bg-yellow-400/10 rounded-full transition-colors"
+                  >
+                    <Share2 className="w-5 h-5 text-yellow-400 cursor-pointer" />
+                  </button>
+                </div>
 
                 {/* Email Input */}
                 <div className="w-full">
