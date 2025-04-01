@@ -40,9 +40,9 @@ function Navbar() {
   }, [pathname]);
 
   // Show loading screen while checking authentication, signing out, or navigating to profile
-  if (status === "loading" || isSigningOut || isNavigatingToProfile || isNavigatingToCoupons) {
-    return <LoadingScreen />;
-  }
+  // if (status === "loading" || isSigningOut || isNavigatingToProfile || isNavigatingToCoupons) {
+  //   return <LoadingScreen />;
+  // }
 
   const handleNavigation = (route) => {
     router.push(route);
@@ -206,9 +206,7 @@ function Navbar() {
           </Button>
         ) : (
           <div className="flex items-center space-x-4">
-            <span className="text-sm md:text-base text-gray-300">
-              Welcome, {owner?.username || owner?.email}
-            </span>
+            
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Avatar className="cursor-pointer border-2 border-yellow-400 hover:border-yellow-300 transition-colors ring-2 ring-transparent hover:ring-yellow-400/20">
