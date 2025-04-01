@@ -3,7 +3,6 @@
 import { usePathname } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import InactivityPopup from "@/components/InactivityPopup";
 
 export default function ClientWrapper({ children }) {
   const pathname = usePathname();
