@@ -164,6 +164,16 @@ const OwnerSchema = new Schema({
     default: null,
   },
 
+  resetToken: {
+    type: String,
+    default: null,
+  },
+
+  resetTokenExpiry: {
+    type: Date,
+    default: null,
+  },
+
   phoneNumber: {
     type: String,
     required: [true, "Phone Number is required"],
