@@ -19,6 +19,8 @@ const InactivityPopup = () => {
   useEffect(() => {
     if (pathname === "/") {
       setHasShown(false);
+      setIsRegisterLoading(false);
+      setIsSignInLoading(false);
     }
   }, [pathname]);
 
@@ -42,13 +44,11 @@ const InactivityPopup = () => {
 
   const handleRegister = () => {
     setIsRegisterLoading(true);
-    setShowPopup(false);
     router.push("/register");
   };
 
   const handleSignIn = () => {
     setIsSignInLoading(true);
-    setShowPopup(false);
     router.push("/sign-in");
   };
 
@@ -85,7 +85,7 @@ const InactivityPopup = () => {
             <div className="flex flex-col gap-3">
               <Button
                 onClick={handleRegister}
-                disabled={isRegisterLoading}
+                // disabled={isRegisterLoading}
                 className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium shadow-lg shadow-yellow-500/20"
               >
                 {isRegisterLoading ? (
