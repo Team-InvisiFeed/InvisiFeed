@@ -236,7 +236,7 @@ async function generateQrPdf(
     // Create QR Code buffer
     const encodedUsername = encodeURIComponent(username);
     const encodedInvoiceNumber = encodeURIComponent(invoiceNumber);
-    let qrData = `http://localhost:3000/feedback/${encodedUsername}?invoiceNo=${encodedInvoiceNumber}`;
+    let qrData = `${process.env.NEXT_PUBLIC_APP_URL}/feedback/${encodedUsername}?invoiceNo=${encodedInvoiceNumber}`;
 
     // Add modified coupon code to QR data if provided
     if (modifiedCouponCode) {
