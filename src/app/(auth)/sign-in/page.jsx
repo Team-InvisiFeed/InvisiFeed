@@ -72,8 +72,10 @@ function Page() {
     if (result?.error) {
       if (result.error === "CredentialsSignin") {
         toast.error("Incorrect username or password");
+        setIsSubmitting(false);
       } else {
         toast.error(result.error);
+        setIsSubmitting(false);
       }
     }
 
@@ -174,6 +176,15 @@ function Page() {
                   </FormItem>
                 )}
               />
+
+              <div className="flex items-center justify-between">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-yellow-400 hover:text-yellow-300"
+                >
+                  Forgot password?
+                </Link>
+              </div>
 
               <Button
                 type="submit"
