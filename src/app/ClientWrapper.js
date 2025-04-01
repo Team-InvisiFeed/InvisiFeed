@@ -22,7 +22,6 @@ export default function ClientWrapper({ children }) {
       {!isFeedbackPage && <Navbar />}
       <main>{children || <p>No children to render</p>}</main>
       {!isFeedbackPage && <Footer />}
-      <InactivityPopup />
     </>
   );
 }
