@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useRouter, usePathname } from "next/navigation";
 
-const InactivityPopup = () => {
+const GetStartedPopup = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [hasShown, setHasShown] = useState(false);
   const [isRegisterLoading, setIsRegisterLoading] = useState(false);
@@ -123,4 +123,4 @@ const InactivityPopup = () => {
   );
 };
 
-export default InactivityPopup; 
+export default GetStartedPopup; 
