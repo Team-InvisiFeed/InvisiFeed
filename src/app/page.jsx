@@ -5,8 +5,7 @@ import HeroSection from "@/components/HeroSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
-import InactivityPopup from "@/components/InactivityPopup";
-
+import GetStartedPopup from "@/components/GetStartedPopup";
 const Page = () => {
   return (
     <main className="bg-[#0A0A0A]">
@@ -14,7 +13,7 @@ const Page = () => {
       <FeaturesSection />
       <FAQSection />
       <CTASection />
-      <InactivityPopup />
+      <GetStartedPopup />
     </main>
   );
 };
