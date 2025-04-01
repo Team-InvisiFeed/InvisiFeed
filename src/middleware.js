@@ -55,5 +55,9 @@ export async function middleware(request) {
     }
   }
 
+  if (!token && url.pathname.startsWith("/user")) {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
+  }
+
   return NextResponse.next();
 }
