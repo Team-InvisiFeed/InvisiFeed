@@ -13,7 +13,9 @@ export default function ClientWrapper({ children }) {
     pathname.startsWith("/feedback") ||
     pathname.startsWith("/sign-in") ||
     pathname.startsWith("/register") ||
-    pathname.startsWith("/verify");
+    pathname.startsWith("/verify") ||
+    pathname.startsWith("/forgot-password")||
+    pathname.startsWith("/forgot-password?");
 
   return (
     <>
