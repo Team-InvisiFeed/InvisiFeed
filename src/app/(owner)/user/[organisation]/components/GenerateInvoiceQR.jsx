@@ -341,7 +341,6 @@ export default function Home() {
                       try {
                         const response = await fetch(pdfUrl);
                         const blob = await response.blob();
-<<<<<<< HEAD
                         const file = new File(
                           [blob],
                           `Invoice by ${owner?.organizationName}.pdf`,
@@ -349,11 +348,6 @@ export default function Home() {
                             type: "application/pdf",
                           }
                         );
-=======
-                        const file = new File([blob], `Invoice from ${owner.organizationName}.pdf`, {
-                          type: "application/pdf",
-                        });
->>>>>>> 90a31b7249a21d5d382a16e808bf5cb8a5430866
 
                         if (
                           navigator.canShare &&
