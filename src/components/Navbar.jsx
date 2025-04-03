@@ -28,7 +28,7 @@ function Navbar() {
 
   // Reset navigation states when pathname changes
   useEffect(() => {
-    if (pathname.includes('/update-profile')) {
+    if (pathname.includes("/update-profile")) {
       setIsNavigatingToProfile(false);
     }
   }, [pathname]);
@@ -60,12 +60,12 @@ function Navbar() {
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
-    await signOut({ redirect: true, callbackUrl: '/sign-in' });
+    await signOut({ redirect: true, callbackUrl: "/sign-in" });
   };
 
   const handleGetStarted = () => {
     setIsNavigatingToSignIn(true);
-    router.push('/sign-in');
+    router.push("/sign-in");
   };
 
   return (
@@ -77,7 +77,7 @@ function Navbar() {
             if (owner) {
               handleNavigation(`/user/${owner?.username}`);
             } else {
-              handleNavigation('/');
+              handleNavigation("/");
             }
           }}
           className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent"
@@ -94,10 +94,15 @@ function Navbar() {
               <motion.button
                 onClick={() => {
                   handleNavigation(`/user/${owner?.username}#dashboard`);
-                  document.getElementById('dashboard')?.scrollIntoView({ behavior: 'smooth' });
+                  document
+                    .getElementById("dashboard")
+                    ?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
-                  pathname === `/user/${owner?.username}` && window.location.hash === '#dashboard' ? "font-bold text-yellow-400" : ""
+                  pathname === `/user/${owner?.username}` &&
+                  window.location.hash === "#dashboard"
+                    ? "font-bold text-yellow-400"
+                    : ""
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -107,10 +112,15 @@ function Navbar() {
               <motion.button
                 onClick={() => {
                   handleNavigation(`/user/${owner?.username}#generate`);
-                  document.getElementById('generate')?.scrollIntoView({ behavior: 'smooth' });
+                  document
+                    .getElementById("generate")
+                    ?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
-                  pathname === `/user/${owner?.username}` && window.location.hash === '#generate' ? "font-bold text-yellow-400" : ""
+                  pathname === `/user/${owner?.username}` &&
+                  window.location.hash === "#generate"
+                    ? "font-bold text-yellow-400"
+                    : ""
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -120,10 +130,15 @@ function Navbar() {
               <motion.button
                 onClick={() => {
                   handleNavigation(`/user/${owner?.username}#ratings`);
-                  document.getElementById('ratings')?.scrollIntoView({ behavior: 'smooth' });
+                  document
+                    .getElementById("ratings")
+                    ?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
-                  pathname === `/user/${owner?.username}` && window.location.hash === '#ratings' ? "font-bold text-yellow-400" : ""
+                  pathname === `/user/${owner?.username}` &&
+                  window.location.hash === "#ratings"
+                    ? "font-bold text-yellow-400"
+                    : ""
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -133,10 +148,15 @@ function Navbar() {
               <motion.button
                 onClick={() => {
                   handleNavigation(`/user/${owner?.username}#feedbacks`);
-                  document.getElementById('feedbacks')?.scrollIntoView({ behavior: 'smooth' });
+                  document
+                    .getElementById("feedbacks")
+                    ?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
-                  pathname === `/user/${owner?.username}` && window.location.hash === '#feedbacks' ? "font-bold text-yellow-400" : ""
+                  pathname === `/user/${owner?.username}` &&
+                  window.location.hash === "#feedbacks"
+                    ? "font-bold text-yellow-400"
+                    : ""
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -147,10 +167,15 @@ function Navbar() {
                 onClick={(e) => {
                   e.preventDefault();
                   handleNavigation(`/user/${owner?.username}#contact`);
-                  document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                  document
+                    .getElementById("contact")
+                    ?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
-                  pathname === `/user/${owner?.username}` && window.location.hash === '#contact' ? "font-bold text-yellow-400" : ""
+                  pathname === `/user/${owner?.username}` &&
+                  window.location.hash === "#contact"
+                    ? "font-bold text-yellow-400"
+                    : ""
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -179,7 +204,9 @@ function Navbar() {
                 className="text-gray-300 hover:text-yellow-400 transition-colors"
                 onClick={(e) => {
                   e.preventDefault();
-                  document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+                  document
+                    .getElementById("contact")
+                    ?.scrollIntoView({ behavior: "smooth" });
                 }}
               >
                 Contact
@@ -190,7 +217,7 @@ function Navbar() {
 
         {/* Login Button */}
         {!owner ? (
-          <Button 
+          <Button
             onClick={handleGetStarted}
             disabled={isNavigatingToSignIn}
             className="bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium shadow-lg shadow-yellow-500/20 cursor-pointer min-w-[120px]"
@@ -206,7 +233,6 @@ function Navbar() {
           </Button>
         ) : (
           <div className="flex items-center space-x-4">
-            
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Avatar className="cursor-pointer border-2 border-yellow-400 hover:border-yellow-300 transition-colors ring-2 ring-transparent hover:ring-yellow-400/20">
