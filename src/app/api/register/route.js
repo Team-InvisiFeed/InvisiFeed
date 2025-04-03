@@ -73,6 +73,7 @@ export async function POST(req) {
         address: { localAddress, city, state, country, pincode },
         feedbacks: [],
         invoices: [], // Initialize empty invoices array instead of invoiceIds
+        isProfileCompleted: true,
       });
 
       await newUser.save();
