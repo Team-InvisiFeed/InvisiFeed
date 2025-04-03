@@ -3,7 +3,14 @@ import { getToken } from "next-auth/jwt";
 export { default } from "next-auth/middleware";
 
 export const config = {
-  matcher: ["/user/:path*", "/sign-in", "/register", "/", "/verify/:path*"],
+  matcher: [
+    "/user/:path*",
+    "/sign-in",
+    "/register",
+    "/",
+    "/verify/:path*",
+    "/complete-profile",
+  ],
 };
 
 export async function middleware(request) {
@@ -35,17 +42,49 @@ export async function middleware(request) {
     );
   }
 
+  // Redirect logged-in users from auth pages to user page
   if (
     token &&
     (url.pathname.startsWith("/sign-in") ||
       url.pathname.startsWith("/register") ||
       url.pathname.startsWith("/verify"))
   ) {
+    // If profile is not complete, redirect to complete-profile
+    if (
+      token.isProfileCompleted === false &&
+      !url.pathname.startsWith("/complete-profile")
+    ) {
+      return NextResponse.redirect(new URL("/complete-profile", request.url));
+    }
+
     return NextResponse.redirect(
       new URL(`/user/${token.username}`, request.url)
     );
   }
 
+  // Redirect users with incomplete profile to complete-profile page,
+  // unless they're already there
+  if (
+    token &&
+    token.isProfileCompleted === false &&
+    url.pathname.startsWith("/user") &&
+    !url.pathname.startsWith("/complete-profile")
+  ) {
+    return NextResponse.redirect(new URL("/complete-profile", request.url));
+  }
+
+  // Redirect users with complete profile away from complete-profile page
+  if (
+    token &&
+    token.isProfileCompleted === true &&
+    url.pathname.startsWith("/complete-profile")
+  ) {
+    return NextResponse.redirect(
+      new URL(`/user/${token.username}`, request.url)
+    );
+  }
+
+  // Handle token expiry for user routes
   if (token) {
     if (
       Date.now() > token.refreshTokenExpiry &&
@@ -55,7 +94,13 @@ export async function middleware(request) {
     }
   }
 
+  // Redirect unauthenticated users to sign-in page
   if (!token && url.pathname.startsWith("/user")) {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
+  }
+
+  // Redirect unauthenticated users from complete-profile page
+  if (!token && url.pathname.startsWith("/complete-profile")) {
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 
