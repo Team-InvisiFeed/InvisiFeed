@@ -1,53 +1,55 @@
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/options";
 import dbConnect from "@/lib/dbConnect";
 import OwnerModel from "@/model/Owner";
 
 export async function POST(req) {
-  await dbConnect();
-
-  const { username, updates } = await req.json();
-
-  const decodedUsername = decodeURIComponent(username);
-
   try {
-    // Handle nested address fields
-    let updateQuery = {};
-    
-    // If the update field contains a dot (.), it's a nested field
-    if (Object.keys(updates)[0].includes('.')) {
-      const [parentField, childField] = Object.keys(updates)[0].split('.');
-      updateQuery = {
-        [`${parentField}.${childField}`]: updates[Object.keys(updates)[0]]
-      };
-    } else {
-      // Handle top-level fields
-      updateQuery = updates;
+    await dbConnect();
+    const body = await req.json();
+
+    // Find the user
+    const user = await OwnerModel.findOne({ username: body.username });
+
+    if (!user) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    // Update the existing owner document
-    const updatedOwner = await OwnerModel.findOneAndUpdate(
-      { username: decodedUsername },
-      { $set: updateQuery },
-      { new: true }
-    );
-
-    if (!updatedOwner) {
-      return Response.json({ message: "Owner not found" }, { status: 404 });
+    // Update user fields
+    if (body.data.organizationName) {
+      user.organizationName = body.data.organizationName;
+    }
+    if (body.data.phoneNumber) {
+      user.phoneNumber = body.data.phoneNumber;
+    }
+    if (body.data.address) {
+      user.address = body.data.address;
     }
 
-    return Response.json(
-      { 
-        message: "Profile updated successfully", 
-        data: updatedOwner 
+    // Save the updated user
+    const updatedUser = await user.save();
+
+    // Return success response
+    return NextResponse.json(
+      {
+        message: "Profile updated successfully",
+        user: {
+          id: user._id,
+          email: user.email,
+          username: user.username,
+          organizationName: user.organizationName,
+          phoneNumber: user.phoneNumber,
+          address: user.address,
+          isProfileCompleted: user.isProfileCompleted,
+        },
       },
       { status: 200 }
     );
   } catch (error) {
     console.error("Error updating profile:", error);
-    return Response.json(
-      { 
-        message: "Failed to update profile", 
-        error: error.message 
-      }, 
+    return NextResponse.json(
+      { message: "Error updating profile" },
       { status: 500 }
     );
   }
