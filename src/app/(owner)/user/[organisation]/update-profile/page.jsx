@@ -26,6 +26,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   organizationName: z.string().min(1, "Organization name is required"),
@@ -40,7 +41,7 @@ const formSchema = z.object({
 });
 
 function UpdateProfilePage() {
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const owner = session?.user;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -48,6 +49,7 @@ function UpdateProfilePage() {
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
+  const router = useRouter();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -169,20 +171,35 @@ function UpdateProfilePage() {
       );
       return;
     }
+    const payload = {
+      data,
+      username: session?.user?.username,
+    };
 
     try {
       setSaving(true);
 
-      const response = await axios.post("/api/update-profile", {
-        username: owner?.username,
-        updates: data,
-      });
+      const response = await axios.post("/api/update-profile", payload);
 
       if (response.status === 200) {
+        // Update session with new data
+        await update({
+          user: {
+            ...session.user,
+            organizationName:
+              data.organizationName || session.user.organizationName,
+            phoneNumber: data.phoneNumber || session.user.phoneNumber,
+            address: data.address || session.user.address,
+          },
+        });
+
         toast.success("Profile updated successfully");
+        setEditingField(null);
+        router.refresh();
       }
     } catch (error) {
-      toast.error("Failed to update profile");
+      console.error("Error updating profile:", error);
+      toast.error(error.response?.data?.message || "Failed to update profile");
     } finally {
       setSaving(false);
     }
