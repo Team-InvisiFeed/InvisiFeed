@@ -42,27 +42,37 @@ const FeedbackSchema = new Schema({
 const AddressSchema = new Schema({
   localAddress: {
     type: String,
-    required: true,
+    required: function () {
+      return !this.parent().isGoogleAuth;
+    },
     trim: true,
   },
   city: {
     type: String,
-    required: true,
+    required: function () {
+      return !this.parent().isGoogleAuth;
+    },
     trim: true,
   },
   state: {
     type: String,
-    required: true,
+    required: function () {
+      return !this.parent().isGoogleAuth;
+    },
     trim: true,
   },
   country: {
     type: String,
-    required: true,
+    required: function () {
+      return !this.parent().isGoogleAuth;
+    },
     trim: true,
   },
   pincode: {
     type: String,
-    required: true,
+    required: function () {
+      return !this.parent().isGoogleAuth;
+    },
   },
 });
 
@@ -99,6 +109,26 @@ const InvoiceSchema = new Schema({
   invoiceId: {
     type: String,
     required: true,
+  },
+  invoicePdfUrl: {
+    type: String,
+    // required: true,
+    trim: true,
+    default: null,
+    uploadedAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  mergedPdfUrl: {
+    type: String,
+    // required: true,
+    trim: true,
+    default: null,
+    uploadedAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   AIuseCount: {
     type: Number,
@@ -159,6 +189,16 @@ const OwnerSchema = new Schema({
     default: false,
   },
 
+  isGoogleAuth: {
+    type: Boolean,
+    default: false,
+  },
+
+  isProfileCompleted: {
+    type: Boolean,
+    default: false,
+  },
+
   refreshToken: {
     type: String,
     default: null,
@@ -176,12 +216,16 @@ const OwnerSchema = new Schema({
 
   phoneNumber: {
     type: String,
-    required: [true, "Phone Number is required"],
+    required: function () {
+      return !this.isGoogleAuth;
+    },
   },
 
   address: {
     type: AddressSchema,
-    required: [true, "Address is required"],
+    required: function () {
+      return !this.isGoogleAuth;
+    },
   },
 
   feedbacks: [FeedbackSchema],
