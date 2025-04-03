@@ -131,6 +131,7 @@ const StatCard = ({ title, value, subtitle, icon: Icon, delay }) => (
 const Dashboard = () => {
   const { data: session } = useSession();
   const owner = session?.user;
+
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
