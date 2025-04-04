@@ -89,10 +89,17 @@ function Page() {
   const handleGoogleSignIn = async (e) => {
     e.preventDefault(); // Prevent form submission
     try {
-      await signIn("google", {
-        callbackUrl: "/user",
-        redirect: true,
+      const result = await signIn("google", {
+        redirect: false,
       });
+
+      if (result?.error) {
+        toast.error(result.error);
+        return;
+      }
+
+      // After successful sign-in, redirect to user page
+      router.push(`/user/${result?.user?.username}`);
     } catch (error) {
       console.error("Google sign in error:", error);
       toast.error("Failed to sign in with Google");
