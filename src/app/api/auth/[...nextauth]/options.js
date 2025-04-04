@@ -133,13 +133,13 @@ export const authOptions = {
           user.id = newUser._id.toString();
           user.username = username;
           user.isProfileCompleted = newUser.isProfileCompleted;
-
           return true;
         } catch (error) {
           console.error("Google Sign-In Error:", error);
-          return `/sign-in`; // 🔥 Redirect to error message
+          return `/sign-in`;
         }
       }
+
       return true;
     },
 
@@ -154,6 +154,19 @@ export const authOptions = {
           token.email = profile.email;
           token.organizationName = profile.name;
           token.isProfileCompleted = user.isProfileCompleted;
+
+          // For Google sign-in, ensure we have the username
+          try {
+            const existingUser = await OwnerModel.findOne({
+              email: profile.email,
+            });
+            if (existingUser) {
+              token.username = existingUser.username;
+              token.isProfileCompleted = existingUser.isProfileCompleted;
+            }
+          } catch (error) {
+            console.error("Error finding user in JWT callback:", error);
+          }
         } else {
           // Existing credentials logic
           token.accessToken = user.accessToken;
@@ -164,56 +177,6 @@ export const authOptions = {
           token.accessTokenExpiry = user.accessTokenExpiry;
           token.refreshTokenExpiry = user.refreshTokenExpiry;
           token.isProfileCompleted = user.isProfileCompleted;
-        }
-      }
-
-      // Handle token refresh
-      if (token.provider !== "google" && token.refreshTokenExpiry) {
-        if (Date.now() < token.refreshTokenExpiry) {
-          if (Date.now() > token.accessTokenExpiry) {
-            try {
-              // Generate new tokens
-              const newAccessToken = generateAccessToken({
-                _id: token.id,
-                email: token.email,
-                username: token.username,
-                isVerified: token.isVerified,
-                organizationName: token.name,
-              });
-              const newRefreshToken = generateRefreshToken({
-                _id: token.id,
-                email: token.email,
-                username: token.username,
-                isVerified: token.isVerified,
-                organizationName: token.name,
-              });
-
-              const decodedNewAccessToken = jwt.decode(
-                newAccessToken,
-                process.env.ACCESS_TOKEN_SECRET
-              );
-              const decodedNewRefreshToken = jwt.decode(
-                newRefreshToken,
-                process.env.REFRESH_TOKEN_SECRET
-              );
-
-              // Update refresh token in database
-              await OwnerModel.findByIdAndUpdate(token.id, {
-                refreshToken: newRefreshToken,
-              });
-
-              // Update token object
-              token.accessToken = newAccessToken;
-              token.refreshToken = newRefreshToken;
-              token.accessTokenExpiry = decodedNewAccessToken.exp * 1000;
-              token.refreshTokenExpiry = decodedNewRefreshToken.exp * 1000;
-            } catch (error) {
-              console.error("Error refreshing token:", error);
-              return null;
-            }
-          }
-        } else {
-          return null;
         }
       }
 
@@ -250,16 +213,28 @@ export const authOptions = {
 
     async redirect({ url, baseUrl, token }) {
       // If the url starts with /user, we need to append the username
-      // console.log("redirect callback url: ", url);
-      // console.log("redirect callback baseUrl: ", baseUrl);
-      // console.log("redirect callback token: ", token);
       if (url.includes("/user")) {
-        const session = await getSession();
-        // console.log("accha session: ", session);
+        console.log("redirect callback token: ", token);
 
-        if (session?.user?.username) {
-          return `${baseUrl}/user/${session.user.username}`;
+        // If we have a token with username, use it
+        if (token?.username) {
+          return `${baseUrl}/user/${token.username}`;
         }
+
+        // If we have a token with email, try to get username from database
+        if (token?.email) {
+          try {
+            const user = await OwnerModel.findOne({ email: token.email });
+            if (user?.username) {
+              return `${baseUrl}/user/${user.username}`;
+            }
+          } catch (error) {
+            console.error("Error getting username from database:", error);
+          }
+        }
+
+        // If all else fails, redirect to /user
+        return `${baseUrl}/user`;
       }
 
       // Default NextAuth redirect behavior
