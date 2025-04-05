@@ -88,7 +88,7 @@ function Navbar() {
         </motion.button>
 
         {/* Navigation Links */}
-        <div className="hidden md:flex space-x-6">
+        <div className="hidden md:flex space-x-6 absolute left-1/2 -translate-x-1/2">
           {owner ? (
             <>
               <motion.button
