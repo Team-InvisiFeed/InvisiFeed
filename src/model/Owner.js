@@ -115,20 +115,12 @@ const InvoiceSchema = new Schema({
     // required: true,
     trim: true,
     default: null,
-    uploadedAt: {
-      type: Date,
-      default: Date.now,
-    },
   },
   mergedPdfUrl: {
     type: String,
     // required: true,
     trim: true,
     default: null,
-    uploadedAt: {
-      type: Date,
-      default: Date.now,
-    },
   },
   AIuseCount: {
     type: Number,
