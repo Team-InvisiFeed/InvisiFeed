@@ -5,6 +5,7 @@ import dbConnect from "@/lib/dbConnect";
 import OwnerModel from "@/model/Owner";
 import jwt from "jsonwebtoken";
 import { getSession } from "next-auth/react";
+import { deleteOldInvoicePdfs } from "@/utils/deleteOldInvoicesFromCloudinary";
 
 export const authOptions = {
   providers: [
@@ -46,6 +47,9 @@ export const authOptions = {
           if (!isPasswordCorrect) {
             throw new Error("Incorrect password");
           }
+
+          // Delete old invoice PDFs (older than 1 hour)
+          await deleteOldInvoicePdfs(user.username);
 
           // Generate tokens
           const accessToken = generateAccessToken(user);
@@ -92,6 +96,9 @@ export const authOptions = {
             if (!existingUser.isGoogleAuth) {
               return `/sign-in?error=DIFFERENT_SIGNIN_METHOD`;
             }
+
+            // Delete old invoice PDFs (older than 1 hour)
+            await deleteOldInvoicePdfs(existingUser.username);
 
             // ✅ Allow sign-in if it's a valid Google user
             user.id = existingUser._id.toString();
@@ -214,7 +221,6 @@ export const authOptions = {
     async redirect({ url, baseUrl, token }) {
       // If the url starts with /user, we need to append the username
       if (url.includes("/user")) {
-        console.log("redirect callback token: ", token);
 
         // If we have a token with username, use it
         if (token?.username) {
