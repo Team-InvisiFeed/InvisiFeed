@@ -138,28 +138,7 @@ export async function POST(req) {
       // Calculate expiry date
       expiryDate.setDate(expiryDate.getDate() + Number(couponData.expiryDays));
     }
-    // console.log(modifiedCouponCode);
-    // Add new invoice with initial AIuseCount and coupon if provided
-    owner.invoices.push({
-      invoiceId: invoiceNumber,
-      AIuseCount: 0,
-      couponAttached: couponData
-        ? {
-            couponCode: dbCouponCode,
-            couponDescription: couponData.description,
-            couponExpiryDate: expiryDate,
-            isCouponUsed: false,
-          }
-        : null,
-    });
-
-    // Update upload counts
-    owner.uploadedInvoiceCount.count += 1;
-    owner.uploadedInvoiceCount.dailyUploads += 1;
-    owner.uploadedInvoiceCount.lastUpdated = now;
-
-    await owner.save();
-
+    
     // Generate QR Code PDF with modified coupon code if provided
     const qrPdfBuffer = await generateQrPdf(
       invoiceNumber,
@@ -190,6 +169,30 @@ export async function POST(req) {
     });
 
     const finalPdfUrl = finalUpload.secure_url;
+    
+    // Add new invoice with initial AIuseCount, coupon if provided, and PDF URLs
+    owner.invoices.push({
+      invoiceId: invoiceNumber,
+      invoicePdfUrl: pdfUrl,
+      mergedPdfUrl: finalPdfUrl,
+      AIuseCount: 0,
+      couponAttached: couponData
+        ? {
+            couponCode: dbCouponCode,
+            couponDescription: couponData.description,
+            couponExpiryDate: expiryDate,
+            isCouponUsed: false,
+          }
+        : null,
+    });
+
+    // Update upload counts
+    owner.uploadedInvoiceCount.count += 1;
+    owner.uploadedInvoiceCount.dailyUploads += 1;
+    owner.uploadedInvoiceCount.lastUpdated = now;
+
+    await owner.save();
+
     return NextResponse.json(
       { url: finalPdfUrl, invoiceNumber },
       { status: 200 }
