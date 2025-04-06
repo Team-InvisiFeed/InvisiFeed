@@ -19,6 +19,17 @@ export async function POST(request) {
       );
     }
 
+    if (user.isGoogleAuth) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "This account was registered with Google Sign-In. Password reset is not applicable.",
+        },
+        { status: 400 }
+      );
+    }
+
     // Generate reset token
     const resetToken = jwt.sign(
       { userId: user._id },
@@ -67,4 +78,4 @@ export async function POST(request) {
       { status: 500 }
     );
   }
-} 
+}
