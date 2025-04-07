@@ -49,38 +49,30 @@ export async function middleware(request) {
       url.pathname.startsWith("/register") ||
       url.pathname.startsWith("/verify"))
   ) {
-    // If profile is not complete, redirect to complete-profile
-    if (
-      token.isProfileCompleted === false &&
-      !url.pathname.startsWith("/complete-profile")
-    ) {
-      return NextResponse.redirect(new URL("/complete-profile", request.url));
-    }
-
     return NextResponse.redirect(
       new URL(`/user/${token.username}`, request.url)
     );
   }
 
-  // Redirect users with incomplete profile to complete-profile page,
-  // unless they're already there
-  if (
-    token &&
-    token.isProfileCompleted === false &&
-    url.pathname.startsWith("/user") &&
-    !url.pathname.startsWith("/complete-profile")
-  ) {
-    return NextResponse.redirect(new URL("/complete-profile", request.url));
-  }
-
   // Redirect users with complete profile away from complete-profile page
   if (
     token &&
-    token.isProfileCompleted === true &&
+    (token.isProfileCompleted === "completed" || token.isProfileCompleted === "skipped") &&
     url.pathname.startsWith("/complete-profile")
   ) {
     return NextResponse.redirect(
       new URL(`/user/${token.username}`, request.url)
+    );
+  }
+
+  // Redirect users with pending profile to complete-profile page
+  if (
+    token &&
+    token.isProfileCompleted === "pending" &&
+    url.pathname.startsWith("/user")
+  ) {
+    return NextResponse.redirect(
+      new URL("/complete-profile", request.url)
     );
   }
 
