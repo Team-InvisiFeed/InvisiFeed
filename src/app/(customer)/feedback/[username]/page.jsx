@@ -48,6 +48,8 @@ export default function FeedbackForm() {
     suggestionContent: "",
   });
 
+  const [organizationName, setOrganizationName] = useState("");
+
   const [loadingFeedback, setLoadingFeedback] = useState(false);
   const [loadingSuggestion, setLoadingSuggestion] = useState(false);
   const [invalidInvoice, setInvalidInvoice] = useState(null);
@@ -75,6 +77,9 @@ export default function FeedbackForm() {
       setFeedbackAlreadySubmitted(false);
 
       const owner = response.data.owner;
+      if (owner) {
+        setOrganizationName(owner.organizationName);
+      }
       if (!owner.invoices) {
         setAiUsageCount(0);
         setAiLimitReached(false);
@@ -475,7 +480,7 @@ export default function FeedbackForm() {
         <Card className="w-full max-w-2xl mx-auto bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/20">
           <CardHeader className="border-b border-yellow-400/20 px-4 sm:px-6">
             <CardTitle className="text-xl sm:text-2xl font-bold text-yellow-400">
-              Service Feedback
+              Service Feedback for {organizationName}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 sm:p-6">
