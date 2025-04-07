@@ -70,6 +70,12 @@ function Page() {
       if (result.error === "CredentialsSignin") {
         toast.error("Incorrect username or password");
         setIsSubmitting(false);
+      } else if (result.error.startsWith("UNVERIFIED_USER:")) {
+        // Extract username from error message
+        const username = result.error.split(":")[1];
+        // Redirect to verification page
+        router.push(`/verify/${username}`);
+        setIsSubmitting(false);
       } else {
         toast.error(result.error);
         setIsSubmitting(false);
@@ -83,7 +89,59 @@ function Page() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
   if (error === "DIFFERENT_SIGNIN_METHOD") {
-    toast("You signed up using credentials. Please use the same method.");
+    return (
+      <div className="flex h-screen overflow-hidden">
+        {/* Left Section with Gradient */}
+        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#000000] p-8 flex-col justify-center items-center text-white">
+          <div className="max-w-md space-y-4">
+            <h1 className="text-4xl font-extrabold tracking-tight">InvisiFeed</h1>
+            <p className="text-lg text-gray-200">
+              Welcome back! Sign in to continue your journey
+            </p>
+            <div className="space-y-3 mt-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                <p>Secure and anonymous feedback system</p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                <p>Real-time insights and analytics</p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                <p>Build a culture of trust and transparency</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Section with Error Message */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-[#0A0A0A]">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="w-full max-w-md space-y-6 text-center"
+          >
+            <div className="space-y-2">
+              <h1 className="text-2xl font-bold tracking-tight text-white">
+                Different Sign-in Method
+              </h1>
+              <p className="text-gray-400">
+                You signed up using credentials. Please use the same method to sign in.
+              </p>
+            </div>
+            
+            <Button
+              onClick={() => router.push("/sign-in")}
+              className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium cursor-pointer h-9 shadow-lg shadow-yellow-500/20"
+            >
+              Sign in with credentials
+            </Button>
+          </motion.div>
+        </div>
+      </div>
+    );
   }
   // Update Google sign in handler
   const handleGoogleSignIn = async (e) => {
