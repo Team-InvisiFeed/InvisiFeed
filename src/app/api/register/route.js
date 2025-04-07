@@ -12,8 +12,6 @@ export async function POST(req) {
       email,
       username,
       password,
-      phoneNumber,
-      address: { localAddress, city, state, country, pincode },
     } = await req.json();
 
     const existingUserVerifiedByUsername = await OwnerModel.findOne({
@@ -69,11 +67,17 @@ export async function POST(req) {
         verifyCode,
         verifyCodeExpiry: expiryDate,
         isVerified: false,
-        phoneNumber,
-        address: { localAddress, city, state, country, pincode },
+        phoneNumber: "",
+        address: {
+          localAddress: "",
+          city: "",
+          state: "",
+          country: "",
+          pincode: "",
+        },
         feedbacks: [],
-        invoices: [], // Initialize empty invoices array instead of invoiceIds
-        isProfileCompleted: true,
+        invoices: [],
+        isProfileCompleted: "pending",
       });
 
       await newUser.save();
