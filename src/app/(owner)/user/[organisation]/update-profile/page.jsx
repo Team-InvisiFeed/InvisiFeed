@@ -30,13 +30,13 @@ import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   organizationName: z.string().min(1, "Organization name is required"),
-  phoneNumber: z.string().min(1, "Phone number is required"),
+  phoneNumber: z.string(),
   address: z.object({
-    country: z.string().min(1, "Country is required"),
-    state: z.string().min(1, "State is required"),
-    city: z.string().min(1, "City is required"),
-    localAddress: z.string().min(1, "Local address is required"),
-    pincode: z.string().min(1, "Pincode is required"),
+    country: z.string(),
+    state: z.string(),
+    city: z.string(),
+    localAddress: z.string(),
+    pincode: z.string(),
   }),
 });
 
@@ -190,10 +190,11 @@ function UpdateProfilePage() {
               data.organizationName || session.user.organizationName,
             phoneNumber: data.phoneNumber || session.user.phoneNumber,
             address: data.address || session.user.address,
+            isProfileCompleted: response.data.user.isProfileCompleted,
           },
         });
 
-        toast.success("Profile updated successfully");
+        toast.success(response.data.message);
         setEditingField(null);
         router.refresh();
       }
