@@ -27,6 +27,23 @@ export async function POST(req) {
       user.address = body.data.address;
     }
 
+    // Check if all required fields are filled
+    const hasOrganizationName = user.organizationName && user.organizationName.trim() !== "";
+    const hasPhoneNumber = user.phoneNumber && user.phoneNumber.trim() !== "";
+    const hasAddress = user.address && 
+      user.address.localAddress && user.address.localAddress.trim() !== "" &&
+      user.address.city && user.address.city.trim() !== "" &&
+      user.address.state && user.address.state.trim() !== "" &&
+      user.address.country && user.address.country.trim() !== "" &&
+      user.address.pincode && user.address.pincode.trim() !== "";
+
+    // Update profile completion status
+    if (hasOrganizationName && hasPhoneNumber && hasAddress) {
+      user.isProfileCompleted = "completed";
+    } else {
+      user.isProfileCompleted = "skipped";
+    }
+
     // Save the updated user
     const updatedUser = await user.save();
 
