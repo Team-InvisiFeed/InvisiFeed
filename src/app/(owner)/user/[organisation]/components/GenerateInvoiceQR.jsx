@@ -2,7 +2,7 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Upload, FileText, Download, Share2 } from "lucide-react";
+import { Upload, FileText, Download, Share2, FileUp } from "lucide-react";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -19,12 +19,42 @@ export default function Home() {
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [showCouponForm, setShowCouponForm] = useState(false);
+  const [showSampleInvoices, setShowSampleInvoices] = useState(false);
   const [couponData, setCouponData] = useState({
     couponCode: "",
     description: "",
     expiryDays: "30",
   });
   const [couponSaved, setCouponSaved] = useState(false);
+
+  // Sample invoice data
+  const sampleInvoices = [
+    {
+      id: 1,
+      name: "Sample Invoice 1",
+      url: "https://res.cloudinary.com/dzcrmyin0/image/upload/v1744027611/sample_invoice_2_cloudinary_ar8q9t.pdf",
+    },
+    {
+      id: 2,
+      name: "Sample Invoice 2",
+      url: "https://res.cloudinary.com/dzcrmyin0/image/upload/v1744027612/sample_invoice_1_cloudinary_k8khff.pdf",
+    },
+    {
+      id: 3,
+      name: "Sample Invoice 3",
+      url: "https://res.cloudinary.com/dzcrmyin0/image/upload/v1744027612/sample_invoice_4_cloudinary_ysupfs.pdf",
+    },
+    {
+      id: 4,
+      name: "Sample Invoice 4",
+      url: "https://res.cloudinary.com/dzcrmyin0/image/upload/v1744027612/sample_invoice_5_cloudinary_d7lpvv.pdf",
+    },
+    {
+      id: 5,
+      name: "Sample Invoice 5",
+      url: "https://res.cloudinary.com/dzcrmyin0/image/upload/v1744027612/sample_invoice_3_cloudinary_pxnvlb.pdf",
+    },
+  ];
 
   // Fetch initial upload count
   useEffect(() => {
@@ -71,15 +101,37 @@ export default function Home() {
     setShowCouponForm(false);
   };
 
-  const handleUpload = async () => {
-    if (!file) {
+  const handleSampleInvoiceSelect = async (sampleInvoice) => {
+    try {
+      // Fetch the sample invoice PDF
+      const response = await fetch(sampleInvoice.url);
+      const blob = await response.blob();
+      
+      // Create a File object from the blob
+      const file = new File([blob], `${sampleInvoice.name}.pdf`, {
+        type: "application/pdf",
+      });
+      
+      // Set the file and close the modal
+      setFile(file);
+      setShowSampleInvoices(false);
+      
+      // Don't automatically trigger upload - let user click the Upload & Extract button
+    } catch (error) {
+      console.error("Error loading sample invoice:", error);
+      alert("Failed to load sample invoice. Please try again.");
+    }
+  };
+
+  const handleUploadWithFile = async (fileToUpload) => {
+    if (!fileToUpload) {
       alert("Please select a PDF file.");
       return;
     }
 
     setLoading(true);
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", fileToUpload);
     formData.append("username", owner.username);
     if (couponSaved) {
       formData.append("couponData", JSON.stringify(couponData));
@@ -119,6 +171,10 @@ export default function Home() {
     }
 
     setLoading(false);
+  };
+
+  const handleUpload = async () => {
+    await handleUploadWithFile(file);
   };
 
   const handleSendEmail = async () => {
@@ -224,7 +280,7 @@ export default function Home() {
             {file && !couponSaved && (
               <button
                 onClick={() => setShowCouponForm(true)}
-                className="w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-lg transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30"
+                className="w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-lg transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 cursor-pointer"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -282,7 +338,7 @@ export default function Home() {
             <motion.button
               onClick={handleUpload}
               disabled={loading || !file || dailyUploads >= 3 || initialLoading}
-              className="w-full px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-lg transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+              className="w-full px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-lg transition-all duration-200 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none cursor-pointer"
               whileHover={{
                 scale: dailyUploads < 3 && !initialLoading ? 1.02 : 1,
               }}
@@ -291,7 +347,7 @@ export default function Home() {
               }}
             >
               {loading || initialLoading ? (
-                <div className="flex items-center justify-center space-x-2">
+                <div className="flex items-center justify-center space-x-2 ">
                   <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
                   <span>{initialLoading ? "Loading..." : "Processing..."}</span>
                 </div>
@@ -307,6 +363,12 @@ export default function Home() {
               )}
             </motion.button>
           </div>
+          <p
+          onClick={() => setShowSampleInvoices(true)}
+          className="text-gray-100 text-sm mt-4 text-center cursor-pointer"
+          disabled={initialLoading || dailyUploads >= 3}>
+            Try out our sample invoices to get started
+          </p>
 
           {invoiceNumber && (
             <motion.div
@@ -523,6 +585,46 @@ export default function Home() {
                 className="px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg hover:bg-yellow-500 transition-colors"
               >
                 Save
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Sample Invoices Modal */}
+      {showSampleInvoices && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-[#1A1A1A] p-6 rounded-lg w-full max-w-md border border-yellow-400/20"
+          >
+            <h2 className="text-xl font-bold mb-4 text-yellow-400">
+              Select Sample Invoice
+            </h2>
+            <div className="space-y-3">
+              {sampleInvoices.map((invoice) => (
+                <button
+                  key={invoice.id}
+                  onClick={() => handleSampleInvoiceSelect(invoice)}
+                  className="w-full px-4 py-3 bg-[#0A0A0A] border border-yellow-400/20 rounded-lg text-white hover:bg-[#0A0A0A]/80 hover:border-yellow-400/40 transition-all duration-200 flex items-center justify-between cursor-pointer"
+                  disabled={loading || dailyUploads >= 3}
+                >
+                  <span>{invoice.name}</span>
+                  {loading && file && file.name === `${invoice.name}.pdf` ? (
+                    <div className="w-5 h-5 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <FileUp className="h-5 w-5 text-yellow-400" />
+                  )}
+                </button>
+              ))}
+            </div>
+            <div className="flex justify-end mt-6">
+              <button
+                onClick={() => setShowSampleInvoices(false)}
+                className="px-4 py-2 text-gray-300 hover:text-white transition-colors cursor-pointer"
+              >
+                Cancel
               </button>
             </div>
           </motion.div>
