@@ -16,6 +16,23 @@ export const config = {
 export async function middleware(request) {
   const token = await getToken({ req: request });
   const url = request.nextUrl;
+  const { pathname } = request.nextUrl;
+
+  // Check if the path is /user/[username]
+  if (pathname.startsWith("/user/")) {
+    const username = pathname.split("/")[2];
+
+    // If user is not logged in, redirect to sign-in
+    if (!token) {
+      return NextResponse.redirect(new URL("/sign-in", request.url));
+    }
+
+    // If user is trying to access a different user's profile
+    if (token.username !== username) {
+      // Return 404 page
+      return NextResponse.redirect(new URL("/sign-in", request.url));
+    }
+  }
 
   // Check if tokens are expired
   if (token) {
@@ -57,7 +74,8 @@ export async function middleware(request) {
   // Redirect users with complete profile away from complete-profile page
   if (
     token &&
-    (token.isProfileCompleted === "completed" || token.isProfileCompleted === "skipped") &&
+    (token.isProfileCompleted === "completed" ||
+      token.isProfileCompleted === "skipped") &&
     url.pathname.startsWith("/complete-profile")
   ) {
     return NextResponse.redirect(
@@ -71,9 +89,7 @@ export async function middleware(request) {
     token.isProfileCompleted === "pending" &&
     url.pathname.startsWith("/user")
   ) {
-    return NextResponse.redirect(
-      new URL("/complete-profile", request.url)
-    );
+    return NextResponse.redirect(new URL("/complete-profile", request.url));
   }
 
   // Handle token expiry for user routes
