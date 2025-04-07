@@ -18,7 +18,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Country, State, City } from "country-state-city";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { signIn } from "next-auth/react";
@@ -28,30 +27,9 @@ function Page() {
   const [step, setStep] = useState(1);
   const router = useRouter();
 
-  const [countries, setCountries] = useState([]);
-  const [states, setStates] = useState([]);
-  const [cities, setCities] = useState([]);
-
-  const [selectedCountry, setSelectedCountry] = useState("");
-  const [selectedState, setSelectedState] = useState("");
-  const [selectedCity, setSelectedCity] = useState("");
-  const [localAddress, setLocalAddress] = useState("");
-  const [pincode, setPincode] = useState("");
-
   // Show Password State
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const [isCountryOpen, setIsCountryOpen] = useState(false);
-  const [isStateOpen, setIsStateOpen] = useState(false);
-  const [isCityOpen, setIsCityOpen] = useState(false);
-  const countryRef = useRef(null);
-  const stateRef = useRef(null);
-  const cityRef = useRef(null);
-
-  const [searchCountry, setSearchCountry] = useState("");
-  const [searchState, setSearchState] = useState("");
-  const [searchCity, setSearchCity] = useState("");
 
   const [isNavigatingToSignIn, setIsNavigatingToSignIn] = useState(false);
 
@@ -62,91 +40,11 @@ function Page() {
   });
   const usernameCheckTimeout = useRef(null);
 
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (countryRef.current && !countryRef.current.contains(event.target)) {
-        setIsCountryOpen(false);
-      }
-      if (stateRef.current && !stateRef.current.contains(event.target)) {
-        setIsStateOpen(false);
-      }
-      if (cityRef.current && !cityRef.current.contains(event.target)) {
-        setIsCityOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // ✅ Fetch Countries using country-state-city
-  useEffect(() => {
-    const fetchedCountries = Country.getAllCountries();
-    setCountries(fetchedCountries);
-  }, []);
-
-  // ✅ Fetch states based on country
-  useEffect(() => {
-    if (selectedCountry) {
-      const countryCode = countries.find(
-        (country) => country.name === selectedCountry
-      )?.isoCode;
-
-      if (countryCode) {
-        const fetchedStates = State.getStatesOfCountry(countryCode);
-        setStates(fetchedStates);
-        setSelectedState("");
-        setCities([]);
-      }
-    }
-  }, [selectedCountry, countries]);
-
-  // ✅ Fetch cities based on state
-  useEffect(() => {
-    if (selectedCountry && selectedState) {
-      const countryCode = countries.find(
-        (country) => country.name === selectedCountry
-      )?.isoCode;
-
-      const stateCode = states.find(
-        (state) => state.name === selectedState
-      )?.isoCode;
-
-      if (countryCode && stateCode) {
-        const fetchedCities = City.getCitiesOfState(countryCode, stateCode);
-        setCities(fetchedCities);
-        setSelectedCity("");
-      }
-    }
-  }, [selectedState, selectedCountry, states]);
-
-  // Filter functions
-  const filteredCountries = countries.filter((country) =>
-    country.name.toLowerCase().includes(searchCountry.toLowerCase())
-  );
-
-  const filteredStates = states.filter((state) =>
-    state.name.toLowerCase().includes(searchState.toLowerCase())
-  );
-
-  const filteredCities = cities.filter((city) =>
-    city.name.toLowerCase().includes(searchCity.toLowerCase())
-  );
-
   // ✅ Form Setup
   const form = useForm({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       organizationName: "",
-      address: {
-        localAddress: "",
-        city: "",
-        state: "",
-        country: "",
-        pincode: "",
-      },
-      phoneNumber: "",
       email: "",
       username: "",
       password: "",
@@ -156,30 +54,20 @@ function Page() {
 
   // ✅ Handle Next Step
   const handleNext = () => {
-    const { organizationName, phoneNumber } = form.getValues();
-
-    const formattedAddress = {
-      localAddress: localAddress.trim(),
-      city: selectedCity.trim(),
-      state: selectedState.trim(),
-      country: selectedCountry.trim(),
-      pincode: pincode.trim(),
-    };
-
-    form.setValue("address", formattedAddress);
-
-    if (
-      organizationName.trim() !== "" &&
-      phoneNumber.trim() !== "" &&
-      localAddress.trim() !== "" &&
-      selectedCity.trim() !== "" &&
-      selectedState.trim() !== "" &&
-      selectedCountry.trim() !== "" &&
-      pincode.trim() !== ""
-    ) {
-      setTimeout(() => setStep(2), 0);
-    } else {
-      toast("Please fill all fields before proceeding.");
+    if (step === 1) {
+      const { organizationName, email } = form.getValues();
+      if (organizationName.trim() !== "" && email.trim() !== "") {
+        setTimeout(() => setStep(2), 0);
+      } else {
+        toast("Please fill all fields before proceeding.");
+      }
+    } else if (step === 2) {
+      const { username } = form.getValues();
+      if (username.trim() !== "" && usernameStatus.isAvailable) {
+        setTimeout(() => setStep(3), 0);
+      } else {
+        toast("Please enter a valid username before proceeding.");
+      }
     }
   };
 
@@ -329,12 +217,12 @@ function Page() {
                     />
                     <FormField
                       control={form.control}
-                      name="phoneNumber"
+                      name="email"
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
                             <Input
-                              placeholder="Enter Phone Number"
+                              placeholder="Enter Email"
                               {...field}
                               className="bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9"
                             />
@@ -342,229 +230,6 @@ function Page() {
                           <FormMessage className="text-xs" />
                         </FormItem>
                       )}
-                    />
-
-                    {/* Country Dropdown */}
-                    <div className="relative" ref={countryRef}>
-                      <div
-                        onClick={() => setIsCountryOpen(!isCountryOpen)}
-                        className="w-full p-2 border rounded bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200"
-                      >
-                        <span
-                          className={
-                            selectedCountry ? "text-white" : "text-gray-400"
-                          }
-                        >
-                          {selectedCountry || "Select Country"}
-                        </span>
-                        <svg
-                          className={`w-4 h-4 text-yellow-400/50 transition-transform duration-200 ${
-                            isCountryOpen ? "rotate-180" : ""
-                          }`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
-                      </div>
-                      {isCountryOpen && (
-                        <div className="absolute z-50 w-full mt-1 bg-[#0A0A0A]/95 backdrop-blur-md border border-yellow-400/10 rounded-md shadow-lg shadow-black/20 max-h-60 overflow-hidden">
-                          <div className="sticky top-0 bg-[#0A0A0A]/95 p-2 border-b border-yellow-400/10">
-                            <input
-                              type="text"
-                              placeholder="Search country..."
-                              value={searchCountry}
-                              onChange={(e) => setSearchCountry(e.target.value)}
-                              className="w-full p-1.5 text-sm bg-[#0A0A0A]/50 border border-yellow-400/10 rounded text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400/30"
-                              autoFocus
-                            />
-                          </div>
-                          <div className="overflow-auto max-h-[200px] scrollbar-thin scrollbar-thumb-yellow-400/20 scrollbar-track-transparent">
-                            {filteredCountries.map((country) => (
-                              <div
-                                key={country.isoCode}
-                                onClick={() => {
-                                  setSelectedCountry(country.name);
-                                  setIsCountryOpen(false);
-                                  setSearchCountry("");
-                                }}
-                                className={`px-3 py-2 cursor-pointer text-white hover:bg-yellow-400/10 transition-all duration-150 border-b border-yellow-400/5 last:border-0 ${
-                                  selectedCountry === country.name
-                                    ? "bg-yellow-400/20"
-                                    : ""
-                                }`}
-                              >
-                                {country.name}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* State and City Grid */}
-                    <div className="grid grid-cols-2 gap-4">
-                      {/* State Dropdown */}
-                      <div className="relative" ref={stateRef}>
-                        <div
-                          onClick={() =>
-                            !selectedCountry || setIsStateOpen(!isStateOpen)
-                          }
-                          className={`w-full p-2 border rounded bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200 ${
-                            !selectedCountry
-                              ? "opacity-50 cursor-not-allowed"
-                              : ""
-                          }`}
-                        >
-                          <span
-                            className={
-                              selectedState ? "text-white" : "text-gray-400"
-                            }
-                          >
-                            {selectedState || "Select State"}
-                          </span>
-                          <svg
-                            className={`w-4 h-4 text-yellow-400/50 transition-transform duration-200 ${
-                              isStateOpen ? "rotate-180" : ""
-                            }`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        </div>
-                        {isStateOpen && selectedCountry && (
-                          <div className="absolute z-50 w-full mt-1 bg-[#0A0A0A]/95 backdrop-blur-md border border-yellow-400/10 rounded-md shadow-lg shadow-black/20 max-h-60 overflow-hidden">
-                            <div className="sticky top-0 bg-[#0A0A0A]/95 p-2 border-b border-yellow-400/10">
-                              <input
-                                type="text"
-                                placeholder="Search state..."
-                                value={searchState}
-                                onChange={(e) => setSearchState(e.target.value)}
-                                className="w-full p-1.5 text-sm bg-[#0A0A0A]/50 border border-yellow-400/10 rounded text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400/30"
-                                autoFocus
-                              />
-                            </div>
-                            <div className="overflow-auto max-h-[200px] scrollbar-thin scrollbar-thumb-yellow-400/20 scrollbar-track-transparent">
-                              {filteredStates.map((state) => (
-                                <div
-                                  key={state.isoCode}
-                                  onClick={() => {
-                                    setSelectedState(state.name);
-                                    setIsStateOpen(false);
-                                    setSearchState("");
-                                  }}
-                                  className={`px-3 py-2 cursor-pointer text-white hover:bg-yellow-400/10 transition-all duration-150 border-b border-yellow-400/5 last:border-0 ${
-                                    selectedState === state.name
-                                      ? "bg-yellow-400/20"
-                                      : ""
-                                  }`}
-                                >
-                                  {state.name}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* City Dropdown */}
-                      <div className="relative" ref={cityRef}>
-                        <div
-                          onClick={() =>
-                            !selectedState || setIsCityOpen(!isCityOpen)
-                          }
-                          className={`w-full p-2 border rounded bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200 ${
-                            !selectedState
-                              ? "opacity-50 cursor-not-allowed"
-                              : ""
-                          }`}
-                        >
-                          <span
-                            className={
-                              selectedCity ? "text-white" : "text-gray-400"
-                            }
-                          >
-                            {selectedCity || "Select City"}
-                          </span>
-                          <svg
-                            className={`w-4 h-4 text-yellow-400/50 transition-transform duration-200 ${
-                              isCityOpen ? "rotate-180" : ""
-                            }`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        </div>
-                        {isCityOpen && selectedState && (
-                          <div className="absolute z-50 w-full mt-1 bg-[#0A0A0A]/95 backdrop-blur-md border border-yellow-400/10 rounded-md shadow-lg shadow-black/20 max-h-60 overflow-hidden">
-                            <div className="sticky top-0 bg-[#0A0A0A]/95 p-2 border-b border-yellow-400/10">
-                              <input
-                                type="text"
-                                placeholder="Search city..."
-                                value={searchCity}
-                                onChange={(e) => setSearchCity(e.target.value)}
-                                className="w-full p-1.5 text-sm bg-[#0A0A0A]/50 border border-yellow-400/10 rounded text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400/30"
-                                autoFocus
-                              />
-                            </div>
-                            <div className="overflow-auto max-h-[200px] scrollbar-thin scrollbar-thumb-yellow-400/20 scrollbar-track-transparent">
-                              {filteredCities.map((city) => (
-                                <div
-                                  key={city.name}
-                                  onClick={() => {
-                                    setSelectedCity(city.name);
-                                    setIsCityOpen(false);
-                                    setSearchCity("");
-                                  }}
-                                  className={`px-3 py-2 cursor-pointer text-white hover:bg-yellow-400/10 transition-all duration-150 border-b border-yellow-400/5 last:border-0 ${
-                                    selectedCity === city.name
-                                      ? "bg-yellow-400/20"
-                                      : ""
-                                  }`}
-                                >
-                                  {city.name}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Local Address */}
-                    <Input
-                      value={localAddress}
-                      onChange={(e) => setLocalAddress(e.target.value)}
-                      placeholder="Enter Local Address"
-                      className="w-full p-2 border rounded bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9"
-                    />
-
-                    {/* Pincode */}
-                    <Input
-                      value={pincode}
-                      onChange={(e) => setPincode(e.target.value)}
-                      placeholder="Enter Pincode"
-                      className="w-full p-2 border rounded bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9"
                     />
 
                     {/* Next Button */}
@@ -668,22 +333,6 @@ function Page() {
                     </div>
                     <FormField
                       control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Input
-                              placeholder="Enter Email"
-                              {...field}
-                              className="bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9"
-                            />
-                          </FormControl>
-                          <FormMessage className="text-xs" />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
                       name="username"
                       render={({ field }) => (
                         <FormItem>
@@ -723,6 +372,44 @@ function Page() {
                         </FormItem>
                       )}
                     />
+                    
+                    {/* Next Button */}
+                    <Button
+                      type="button"
+                      onClick={handleNext}
+                      disabled={isSubmitting || !usernameStatus.isAvailable}
+                      className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium cursor-pointer h-9 shadow-lg shadow-yellow-500/20"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Please wait
+                        </>
+                      ) : (
+                        "Next"
+                      )}
+                    </Button>
+                  </motion.div>
+                )}
+
+                {step === 3 && (
+                  <motion.div
+                    key="step3"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-4"
+                  >
+                    <div className="flex justify-start mb-2">
+                      <button
+                        className="flex items-center gap-2 text-gray-400 hover:text-white text-sm"
+                        onClick={() => setStep(2)}
+                      >
+                        <IoIosArrowBack className="h-4 w-4 cursor-pointer" />
+                        Back
+                      </button>
+                    </div>
                     <FormField
                       control={form.control}
                       name="password"
