@@ -42,37 +42,32 @@ const FeedbackSchema = new Schema({
 const AddressSchema = new Schema({
   localAddress: {
     type: String,
-    required: function () {
-      return !this.parent().isGoogleAuth;
-    },
+    required: false,
     trim: true,
+    default: "",
   },
   city: {
     type: String,
-    required: function () {
-      return !this.parent().isGoogleAuth;
-    },
+    required: false,
     trim: true,
+    default: "",
   },
   state: {
     type: String,
-    required: function () {
-      return !this.parent().isGoogleAuth;
-    },
+    required: false,
     trim: true,
+    default: "",
   },
   country: {
     type: String,
-    required: function () {
-      return !this.parent().isGoogleAuth;
-    },
+    required: false,
     trim: true,
+    default: "",
   },
   pincode: {
     type: String,
-    required: function () {
-      return !this.parent().isGoogleAuth;
-    },
+    required: false,
+    default: "",
   },
 });
 
@@ -187,8 +182,9 @@ const OwnerSchema = new Schema({
   },
 
   isProfileCompleted: {
-    type: Boolean,
-    default: false,
+    type: String,
+    enum: ["pending", "skipped", "completed"],
+    default: "pending",
   },
 
   refreshToken: {
@@ -208,15 +204,19 @@ const OwnerSchema = new Schema({
 
   phoneNumber: {
     type: String,
-    required: function () {
-      return !this.isGoogleAuth;
-    },
+    required: false,
+    default: "",
   },
 
   address: {
     type: AddressSchema,
-    required: function () {
-      return !this.isGoogleAuth;
+    required: false,
+    default: {
+      localAddress: "",
+      city: "",
+      state: "",
+      country: "",
+      pincode: "",
     },
   },
 
