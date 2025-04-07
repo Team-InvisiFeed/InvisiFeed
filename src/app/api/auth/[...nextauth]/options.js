@@ -6,6 +6,8 @@ import OwnerModel from "@/model/Owner";
 import jwt from "jsonwebtoken";
 import { getSession } from "next-auth/react";
 import { deleteOldInvoicePdfs } from "@/utils/deleteOldInvoicesFromCloudinary";
+import sendVerificationEmail from "@/utils/sendVerificationEmail";
+import { redirect } from "next/navigation";
 
 export const authOptions = {
   providers: [
@@ -32,11 +34,21 @@ export const authOptions = {
           });
 
           if (!user) {
-            throw new Error("User not found with this email");
+            throw new Error("User not found with this email or username");
           }
 
           if (!user.isVerified) {
-            throw new Error("Please verify your account before login");
+            const verifyCode = Math.floor(
+              100000 + Math.random() * 900000
+            ).toString();
+            user.verifyCode = verifyCode;
+            user.verifyCodeExpiry = new Date(Date.now() + 3600000); // 1 hour expiry
+            await user.save();
+            const emailResponse = await sendVerificationEmail(user.email, verifyCode);
+            if (!emailResponse.success) {
+              throw new Error(emailResponse.message);
+            }
+            throw new Error(`UNVERIFIED_USER:${user.username}`);
           }
 
           const isPasswordCorrect = await bcrypt.compare(
@@ -95,6 +107,7 @@ export const authOptions = {
             // ⚡ Check if user originally signed up with credentials
             if (!existingUser.isGoogleAuth) {
               return `/sign-in?error=DIFFERENT_SIGNIN_METHOD`;
+              
             }
 
             // Delete old invoice PDFs (older than 1 hour)
@@ -126,7 +139,7 @@ export const authOptions = {
             verifyCodeExpiry: new Date(),
             isVerified: true,
             isGoogleAuth: true,
-            isProfileCompleted: false,
+            isProfileCompleted: "pending",
             phoneNumber: "",
             address: {
               localAddress: "",
@@ -160,7 +173,7 @@ export const authOptions = {
         if (account.provider === "google") {
           token.email = profile.email;
           token.organizationName = profile.name;
-          token.isProfileCompleted = user.isProfileCompleted;
+          token.isProfileCompleted = user.isProfileCompleted || "pending";
 
           // For Google sign-in, ensure we have the username
           try {
@@ -169,7 +182,8 @@ export const authOptions = {
             });
             if (existingUser) {
               token.username = existingUser.username;
-              token.isProfileCompleted = existingUser.isProfileCompleted;
+              token.isProfileCompleted =
+                existingUser.isProfileCompleted || "pending";
             }
           } catch (error) {
             console.error("Error finding user in JWT callback:", error);
@@ -183,13 +197,13 @@ export const authOptions = {
           token.address = user.address;
           token.accessTokenExpiry = user.accessTokenExpiry;
           token.refreshTokenExpiry = user.refreshTokenExpiry;
-          token.isProfileCompleted = user.isProfileCompleted;
+          token.isProfileCompleted = user.isProfileCompleted || "pending";
         }
       }
 
       // Handle session update
       if (trigger === "update" && session?.user) {
-        token.isProfileCompleted = session.user.isProfileCompleted;
+        token.isProfileCompleted = session.user.isProfileCompleted || "pending";
         token.organizationName = session.user.organizationName;
         token.phoneNumber = session.user.phoneNumber;
         token.address = session.user.address;
@@ -203,7 +217,7 @@ export const authOptions = {
         session.user.id = token.id;
         session.user.email = token.email;
         session.user.organizationName = token.organizationName;
-        session.user.isProfileCompleted = token.isProfileCompleted;
+        session.user.isProfileCompleted = token.isProfileCompleted || "pending";
         session.user.username = token.username;
         session.user.phoneNumber = token.phoneNumber;
         session.user.address = token.address;
@@ -221,7 +235,6 @@ export const authOptions = {
     async redirect({ url, baseUrl, token }) {
       // If the url starts with /user, we need to append the username
       if (url.includes("/user")) {
-
         // If we have a token with username, use it
         if (token?.username) {
           return `${baseUrl}/user/${token.username}`;
