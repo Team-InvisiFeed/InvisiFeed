@@ -431,7 +431,7 @@ const Dashboard = () => {
                                     y={(viewBox.cy || 0) + 24}
                                     className="fill-muted-foreground"
                                   >
-                                    Pos/Neg Ratio
+                                    Positive Feedbacks
                                   </tspan>
                                 </text>
                               );
