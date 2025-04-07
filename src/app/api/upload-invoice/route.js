@@ -236,41 +236,31 @@ async function generateQrPdf(
   modifiedCouponCode = null
 ) {
   try {
-    // Create QR Code buffer
     const encodedUsername = encodeURIComponent(username);
     const encodedInvoiceNumber = encodeURIComponent(invoiceNumber);
     let qrData = `${process.env.NEXT_PUBLIC_APP_URL}/feedback/${encodedUsername}?invoiceNo=${encodedInvoiceNumber}`;
 
-    // Add modified coupon code to QR data if provided
     if (modifiedCouponCode) {
       qrData += `&cpcd=${modifiedCouponCode}`;
     }
 
     const qrBuffer = await QRCode.toBuffer(qrData, { width: 300 });
 
-    // Create a new PDF document
     const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([595.28, 841.89]); // A4
 
-    // Add a page to the PDF
-    const page = pdfDoc.addPage([595.28, 841.89]); // A4 size dimensions
-
-    // Set light cream background
     page.drawRectangle({
       x: 0,
       y: 0,
       width: page.getWidth(),
       height: page.getHeight(),
-      color: rgb(0.98, 0.97, 0.95), // Light cream color
+      color: rgb(1, 1, 1), // White background
     });
 
-    // Embed fonts
     const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const helveticaBoldFont = await pdfDoc.embedFont(
-      StandardFonts.HelveticaBold
-    );
+    const helveticaBoldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-    // Helper function to center text
-    const centerText = (text, y, size, font) => {
+    const centerText = (text, y, size, font, color = rgb(0.2, 0.2, 0.2)) => {
       const textWidth = font.widthOfTextAtSize(text, size);
       const x = (page.getWidth() - textWidth) / 2;
       page.drawText(text, {
@@ -278,23 +268,18 @@ async function generateQrPdf(
         y,
         size,
         font,
-        color: rgb(0.2, 0.2, 0.2), // Dark gray, almost black
+        color,
       });
     };
 
-    // Draw header
-    centerText("InvisiFeed", 750, 36, helveticaBoldFont);
-
-    // Draw subtitle
+    // Header
+    centerText("InvisiFeed", 750, 36, helveticaBoldFont, rgb(1, 0.843, 0)); // golden yellow
     centerText("Your Feedback Matters", 700, 20, helveticaFont);
-
-    // Draw invoice number
     centerText(`Invoice: ${invoiceNumber}`, 650, 16, helveticaFont);
 
-    // Draw instructions
     const instructions = [
-      "Scan this QR code to provide your valuable feedback",
-      "Your feedback helps us improve our services",
+      "Scan this QR code to share your valuable feedback",
+      "Your insights help us deliver exceptional service",
       "Thank you for choosing InvisiFeed!",
     ];
 
@@ -302,52 +287,73 @@ async function generateQrPdf(
       centerText(text, 600 - index * 25, 14, helveticaFont);
     });
 
-    // Embed the QR Code as an image
+    // QR Code
     const qrImage = await pdfDoc.embedPng(qrBuffer);
     const { width, height } = qrImage.scale(0.5);
-
-    // Calculate center position for QR code
     const centerX = (page.getWidth() - width) / 2;
-    const centerY = 350; // Lowered from 400 to 350 to prevent overlap with text
+    const qrY = 375;
 
-    // Place the QR Code image
     page.drawImage(qrImage, {
       x: centerX,
-      y: centerY,
+      y: qrY,
       width,
       height,
     });
 
-    // Add clickable link below QR code
+    // Link
     const linkText = qrData;
-    const linkTextWidth = helveticaFont.widthOfTextAtSize(linkText, 14);
-    const linkX = (page.getWidth() - linkTextWidth) / 2;
-    const linkY = centerY - 30; // Position below QR code
+    const linkFontSize = 10;
+    const linkY = qrY - 40;
+    const linkWidth = helveticaFont.widthOfTextAtSize(linkText, linkFontSize);
+    const linkX = (page.getWidth() - linkWidth) / 2;
 
-    // Draw the link text in blue to indicate it's clickable
+    centerText("Or click the link below:", linkY + 20, 12, helveticaFont);
     page.drawText(linkText, {
       x: linkX,
       y: linkY,
-      size: 14,
+      size: linkFontSize,
       font: helveticaFont,
-      color: rgb(0, 0, 0.8), // Blue color to indicate it's a link
+      color: rgb(0, 0, 0.8),
     });
 
-    // Draw footer
-    centerText(
-      "© 2024 InvisiFeed. All rights reserved.",
-      50,
-      12,
-      helveticaFont
-    );
+    // Coupon Section
+    if (modifiedCouponCode) {
+      const couponBoxY = linkY - 100;
 
-    // Serialize the PDFDocument to bytes
+      page.drawRectangle({
+        x: 50,
+        y: couponBoxY,
+        width: page.getWidth() - 100,
+        height: 60,
+        color: rgb(0.95, 0.95, 0.95),
+        borderColor: rgb(1, 0.843, 0), // golden yellow border
+        borderWidth: 1,
+      });
+
+      centerText("WIN EXCLUSIVE COUPONS!", couponBoxY + 40, 16, helveticaBoldFont, rgb(1, 0.843, 0)); // golden yellow text
+      centerText("Complete the feedback form for a chance to win special discounts", couponBoxY + 20, 12, helveticaFont);
+    }
+
+    // Footer
+    page.drawRectangle({
+      x: 0,
+      y: 0,
+      width: page.getWidth(),
+      height: 40,
+      color: rgb(0.95, 0.95, 0.95),
+    });
+
+    centerText("© 2024 InvisiFeed. All rights reserved.", 25, 10, helveticaFont, rgb(0.5, 0.5, 0.5));
+
     return await pdfDoc.save();
   } catch (error) {
     console.error("Error generating QR PDF:", error);
     throw error;
   }
 }
+
+
+
 
 async function mergePdfs(invoicePdfUrl, qrPdfBuffer) {
   try {
