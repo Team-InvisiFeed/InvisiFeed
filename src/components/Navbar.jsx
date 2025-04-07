@@ -99,10 +99,7 @@ function Navbar() {
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
-                  pathname === `/user/${owner?.username}` &&
-                  window.location.hash === "#dashboard"
-                    ? "font-bold text-yellow-400"
-                    : ""
+                  pathname === `/user/${owner?.username}`
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -117,10 +114,7 @@ function Navbar() {
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
-                  pathname === `/user/${owner?.username}` &&
-                  window.location.hash === "#generate"
-                    ? "font-bold text-yellow-400"
-                    : ""
+                  pathname === `/user/${owner?.username}`
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -135,10 +129,7 @@ function Navbar() {
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
-                  pathname === `/user/${owner?.username}` &&
-                  window.location.hash === "#ratings"
-                    ? "font-bold text-yellow-400"
-                    : ""
+                  pathname === `/user/${owner?.username}`
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -153,10 +144,7 @@ function Navbar() {
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
-                  pathname === `/user/${owner?.username}` &&
-                  window.location.hash === "#feedbacks"
-                    ? "font-bold text-yellow-400"
-                    : ""
+                  pathname === `/user/${owner?.username}`
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -172,10 +160,7 @@ function Navbar() {
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
-                  pathname === `/user/${owner?.username}` &&
-                  window.location.hash === "#contact"
-                    ? "font-bold text-yellow-400"
-                    : ""
+                  pathname === `/user/${owner?.username}`
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
