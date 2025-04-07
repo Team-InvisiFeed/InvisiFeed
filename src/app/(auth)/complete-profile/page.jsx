@@ -69,7 +69,7 @@ function Page() {
       return;
     }
 
-    if (session.user.isProfileCompleted) {
+    if (session.user.isProfileCompleted === "completed" || session.user.isProfileCompleted === "skipped") {
       router.push(`/user/${session.user.username}`);
     }
   }, [session, status, router]);
@@ -172,50 +172,92 @@ function Page() {
 
   // Form Submit
   const onSubmit = async (data) => {
+    try {
     setIsSubmitting(true);
 
-    if (
-      !selectedCountry ||
-      !selectedState ||
-      !selectedCity ||
-      !localAddress ||
-      !pincode
-    ) {
-      toast.error("Please fill in all address fields");
+      // Format the address data
+      const formattedAddress = {
+        localAddress: data.address.localAddress || "",
+        city: data.address.city || "",
+        state: data.address.state || "",
+        country: data.address.country || "",
+        pincode: data.address.pincode || "",
+      };
+
+      // Submit the profile data
+      const response = await axios.post("/api/complete-profile", {
+        organizationName: data.organizationName,
+        phoneNumber: data.phoneNumber,
+        address: formattedAddress,
+      });
+
+      if (response.data.success) {
+        toast.success(response.data.message);
+        
+        // Update the session to reflect the new profile status
+        await update({
+          ...session,
+          user: {
+            ...session.user,
+            organizationName: data.organizationName,
+            phoneNumber: data.phoneNumber,
+            address: formattedAddress,
+            isProfileCompleted: response.data.profileStatus,
+          },
+        });
+        
+        // Redirect to user page
+        router.push(`/user/${session.user.username}`);
+      } else {
+        toast.error("Failed to complete profile");
+      }
+    } catch (error) {
+      console.error("Error completing profile:", error);
+      toast.error("An error occurred while completing your profile");
+    } finally {
       setIsSubmitting(false);
-      return;
     }
+  };
 
-    const formattedAddress = {
-      localAddress: localAddress.trim(),
-      city: selectedCity.trim(),
-      state: selectedState.trim(),
-      country: selectedCountry.trim(),
-      pincode: pincode.trim(),
-    };
-
-    data.address = formattedAddress;
-
+  // Handle "I'll do it later" button click
+  const handleSkipProfile = async () => {
     try {
-      const response = await axios.post("/api/complete-profile", data);
+      setIsSubmitting(true);
+      
+      // Submit empty data with skipProfile flag
+      const response = await axios.post("/api/complete-profile", {
+        organizationName: session.user.organizationName || "",
+        phoneNumber: "",
+        address: {
+          localAddress: "",
+          city: "",
+          state: "",
+          country: "",
+          pincode: "",
+        },
+        skipProfile: true, // Flag to indicate this is a skip request
+      });
 
-      toast.success(response.data.message || "Profile updated successfully");
-
-      // Update session with new data
+      if (response.data.success) {
+        toast.success(response.data.message);
+        
+        // Update the session to reflect the new profile status
       await update({
+          ...session,
         user: {
           ...session.user,
-          isProfileCompleted: true,
-          organizationName: data.organizationName,
-          phoneNumber: data.phoneNumber,
-          address: formattedAddress,
+            isProfileCompleted: response.data.profileStatus,
         },
       });
 
+        // Redirect to user page
       router.push(`/user/${session.user.username}`);
+      } else {
+        toast.error("Failed to skip profile completion");
+      }
     } catch (error) {
-      console.error("Profile update failed:", error);
-      toast.error(error.response?.data?.message || "Profile update failed");
+      console.error("Error skipping profile:", error);
+      toast.error("An error occurred while skipping profile completion");
     } finally {
       setIsSubmitting(false);
     }
@@ -537,11 +579,6 @@ function Page() {
                     type="submit"
                     disabled={isSubmitting}
                     className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium cursor-pointer h-9 shadow-lg shadow-yellow-500/20"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      const formData = form.getValues();
-                      onSubmit(formData);
-                    }}
                   >
                     {isSubmitting ? (
                       <>
@@ -551,6 +588,15 @@ function Page() {
                     ) : (
                       "Complete Profile"
                     )}
+                  </Button>
+                  
+                  <Button
+                    type="button"
+                    onClick={handleSkipProfile}
+                    disabled={isSubmitting}
+                    className="w-full bg-transparent hover:bg-yellow-400/10 text-yellow-400 border border-yellow-400/20 font-medium cursor-pointer h-9"
+                  >
+                    I'll do it later
                   </Button>
                 </div>
               </motion.div>
