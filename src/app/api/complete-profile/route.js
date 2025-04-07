@@ -15,58 +15,71 @@ export async function POST(request) {
         { status: 401 }
       );
     }
+    console.log(session.user);
 
     // Connect to the database
     await dbConnect();
 
     // Get request body
     const data = await request.json();
-
-    // Validate data
-    if (!data.phoneNumber || !data.address || !data.organizationName) {
-      return NextResponse.json(
-        { success: false, message: "Missing required fields" },
-        { status: 400 }
-      );
+    console.log(data);
+    
+    // Check if this is a "skip profile" request
+    const isSkipRequest = data.skipProfile === true;
+    
+    // Determine if all fields are filled
+    const hasOrganizationName = data.organizationName && data.organizationName.trim() !== "";
+    const hasPhoneNumber = data.phoneNumber && data.phoneNumber.trim() !== "";
+    const hasAddress = data.address && 
+      data.address.localAddress && data.address.localAddress.trim() !== "" &&
+      data.address.city && data.address.city.trim() !== "" &&
+      data.address.state && data.address.state.trim() !== "" &&
+      data.address.country && data.address.country.trim() !== "" &&
+      data.address.pincode && data.address.pincode.trim() !== "";
+    
+    // Set profile completion status
+    let profileStatus = "pending";
+    if (isSkipRequest) {
+      profileStatus = "skipped";
+    } else if (hasOrganizationName && hasPhoneNumber && hasAddress) {
+      profileStatus = "completed";
+    } else {
+      profileStatus = "skipped";
     }
 
-    // Check if the address has all required fields
-    const { address } = data;
-    if (
-      !address.localAddress ||
-      !address.city ||
-      !address.state ||
-      !address.country ||
-      !address.pincode
-    ) {
-      return NextResponse.json(
-        { success: false, message: "Missing address fields" },
-        { status: 400 }
-      );
-    }
-
-    // Update user profile
-    const updatedUser = await OwnerModel.findByIdAndUpdate(
-      session.user.id,
+    // Update user profile with whatever data is provided
+    const updatedUser = await OwnerModel.findOneAndUpdate(
+      { email: session.user.email },
       {
-        organizationName: data.organizationName,
-        phoneNumber: data.phoneNumber,
-        address: address,
-        isProfileCompleted: true,
+        organizationName: data.organizationName || "",
+        phoneNumber: data.phoneNumber || "",
+        address: {
+          localAddress: data.address?.localAddress || "",
+          city: data.address?.city || "",
+          state: data.address?.state || "",
+          country: data.address?.country || "",
+          pincode: data.address?.pincode || "",
+        },
+        isProfileCompleted: profileStatus,
       },
       { new: true }
     );
 
     if (!updatedUser) {
       return NextResponse.json(
-        { success: false, message: "User not found" },
-        { status: 404 }
+        { success: false, message: "Failed to update profile" },
+        { status: 500 }
       );
     }
 
     return NextResponse.json({
       success: true,
-      message: "Profile completed successfully",
+      message: isSkipRequest 
+        ? "Profile completion skipped. You can complete it later."
+        : profileStatus === "completed"
+          ? "Profile completed successfully"
+          : "Profile updated but some fields are still missing",
+      profileStatus,
     });
   } catch (error) {
     console.error("Error updating profile:", error);
