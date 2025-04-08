@@ -26,7 +26,7 @@ function ChartContainer({
   id,
   className,
   children,
-  config,
+  config = {},
   ...props
 }) {
   const uniqueId = React.useId()
@@ -55,6 +55,10 @@ const ChartStyle = ({
   id,
   config
 }) => {
+  if (!config) {
+    return null;
+  }
+  
   const colorConfig = Object.entries(config).filter(([, config]) => config.theme || config.color)
 
   if (!colorConfig.length) {
