@@ -2,137 +2,169 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Shield, MessageSquare, BarChart, Users } from "lucide-react";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselPrevious,
-  CarouselNext,
-} from "@/components/ui/carousel";
-import Autoplay from "embla-carousel-autoplay";
-
-const heroContent = [
-  {
-    title: "Transform Your Organization",
-    subtitle: "Empower your team with honest, anonymous feedback",
-    description: "Create a culture of trust and transparency with our secure feedback system",
-    icon: Shield,
-    gradient: "from-yellow-500 to-yellow-400",
-  },
-  {
-    title: "Real-Time Insights",
-    subtitle: "Make data-driven decisions",
-    description: "Get instant analytics and insights to improve your organization's performance",
-    icon: BarChart,
-    gradient: "from-yellow-500 to-yellow-400",
-  },
-  {
-    title: "Build Trust",
-    subtitle: "Foster open communication",
-    description: "Enable your team to share feedback freely and anonymously",
-    icon: MessageSquare,
-    gradient: "from-yellow-500 to-yellow-400",
-  },
-  {
-    title: "Engage Your Team",
-    subtitle: "Strengthen team dynamics",
-    description: "Create an environment where every voice matters and contributes to growth",
-    icon: Users,
-    gradient: "from-yellow-500 to-yellow-400",
-  },
-];
+import { ArrowRight, FileText, QrCode, MessageSquare } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 function HeroSection() {
+  const router = useRouter();
   return (
-    <section className="relative min-h-screen bg-[#0A0A0A]" id="home">
+    <section className="relative h-[calc(100vh-80px)] bg-[#0A0A0A]" id="home">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#0A0A0A] via-[#0A0A0A] to-[#000000] opacity-50" />
       
-      <Carousel
-        plugins={[Autoplay({ delay: 5000 })]}
-        className="w-full relative"
-      >
-        <CarouselContent className="-ml-0">
-          {heroContent.map((content, index) => {
-            const Icon = content.icon;
-            return (
-              <CarouselItem key={index} className="pl-0">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="relative h-screen w-full"
-                >
-                  {/* Background Gradient */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${content.gradient} opacity-5`} />
+      <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="h-full flex flex-col md:flex-row items-center justify-center gap-6 sm:gap-8 py-6 sm:py-8">
+          {/* Left Content */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex-1 text-left w-full md:w-auto"
+          >
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4 leading-tight"
+            >
+              Get Honest Feedback. <p className="text-yellow-400 text-2xl sm:text-3xl md:text-4xl font-bold">No Awkward Conversations.</p>
+            </motion.h1>
+            
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="text-base sm:text-lg text-gray-300 mb-4 sm:mb-6 leading-relaxed max-w-xl"
+            >
+              InvisiFeed helps you embed AI-powered feedback forms inside your invoices so customers can give feedback anonymously.
+            </motion.p>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto"
+            >
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="cursor-pointer group flex items-center justify-center space-x-2 sm:space-x-3 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 w-full sm:w-auto"
+                onClick={() => router.push('/register')}
+              >
+                <span className="text-sm sm:text-base">Generate Your First Feedback PDF</span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </motion.button>
+            </motion.div>
+          </motion.div>
+          
+          {/* Right Content - Illustration */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="flex-1 relative w-full md:w-auto mt-6 md:mt-0"
+          >
+            <div className="relative w-full h-[300px] sm:h-[350px] md:h-[400px]">
+              {/* Invoice with QR Code */}
+              <div className="absolute top-0 right-0 w-[80%] h-[80%] bg-white rounded-lg shadow-2xl transform rotate-3 z-10">
+                <div className="p-3 sm:p-4">
+                  <div className="flex justify-between items-center mb-3 sm:mb-4">
+                    <h3 className="text-base sm:text-lg font-bold text-gray-800">INVOICE</h3>
+                    <div className="text-xs text-gray-500">#INV-2023-001</div>
+                  </div>
                   
-                  {/* Content Container */}
-                  <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="h-full flex flex-col items-center justify-center text-center">
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                        className="w-24 h-24 bg-[#0A0A0A]/50 backdrop-blur-sm rounded-full flex items-center justify-center mb-8 border-2 border-yellow-400/30 shadow-lg shadow-yellow-400/10"
-                      >
-                        <Icon className="w-12 h-12 text-yellow-400" />
-                      </motion.div>
-                      
-                      <motion.h2
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.3 }}
-                        className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight"
-                      >
-                        {content.title}
-                      </motion.h2>
-                      
-                      <motion.h3
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.4 }}
-                        className="text-2xl md:text-3xl text-yellow-400 mb-8 font-medium"
-                      >
-                        {content.subtitle}
-                      </motion.h3>
-                      
-                      <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.5 }}
-                        className="text-gray-300 text-xl max-w-3xl mb-12 leading-relaxed"
-                      >
-                        {content.description}
-                      </motion.p>
-                      
-                      <motion.button
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.6 }}
-                        className="group flex items-center space-x-3 px-10 py-4 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105"
-                      >
-                        <span className="text-lg">Get Started</span>
-                        <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                      </motion.button>
+                  <div className="border-t border-gray-200 pt-2 sm:pt-3 mb-3 sm:mb-4">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                      <div>
+                        <p className="text-xs text-gray-500">From:</p>
+                        <p className="text-xs sm:text-sm font-medium">Your Business Name</p>
+                        <p className="text-xs">123 Business St</p>
+                        <p className="text-xs">City, State 12345</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">To:</p>
+                        <p className="text-xs sm:text-sm font-medium">Client Name</p>
+                        <p className="text-xs">456 Client Ave</p>
+                        <p className="text-xs">City, State 67890</p>
+                      </div>
                     </div>
                   </div>
-                </motion.div>
-              </CarouselItem>
-            );
-          })}
-        </CarouselContent>
-        
-        {/* Navigation Arrows */}
-        <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4 sm:px-6 lg:px-8 pointer-events-none">
-          <div className="relative pointer-events-auto">
-            <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 bg-[#0A0A0A]/30 backdrop-blur-sm border-yellow-400/20 text-yellow-400 hover:bg-[#0A0A0A]/50 hover:text-yellow-300 transition-all duration-300 rounded-full shadow-lg hover:scale-110" />
-          </div>
-          <div className="relative pointer-events-auto">
-            <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 bg-[#0A0A0A]/30 backdrop-blur-sm border-yellow-400/20 text-yellow-400 hover:bg-[#0A0A0A]/50 hover:text-yellow-300 transition-all duration-300 rounded-full shadow-lg hover:scale-110" />
-          </div>
+                  
+                  <div className="border-t border-gray-200 pt-2 sm:pt-3 mb-3 sm:mb-4">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="text-left text-xs text-gray-500">
+                          <th className="pb-1">Description</th>
+                          <th className="pb-1">Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-t border-gray-100">
+                          <td className="py-1 text-xs sm:text-sm">Service Description</td>
+                          <td className="py-1 text-xs sm:text-sm">$1,000.00</td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <tr className="border-t border-gray-200">
+                          <td className="py-1 text-xs sm:text-sm font-medium">Total</td>
+                          <td className="py-1 text-xs sm:text-sm font-medium">$1,000.00</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                  
+                  <div className="border-t border-gray-200 pt-2 sm:pt-3 flex justify-between items-center">
+                    <div className="text-xs text-gray-500">
+                      Thank you for your business!
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <QrCode className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+                      <span className="text-xs font-medium text-yellow-500">Scan for feedback</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Feedback Popup */}
+              <div className="absolute bottom-0 left-0 w-[70%] h-[60%] bg-white rounded-lg shadow-2xl transform -rotate-2 z-20">
+                <div className="p-3 sm:p-4">
+                  <div className="flex justify-between items-center mb-2 sm:mb-3">
+                    <h3 className="text-base sm:text-lg font-bold text-gray-800">Anonymous Feedback</h3>
+                    <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
+                  </div>
+                  
+                  <div className="mb-3 sm:mb-4">
+                    <p className="text-xs text-gray-600 mb-2 sm:mb-3">
+                      We value your honest feedback to improve our services. Your response is completely anonymous.
+                    </p>
+                    
+                    <div className="mb-2 sm:mb-3">
+                      <p className="text-xs font-medium mb-1">Overall Experience</p>
+                      <div className="flex space-x-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <div key={star} className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-yellow-100 flex items-center justify-center">
+                            <span className="text-yellow-500 text-xs">★</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="mb-2 sm:mb-3">
+                      <p className="text-xs font-medium mb-1">What did you like most?</p>
+                      <textarea 
+                        className="w-full p-2 border border-gray-200 rounded-md text-xs" 
+                        rows="1"
+                        placeholder="Your feedback here..."
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
-      </Carousel>
+      </div>
     </section>
   );
 }
