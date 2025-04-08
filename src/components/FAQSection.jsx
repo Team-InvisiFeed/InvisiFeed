@@ -9,29 +9,44 @@ import {
 
 const faqs = [
   {
-    question: "How does anonymous feedback work?",
+    question: "What kind of invoices are supported?",
     answer:
-      "Our platform ensures complete anonymity by removing all identifying information from feedback submissions. Users can freely share their thoughts without fear of repercussions, while organizations receive valuable insights to improve their services.",
+      "InvisiFeed supports all valid invoices in PDF format. Our system is designed to work with standard invoice layouts and can extract invoice numbers automatically.",
   },
   {
-    question: "Is my data secure?",
+    question: "Can customers submit feedback without email/login?",
     answer:
-      "Yes, we take security seriously. We use enterprise-grade encryption and follow best practices for data protection. Your data is stored securely and never shared with third parties without your explicit consent.",
+      "Yes, absolutely! One of the key benefits of InvisiFeed is that customers can submit feedback anonymously without creating an account or providing their email address. They simply scan the QR code on the invoice and provide their feedback.",
   },
   {
-    question: "Can I customize the feedback forms?",
+    question: "Is feedback completely anonymous?",
     answer:
-      "Absolutely! You can create custom feedback forms with specific questions, rating scales, and categories that match your organization's needs. The platform is fully customizable to suit your requirements.",
+      "Yes, feedback is completely anonymous. We don't collect or store any personal information from your customers when they submit feedback. This encourages honest and candid responses.",
   },
   {
-    question: "How do I get started?",
+    question: "Are coupons required?",
     answer:
-      "Getting started is easy! Simply register your organization, create your first feedback form, and share it with your customers. Our intuitive dashboard will help you track and analyze responses in real-time.",
+      "No, coupons are completely optional. You can choose to offer incentives to customers who submit feedback, but it's not required. You have full control over whether to include coupons and what they offer.",
   },
   {
-    question: "What kind of analytics do you provide?",
+    question: "How secure is my data?",
     answer:
-      "We provide comprehensive analytics including response rates, sentiment analysis, trend tracking, and detailed reports. You can visualize your data through interactive charts and export reports for further analysis.",
+      "We take security very seriously. All data is encrypted using industry-standard protocols, and we don't permanently store your invoices. Your data is owned and controlled by you, and we adhere to GDPR regulations to ensure your information is protected.",
+  },
+  {
+    question: "How does the AI-generated feedback form work?",
+    answer:
+      "Our AI analyzes your business type and industry to generate relevant feedback questions. The form adapts to your specific service offerings, ensuring you get the most valuable insights from your customers.",
+  },
+  {
+    question: "Can I customize the feedback form?",
+    answer:
+      "Yes, you can customize the AI-generated feedback form to include specific questions or areas you want to focus on. This allows you to gather targeted feedback on aspects of your service that matter most to you.",
+  },
+  {
+    question: "How do I access the feedback analytics?",
+    answer:
+      "All feedback is available in your dashboard, where you can view comprehensive analytics, trends, and insights. The dashboard provides visual representations of your feedback data, making it easy to identify patterns and areas for improvement.",
   },
 ];
 
@@ -51,7 +66,7 @@ const FAQSection = () => {
             Frequently Asked Questions
           </h2>
           <p className="text-gray-400 text-lg">
-            Find answers to common questions about our platform
+            Find answers to common questions about InvisiFeed
           </p>
         </motion.div>
 
