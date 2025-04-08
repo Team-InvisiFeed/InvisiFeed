@@ -167,7 +167,7 @@ function HeroSection() {
         </div>
 
         {/* Mobile Layout - Redesigned */}
-        <div className="md:hidden flex flex-col items-center justify-between py-8 px-4 h-[calc(100vh-80px)]">
+        <div className="md:hidden flex flex-col items-center justify-between py-25 px-4 h-[calc(100vh-80px)]">
           {/* Mobile Hero Content with Visual Elements */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
