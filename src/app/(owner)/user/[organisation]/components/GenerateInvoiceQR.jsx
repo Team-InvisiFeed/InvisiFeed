@@ -91,7 +91,15 @@ export default function Home() {
   };
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    const selectedFile = e.target.files[0];
+    
+    // Check if file size is greater than 3MB
+    if (selectedFile && selectedFile.size > 3 * 1024 * 1024) {
+      toast.error("File size exceeds 3MB limit. Please select a smaller file.");
+      return;
+    }
+    
+    setFile(selectedFile);
     setEmailSent(false);
     setCustomerEmail("");
   };
@@ -115,6 +123,12 @@ export default function Home() {
       // Fetch the sample invoice PDF
       const response = await fetch(sampleInvoice.url);
       const blob = await response.blob();
+      
+      // Check if file size is greater than 3MB
+      if (blob.size > 3 * 1024 * 1024) {
+        toast.error("Sample invoice size exceeds 3MB limit. Please select a different sample invoice.");
+        return;
+      }
 
       // Create a File object from the blob
       const file = new File([blob], `${sampleInvoice.name}.pdf`, {
@@ -133,6 +147,12 @@ export default function Home() {
   const handleUploadWithFile = async (fileToUpload) => {
     if (!fileToUpload) {
       toast.error("Please select a PDF file.");
+      return;
+    }
+
+    // Check if file size is greater than 3MB
+    if (fileToUpload.size > 3 * 1024 * 1024) {
+      toast.error("File size exceeds 3MB limit. Please select a smaller file.");
       return;
     }
 
