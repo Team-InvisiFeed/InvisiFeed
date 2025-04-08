@@ -2,19 +2,20 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, FileText, QrCode, MessageSquare } from "lucide-react";
+import { ArrowRight, FileText, QrCode, MessageSquare, CheckCircle, Star, ThumbsUp, Shield, Zap } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 function HeroSection() {
   const router = useRouter();
   return (
-    <section className="relative h-[calc(100vh-80px)] bg-[#0A0A0A]" id="home">
+    <section className="relative min-h-[calc(100vh-80px)] bg-[#0A0A0A]" id="home">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#0A0A0A] via-[#0A0A0A] to-[#000000] opacity-50" />
       
       <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="h-full flex flex-col md:flex-row items-center justify-center gap-6 sm:gap-8 py-6 sm:py-8">
+        {/* Desktop Layout */}
+        <div className="hidden md:flex h-full flex-row items-center justify-center gap-6 sm:gap-8 py-6 sm:py-8">
           {/* Left Content */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -162,6 +163,127 @@ function HeroSection() {
                 </div>
               </div>
             </div>
+          </motion.div>
+        </div>
+
+        {/* Mobile Layout - Redesigned */}
+        <div className="md:hidden flex flex-col items-center justify-between py-8 px-4 h-[calc(100vh-80px)]">
+          {/* Mobile Hero Content with Visual Elements */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="w-full flex flex-col items-center justify-between h-full"
+          >
+            {/* Top Visual Element - Feedback Quote */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="w-full max-w-xs mx-auto mb-6 relative"
+            >
+              <div className="absolute -top-2 -left-2 w-8 h-8 bg-yellow-400/20 rounded-full flex items-center justify-center">
+                <MessageSquare className="w-4 h-4 text-yellow-400" />
+              </div>
+              <div className="bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A] rounded-xl p-4 border border-yellow-400/20 shadow-lg">
+                <p className="text-sm text-gray-300 italic text-center">
+                  "The anonymous feedback helped us improve our service quality by 40% in just 3 months!"
+                </p>
+                <div className="flex justify-center mt-2">
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star key={star} className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Main Heading */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="text-2xl font-bold text-white mb-3 text-center leading-tight"
+            >
+              Get Honest Feedback. <p className="text-yellow-400">No Awkward Conversations.</p>
+            </motion.h1>
+            
+            {/* Brief Description */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="text-sm text-gray-300 mb-6 text-center max-w-xs"
+            >
+              Embed AI-powered feedback forms in your invoices for anonymous customer insights.
+            </motion.p>
+
+            {/* Feature Icons Row */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="flex justify-center space-x-8 mb-8"
+            >
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 bg-yellow-400/10 rounded-full flex items-center justify-center mb-2">
+                  <QrCode className="w-6 h-6 text-yellow-400" />
+                </div>
+                <span className="text-xs text-gray-300">QR Code</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 bg-yellow-400/10 rounded-full flex items-center justify-center mb-2">
+                  <Shield className="w-6 h-6 text-yellow-400" />
+                </div>
+                <span className="text-xs text-gray-300">Anonymous</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 bg-yellow-400/10 rounded-full flex items-center justify-center mb-2">
+                  <Zap className="w-6 h-6 text-yellow-400" />
+                </div>
+                <span className="text-xs text-gray-300">AI-Powered</span>
+              </div>
+            </motion.div>
+
+            {/* CTA Button */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="w-full max-w-xs mx-auto mb-8"
+            >
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="cursor-pointer group w-full flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30"
+                onClick={() => router.push('/register')}
+              >
+                <span className="text-base">Get Started</span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </motion.button>
+            </motion.div>
+
+            {/* Bottom Visual Element - Stats */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.7 }}
+              className="w-full max-w-xs mx-auto"
+            >
+              <div className="bg-gradient-to-r from-yellow-500/10 to-yellow-400/5 rounded-xl p-4 border border-yellow-400/20">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <ThumbsUp className="w-5 h-5 text-yellow-400 mr-2" />
+                    <span className="text-sm text-gray-300">98% Response Rate</span>
+                  </div>
+                  <div className="flex items-center">
+                    <CheckCircle className="w-5 h-5 text-yellow-400 mr-2" />
+                    <span className="text-sm text-gray-300">100% Anonymous</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </div>
