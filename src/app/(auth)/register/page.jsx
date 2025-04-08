@@ -149,7 +149,7 @@ function Page() {
       {/* Left Section with Gradient */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#000000] p-8 flex-col justify-center items-center text-white">
         <div className="max-w-md space-y-4">
-          <h1 className="text-4xl font-extrabold tracking-tight">InvisiFeed</h1>
+          <h1 className="text-4xl font-extrabold tracking-tight cursor-pointer" onClick={() => router.push("/")}>InvisiFeed</h1>
           <p className="text-lg text-gray-200">
             Transform your organization with honest, anonymous feedback
           </p>
