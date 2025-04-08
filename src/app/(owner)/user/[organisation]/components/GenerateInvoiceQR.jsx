@@ -456,9 +456,9 @@ export default function Home() {
                   handleResetData
                 )
               }
-              className="text-red-400 hover:text-red-300 text-xs mt-1 text-center cursor-pointer"
+              className="text-gray-400 hover:text-yellow-400 text-xs mt-1 text-center cursor-pointer"
             >
-              Reset data if you have sample invoices uploaded
+              [Reset data if you have sample invoices uploaded]
             </p>
 
             {invoiceNumber && (
