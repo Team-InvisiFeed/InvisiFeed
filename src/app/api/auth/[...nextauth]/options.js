@@ -4,10 +4,8 @@ import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/dbConnect";
 import OwnerModel from "@/model/Owner";
 import jwt from "jsonwebtoken";
-import { getSession } from "next-auth/react";
 import { deleteOldInvoicePdfs } from "@/utils/deleteOldInvoicesFromCloudinary";
 import sendVerificationEmail from "@/utils/sendVerificationEmail";
-import { redirect } from "next/navigation";
 
 export const authOptions = {
   providers: [
@@ -44,7 +42,10 @@ export const authOptions = {
             user.verifyCode = verifyCode;
             user.verifyCodeExpiry = new Date(Date.now() + 3600000); // 1 hour expiry
             await user.save();
-            const emailResponse = await sendVerificationEmail(user.email, verifyCode);
+            const emailResponse = await sendVerificationEmail(
+              user.email,
+              verifyCode
+            );
             if (!emailResponse.success) {
               throw new Error(emailResponse.message);
             }
@@ -67,14 +68,8 @@ export const authOptions = {
           const accessToken = generateAccessToken(user);
           const refreshToken = generateRefreshToken(user);
 
-          const decodedAccessToken = jwt.decode(
-            accessToken,
-            process.env.ACCESS_TOKEN_SECRET
-          );
-          const decodedRefreshToken = jwt.decode(
-            refreshToken,
-            process.env.REFRESH_TOKEN_SECRET
-          );
+          const decodedAccessToken = jwt.decode(accessToken);
+          const decodedRefreshToken = jwt.decode(refreshToken);
 
           // Store refresh token in database
           user.refreshToken = refreshToken;
@@ -107,7 +102,6 @@ export const authOptions = {
             // ⚡ Check if user originally signed up with credentials
             if (!existingUser.isGoogleAuth) {
               return `/sign-in?error=DIFFERENT_SIGNIN_METHOD`;
-              
             }
 
             // Delete old invoice PDFs (older than 1 hour)
