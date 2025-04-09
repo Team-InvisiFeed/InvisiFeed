@@ -74,6 +74,7 @@ export const authOptions = {
           // Store refresh token in database
           user.refreshToken = refreshToken;
           await user.save();
+          console.log("Authorize user", user);
 
           return {
             ...user.toObject(),
@@ -91,12 +92,14 @@ export const authOptions = {
 
   callbacks: {
     async signIn({ user, account }) {
+      console.log("signIn", user, account);
       if (account?.provider === "google") {
         await dbConnect();
 
         try {
           // Check if user exists
           const existingUser = await OwnerModel.findOne({ email: user.email });
+          console.log("existingUser", existingUser);
 
           if (existingUser) {
             // ⚡ Check if user originally signed up with credentials
@@ -158,6 +161,7 @@ export const authOptions = {
     },
 
     async jwt({ token, user, account, profile, session, trigger }) {
+      console.log("jwt", token, user, account, profile, session, trigger);
       if (user && account) {
         // Initial sign in
         token.id = user.id;
@@ -207,6 +211,7 @@ export const authOptions = {
     },
 
     async session({ session, token, trigger }) {
+      console.log("session", session, token, trigger);
       if (token) {
         session.user.id = token.id;
         session.user.email = token.email;
@@ -227,6 +232,7 @@ export const authOptions = {
     },
 
     async redirect({ url, baseUrl, token }) {
+      console.log("redirect", url, baseUrl, token);
       // If the url starts with /user, we need to append the username
       if (url.includes("/user")) {
         // If we have a token with username, use it
