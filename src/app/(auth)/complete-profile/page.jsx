@@ -38,6 +38,7 @@ function Page() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { data: session, status, update } = useSession();
+  const username = session?.user?.username;
 
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
@@ -189,6 +190,7 @@ function Page() {
         organizationName: data.organizationName,
         phoneNumber: data.phoneNumber,
         address: formattedAddress,
+        username: username,
       });
 
       if (response.data.success) {
@@ -236,6 +238,7 @@ function Page() {
           pincode: "",
         },
         skipProfile: true, // Flag to indicate this is a skip request
+        username: username,
       });
 
       if (response.data.success) {
