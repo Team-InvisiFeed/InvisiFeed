@@ -7,7 +7,7 @@ import { Form } from "@/components/ui/form"; // Custom Form component
 import Link from "next/link"; // For client-side navigation in Next.js
 import * as z from "zod"; // Zod for schema-based validation
 import React, { useState, useEffect, Suspense } from "react"; // React hooks for state and lifecycle
-import { useRouter } from "next/router"; // Next.js router for navigation
+import { useRouter, useSearchParams } from "next/navigation"; // Next.js router for navigation
 import {
   FormControl,
   FormField,
@@ -26,10 +26,10 @@ function SignInContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isNavigatingToRegister, setIsNavigatingToRegister] = useState(false);
-  const router = useRouter();
-  const { error } = router.query;
+  const searchParams = useSearchParams();
 
   const { data: session, status } = useSession();
+  const router = useRouter();
 
   // Check for token expiration
   useEffect(() => {
@@ -64,7 +64,6 @@ function SignInContent() {
       identifier: data.identifier,
       password: data.password,
       redirect: false,
-      callbackUrl: "/user"
     });
 
     if (result?.error) {
@@ -84,12 +83,12 @@ function SignInContent() {
     }
 
     if (result?.url) {
-      router.push(result.url);
+      router.replace(result.url);
     }
   };
 
-  const pageError = router.query.error;
-  if (pageError === "DIFFERENT_SIGNIN_METHOD") {
+  const error = searchParams.get("error");
+  if (error === "DIFFERENT_SIGNIN_METHOD") {
     return (
       <div className="flex h-screen overflow-hidden">
         {/* Left Section with Gradient */}
