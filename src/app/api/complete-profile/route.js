@@ -1,28 +1,17 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import dbConnect from "@/lib/dbConnect";
 import OwnerModel from "@/model/Owner";
 
 export async function POST(request) {
   try {
-    const session = await getServerSession(authOptions);
 
-    // Check if user is authenticated
-    if (!session || !session.user) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-    console.log(session.user);
 
     // Connect to the database
     await dbConnect();
 
     // Get request body
     const data = await request.json();
-    console.log(data);
+    const {username} = data;
     
     // Check if this is a "skip profile" request
     const isSkipRequest = data.skipProfile === true;
@@ -49,7 +38,7 @@ export async function POST(request) {
 
     // Update user profile with whatever data is provided
     const updatedUser = await OwnerModel.findOneAndUpdate(
-      { email: session.user.email },
+      { username: username },
       {
         organizationName: data.organizationName || "",
         phoneNumber: data.phoneNumber || "",
