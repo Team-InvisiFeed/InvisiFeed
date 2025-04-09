@@ -8,6 +8,7 @@ import { deleteOldInvoicePdfs } from "@/utils/deleteOldInvoicesFromCloudinary";
 import sendVerificationEmail from "@/utils/sendVerificationEmail";
 
 export const authOptions = {
+  debug: true,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
