@@ -75,7 +75,7 @@ function ForgotPasswordContent() {
   const onEmailSubmit = async (data) => {
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/auth/forgot-password", {
+      const response = await fetch("/api/forgot-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -103,7 +103,7 @@ function ForgotPasswordContent() {
     setIsSubmitting(true);
     try {
       const token = searchParams.get("token");
-      const response = await fetch("/api/auth/reset-password", {
+      const response = await fetch("/api/reset-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
