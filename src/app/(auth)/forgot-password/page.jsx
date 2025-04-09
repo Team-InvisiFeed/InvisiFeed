@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import Link from "next/link";
 import * as z from "zod";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   FormControl,
@@ -38,7 +38,7 @@ const passwordSchema = z.object({
   path: ["confirmPassword"],
 });
 
-function Page() {
+function ForgotPasswordContent() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -372,6 +372,14 @@ function Page() {
         </motion.div>
       </div>
     </div>
+  );
+}
+
+function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ForgotPasswordContent />
+    </Suspense>
   );
 }
 

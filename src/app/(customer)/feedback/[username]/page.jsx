@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,7 @@ const emojiOptions = [
   { value: 5, emoji: "😍", label: "Very Satisfied" },
 ];
 
-export default function FeedbackForm() {
+function FeedbackFormContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const username = params.username;
@@ -629,5 +629,13 @@ export default function FeedbackForm() {
         </Card>
       </motion.div>
     </div>
+  );
+}
+
+export default function FeedbackForm() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <FeedbackFormContent />
+    </Suspense>
   );
 }

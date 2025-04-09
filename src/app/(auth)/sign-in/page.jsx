@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form"; // React Hook Form for handling forms
 import { Form } from "@/components/ui/form"; // Custom Form component
 import Link from "next/link"; // For client-side navigation in Next.js
 import * as z from "zod"; // Zod for schema-based validation
-import React, { useState, useEffect } from "react"; // React hooks for state and lifecycle
+import React, { useState, useEffect, Suspense } from "react"; // React hooks for state and lifecycle
 import { useRouter, useSearchParams } from "next/navigation"; // Next.js router for navigation
 import {
   FormControl,
@@ -22,11 +22,11 @@ import { Loader2, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
-// Main page component
-function Page() {
-  const [isSubmitting, setIsSubmitting] = useState(false); // Flag for form submission
+function SignInContent() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isNavigatingToRegister, setIsNavigatingToRegister] = useState(false);
+  const searchParams = useSearchParams();
 
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -86,7 +86,7 @@ function Page() {
       router.replace(result.url);
     }
   };
-  const searchParams = useSearchParams();
+
   const error = searchParams.get("error");
   if (error === "DIFFERENT_SIGNIN_METHOD") {
     return (
@@ -346,6 +346,14 @@ function Page() {
         </motion.div>
       </div>
     </div>
+  );
+}
+
+function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SignInContent />
+    </Suspense>
   );
 }
 
