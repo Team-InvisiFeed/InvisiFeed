@@ -249,39 +249,65 @@ export const authOptions = {
         // If all else fails, redirect to /user
         return `${baseUrl}/user`;
       }
-      return url;
+
+      // Default NextAuth redirect behavior
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      else if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
     },
   },
+
+  events: {
+    async signOut({ token }) {
+      try {
+        await dbConnect();
+        // Delete refresh token from database
+        await OwnerModel.findByIdAndUpdate(token._id, {
+          refreshToken: null,
+        });
+      } catch (error) {
+        console.error("Error deleting refresh token:", error);
+      }
+    },
+  },
+
   pages: {
     signIn: "/sign-in",
-    error: "/sign-in",
+    error: "/sign-in", // Add error page redirect
   },
+
   session: {
     strategy: "jwt",
   },
+
   secret: process.env.NEXTAUTH_SECRET,
 };
 
+// Helper functions to generate tokens
 function generateAccessToken(user) {
   return jwt.sign(
     {
-      id: user._id,
+      _id: user._id,
       email: user.email,
       username: user.username,
+      isVerified: user.isVerified,
+      organizationName: user.organizationName,
     },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "20s" }
+    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
   );
 }
 
 function generateRefreshToken(user) {
   return jwt.sign(
     {
-      id: user._id,
+      _id: user._id,
       email: user.email,
       username: user.username,
+      isVerified: user.isVerified,
+      organizationName: user.organizationName,
     },
     process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: "60s" }
+    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
   );
-} 
+}
