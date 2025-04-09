@@ -269,7 +269,7 @@ function generateAccessToken(user) {
       email: user.email,
       username: user.username,
     },
-    process.env.JWT_SECRET,
+    process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: "20s" }
   );
 }
@@ -281,7 +281,7 @@ function generateRefreshToken(user) {
       email: user.email,
       username: user.username,
     },
-    process.env.JWT_REFRESH_SECRET,
+    process.env.REFRESH_TOKEN_SECRET,
     { expiresIn: "60s" }
   );
 } 
