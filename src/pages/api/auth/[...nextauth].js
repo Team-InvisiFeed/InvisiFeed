@@ -92,7 +92,7 @@ export default NextAuth({
           }
 
           // Delete old invoice PDFs (older than 1 hour)
-          await deleteOldInvoicePdfs(user.username);
+          //await deleteOldInvoicePdfs(user.username);
 
           // Generate tokens
           const accessToken = generateAccessToken(user);
@@ -135,7 +135,7 @@ export default NextAuth({
             }
 
             // Delete old invoice PDFs (older than 1 hour)
-            await deleteOldInvoicePdfs(existingUser.username);
+            //await deleteOldInvoicePdfs(existingUser.username);
 
             // ✅ Allow sign-in if it's a valid Google user
             user.id = existingUser._id.toString();
