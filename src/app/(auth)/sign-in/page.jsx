@@ -5,8 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"; // For integrating Zod va
 import { useForm } from "react-hook-form"; // React Hook Form for handling forms
 import { Form } from "@/components/ui/form"; // Custom Form component
 import Link from "next/link"; // For client-side navigation in Next.js
-import * as z from "zod"; // Zod for schema-based validation
-import React, { useState, useEffect, Suspense } from "react"; // React hooks for state and lifecycle
+import React, { useState, Suspense } from "react"; // React hooks for state and lifecycle
 import { useRouter, useSearchParams } from "next/navigation"; // Next.js router for navigation
 import {
   FormControl,
@@ -17,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input"; // Input component
 import { Button } from "@/components/ui/button"; // Button component
 import { signInSchema } from "@/schemas/signinSchema";
-import { signIn, useSession, signOut } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
