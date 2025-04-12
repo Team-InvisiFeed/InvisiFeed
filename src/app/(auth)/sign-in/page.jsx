@@ -28,24 +28,24 @@ function SignInContent() {
   const [isNavigatingToRegister, setIsNavigatingToRegister] = useState(false);
   const searchParams = useSearchParams();
 
-  const { data: session, status } = useSession();
+  // const { data: session, status } = useSession();
   const router = useRouter();
 
   // Check for token expiration
-  useEffect(() => {
-    if (session?.accessToken) {
-      const checkTokenExpiry = () => {
-        const now = Date.now();
-        if (now > session.refreshTokenExpiry) {
-          signOut({ redirect: true, callbackUrl: "/sign-in" });
-        }
-      };
+  // useEffect(() => {
+  //   if (session?.accessToken) {
+  //     const checkTokenExpiry = () => {
+  //       const now = Date.now();
+  //       if (now > session.refreshTokenExpiry) {
+  //         signOut({ redirect: true, callbackUrl: "/sign-in" });
+  //       }
+  //     };
 
-      // Check every second
-      const interval = setInterval(checkTokenExpiry, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [session]);
+  //     // Check every second
+  //     const interval = setInterval(checkTokenExpiry, 1000);
+  //     return () => clearInterval(interval);
+  //   }
+  // }, [session]);
 
   // Setting up React Hook Form with Zod validation schema
   const form = useForm({
