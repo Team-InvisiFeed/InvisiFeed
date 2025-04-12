@@ -303,7 +303,6 @@ export default NextAuth({
 
   pages: {
     signIn: "/sign-in",
-    error: "/sign-in", // Add error page redirect
   },
 
   session: {
