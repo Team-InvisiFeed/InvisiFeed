@@ -1,4 +1,3 @@
-import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
@@ -8,36 +7,7 @@ import jwt from "jsonwebtoken";
 import { deleteOldInvoicePdfs } from "@/utils/deleteOldInvoicesFromCloudinary";
 import sendVerificationEmail from "@/utils/sendVerificationEmail";
 
-// Helper functions to generate tokens
-function generateAccessToken(user) {
-  return jwt.sign(
-    {
-      _id: user._id,
-      email: user.email,
-      username: user.username,
-      isVerified: user.isVerified,
-      organizationName: user.organizationName,
-    },
-    process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
-  );
-}
-
-function generateRefreshToken(user) {
-  return jwt.sign(
-    {
-      _id: user._id,
-      email: user.email,
-      username: user.username,
-      isVerified: user.isVerified,
-      organizationName: user.organizationName,
-    },
-    process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
-  );
-}
-
-export default NextAuth({
+export const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -92,7 +62,7 @@ export default NextAuth({
           }
 
           // Delete old invoice PDFs (older than 1 hour)
-          //await deleteOldInvoicePdfs(user.username);
+          await deleteOldInvoicePdfs(user.username);
 
           // Generate tokens
           const accessToken = generateAccessToken(user);
@@ -135,7 +105,7 @@ export default NextAuth({
             }
 
             // Delete old invoice PDFs (older than 1 hour)
-            //await deleteOldInvoicePdfs(existingUser.username);
+            await deleteOldInvoicePdfs(existingUser.username);
 
             // ✅ Allow sign-in if it's a valid Google user
             user.id = existingUser._id.toString();
@@ -303,6 +273,7 @@ export default NextAuth({
 
   pages: {
     signIn: "/sign-in",
+    error: "/sign-in", // Add error page redirect
   },
 
   session: {
@@ -310,6 +281,33 @@ export default NextAuth({
   },
 
   secret: process.env.NEXTAUTH_SECRET,
+};
 
-  NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-});
+// Helper functions to generate tokens
+function generateAccessToken(user) {
+  return jwt.sign(
+    {
+      _id: user._id,
+      email: user.email,
+      username: user.username,
+      isVerified: user.isVerified,
+      organizationName: user.organizationName,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
+  );
+}
+
+function generateRefreshToken(user) {
+  return jwt.sign(
+    {
+      _id: user._id,
+      email: user.email,
+      username: user.username,
+      isVerified: user.isVerified,
+      organizationName: user.organizationName,
+    },
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
+  );
+}
