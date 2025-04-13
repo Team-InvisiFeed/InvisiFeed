@@ -65,8 +65,7 @@ function SignInContent() {
       password: data.password,
       redirect: false,
     });
-    console.log("result:", result);
-    console.log("result.url:", result.url);
+
     if (result?.error) {
       if (result.error === "CredentialsSignin") {
         toast.error("Incorrect username or password");
@@ -83,9 +82,7 @@ function SignInContent() {
       }
     }
 
-    if (username) {
-      router.replace(`/user/${username}`);
-    }
+    router.replace(`/user/${result?.user?.username}`);
   };
 
   const error = searchParams.get("error");
