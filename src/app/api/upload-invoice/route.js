@@ -4,12 +4,9 @@ import axios from "axios";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import QRCode from "qrcode";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import dotenv from "dotenv";
 import OwnerModel from "@/model/Owner";
 import dbConnect from "@/lib/dbConnect";
 import crypto from "crypto";
-
-dotenv.config();
 
 // Cloudinary Config
 cloudinary.v2.config({
