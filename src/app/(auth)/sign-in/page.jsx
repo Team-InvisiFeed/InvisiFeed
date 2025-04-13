@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"; // For integrating Zod va
 import { useForm } from "react-hook-form"; // React Hook Form for handling forms
 import { Form } from "@/components/ui/form"; // Custom Form component
 import Link from "next/link"; // For client-side navigation in Next.js
-import React, { useState, Suspense } from "react"; // React hooks for state and lifecycle
+import React, { useState, Suspense, useEffect } from "react"; // React hooks for state and lifecycle
 import { useRouter, useSearchParams } from "next/navigation"; // Next.js router for navigation
 import {
   FormControl,
