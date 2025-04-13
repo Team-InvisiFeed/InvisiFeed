@@ -27,7 +27,7 @@ function SignInContent() {
   const [isNavigatingToRegister, setIsNavigatingToRegister] = useState(false);
   const searchParams = useSearchParams();
 
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const router = useRouter();
 
   // Check for token expiration
