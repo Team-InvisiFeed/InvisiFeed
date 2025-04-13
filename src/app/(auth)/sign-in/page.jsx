@@ -28,6 +28,7 @@ function SignInContent() {
   const searchParams = useSearchParams();
 
   const { data: session } = useSession();
+  const username = session?.user?.username;
   const router = useRouter();
 
   // Check for token expiration
@@ -82,8 +83,8 @@ function SignInContent() {
       }
     }
 
-    if (result?.url) {
-      router.replace(result.url);
+    if (username) {
+      router.replace(`/user/${username}`);
     }
   };
 
