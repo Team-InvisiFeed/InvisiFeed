@@ -105,12 +105,6 @@ const InvoiceSchema = new Schema({
     type: String,
     required: true,
   },
-  invoicePdfUrl: {
-    type: String,
-    // required: true,
-    trim: true,
-    default: null,
-  },
   mergedPdfUrl: {
     type: String,
     // required: true,
