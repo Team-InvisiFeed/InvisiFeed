@@ -30,7 +30,50 @@ function MobileNav() {
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0A0A0A] border-t border-yellow-400/10 z-1000">
       <div className="flex items-center justify-around py-3 px-4">
-        {owner ? (
+        {pathname === "/" ? (
+          <>
+            <Link href="/" className="flex flex-col items-center space-y-1">
+              <Home
+                className={`h-6 w-6 ${
+                  pathname === "/" ? "text-yellow-400" : "text-gray-300"
+                } hover:text-yellow-400`}
+              />
+              <span
+                className={`text-xs ${
+                  pathname === "/" ? "text-yellow-400" : "text-gray-300"
+                }`}
+              >
+                Home
+              </span>
+            </Link>
+            <Link
+              href="#about"
+              className="flex flex-col items-center space-y-1"
+              onClick={(e) => {
+                e.preventDefault();
+                document
+                  .getElementById("about")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              <BarChart2 className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
+              <span className="text-xs text-gray-300">About</span>
+            </Link>
+            <Link
+              href="#contact"
+              className="flex flex-col items-center space-y-1"
+              onClick={(e) => {
+                e.preventDefault();
+                document
+                  .getElementById("contact")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              <MessageCircle className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
+              <span className="text-xs text-gray-300">Contact</span>
+            </Link>
+          </>
+        ) : owner ? (
           <>
             <motion.button
               onClick={() =>
