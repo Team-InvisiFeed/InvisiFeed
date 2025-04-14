@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button";
 import { signOut, useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -23,6 +23,7 @@ function UserNav({ isMobile = false }) {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const profileDropdownRef = useRef(null);
   const router = useRouter();
+  const [isNavigatingToUsername, setIsNavigatingToUsername] = useState(false);
 
   const onManageProfile = () => {
     setIsNavigatingToProfile(true);
@@ -47,6 +48,22 @@ function UserNav({ isMobile = false }) {
   const toggleProfileDropdown = () => {
     setIsProfileDropdownOpen(!isProfileDropdownOpen);
   };
+
+  const handleUsernameClick = () => {
+    setIsProfileDropdownOpen(false);
+    router.push(`/user/${owner?.username}`);
+  };
+
+  useEffect(() => {
+    const handleRouteChangeComplete = () => {
+      setIsNavigatingToUsername(false);
+    };
+
+    window.addEventListener("popstate", handleRouteChangeComplete);
+    return () => {
+      window.removeEventListener("popstate", handleRouteChangeComplete);
+    };
+  }, []);
 
   if (!owner) {
     return (
@@ -94,7 +111,10 @@ function UserNav({ isMobile = false }) {
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium text-yellow-400">
+                    <span
+                      onClick={handleUsernameClick}
+                      className="text-sm font-medium text-yellow-400 cursor-pointer hover:text-yellow-300"
+                    >
                       {owner?.username}
                     </span>
                     <span className="text-xs text-gray-400">
@@ -202,7 +222,10 @@ function UserNav({ isMobile = false }) {
                 </AvatarFallback>
               </Avatar>
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-yellow-400">
+                <span
+                  onClick={handleUsernameClick}
+                  className="text-sm font-medium text-yellow-400 cursor-pointer hover:text-yellow-300"
+                >
                   {owner?.username}
                 </span>
                 <span className="text-xs text-gray-400">{owner?.email}</span>
