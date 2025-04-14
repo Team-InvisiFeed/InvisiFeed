@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -12,23 +12,51 @@ import {
   ThumbsUp,
   Shield,
   Zap,
+  BarChart,
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 function HeroSection() {
   const router = useRouter();
+  const [isLandscape, setIsLandscape] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  // Check device orientation and size
+  useEffect(() => {
+    const checkDevice = () => {
+      setIsLandscape(window.innerWidth > window.innerHeight);
+      // Consider devices between 768px and 1024px as tablets
+      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
+      // Consider devices below 640px as small screens
+      setIsSmallScreen(window.innerWidth < 640);
+    };
+
+    // Initial check
+    checkDevice();
+
+    // Add event listener for orientation changes
+    window.addEventListener("resize", checkDevice);
+    window.addEventListener("orientationchange", checkDevice);
+
+    return () => {
+      window.removeEventListener("resize", checkDevice);
+      window.removeEventListener("orientationchange", checkDevice);
+    };
+  }, []);
+
   return (
     <section
-      className="relative min-h-[calc(100vh-80px)] bg-[#0A0A0A] pb-8 sm:pb-12"
+      className={`relative bg-[#0A0A0A] flex items-center justify-center min-h-[calc(100vh-80px)]`}
       id="home"
     >
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#0A0A0A] via-[#0A0A0A] to-[#000000] opacity-50" />
 
-      <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* Desktop Layout */}
-        <div className="hidden md:flex h-full flex-row items-center justify-center gap-6 sm:gap-8 py-6 sm:py-8">
+        <div className="hidden lg:flex h-full flex-row items-center justify-center gap-6 sm:gap-8">
           {/* Left Content */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -209,49 +237,25 @@ function HeroSection() {
           </motion.div>
         </div>
 
-        {/* Mobile Layout - Redesigned */}
-        <div className="md:hidden flex flex-col items-center justify-between py-20 px-4 h-[calc(100vh-80px)]">
+        {/* Mobile/Tablet Layout - Redesigned */}
+        <div className="lg:hidden flex flex-col items-center justify-center">
           {/* Mobile Hero Content with Visual Elements */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="w-full flex flex-col items-center justify-between h-full"
+            className={`w-full flex flex-col items-center justify-center ${
+              isLandscape ? "space-y-6" : "space-y-8"
+            }`}
           >
-            {/* Top Visual Element - Feedback Quote */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="w-full max-w-xs mx-auto mb-6 relative"
-            >
-              <div className="absolute -top-2 -left-2 w-8 h-8 bg-yellow-400/20 rounded-full flex items-center justify-center">
-                <MessageSquare className="w-4 h-4 text-yellow-400" />
-              </div>
-              <div className="bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A] rounded-xl p-4 border border-yellow-400/20 shadow-lg">
-                <p className="text-sm text-gray-300 italic text-center">
-                  "The anonymous feedback helped us improve our service quality
-                  by 40% in just 3 months!"
-                </p>
-                <div className="flex justify-center mt-2">
-                  <div className="flex">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        className="w-3 h-3 text-yellow-400 fill-yellow-400"
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
             {/* Main Heading */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="text-2xl font-bold text-white mb-3 text-center leading-tight"
+              className={`text-white text-center leading-tight ${
+                isSmallScreen ? "text-2xl" : "text-3xl"
+              } font-bold`}
             >
               Get Honest Feedback.{" "}
               <p className="text-yellow-400">No Awkward Conversations.</p>
@@ -262,7 +266,9 @@ function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="text-sm text-gray-300 mb-6 text-center max-w-xs"
+              className={`text-gray-300 text-center max-w-xs ${
+                isSmallScreen ? "text-sm" : "text-base"
+              }`}
             >
               Embed AI-powered feedback forms in your invoices for anonymous
               customer insights.
@@ -273,25 +279,45 @@ function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
-              className="flex justify-center space-x-8 mb-8"
+              className={`flex justify-center ${
+                isLandscape ? "space-x-3" : "space-x-6"
+              }`}
             >
               <div className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-yellow-400/10 rounded-full flex items-center justify-center mb-2">
-                  <QrCode className="w-6 h-6 text-yellow-400" />
+                <div className={`${
+                  isSmallScreen ? "w-12 h-12" : "w-14 h-14"
+                } bg-yellow-400/10 rounded-full flex items-center justify-center mb-1`}>
+                  <BarChart className={`${
+                    isSmallScreen ? "w-6 h-6" : "w-7 h-7"
+                  } text-yellow-400`} />
                 </div>
-                <span className="text-xs text-gray-300">QR Code</span>
+                <span className={`${
+                  isSmallScreen ? "text-xs" : "text-sm"
+                } text-gray-300`}>Smart Analysis</span>
               </div>
               <div className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-yellow-400/10 rounded-full flex items-center justify-center mb-2">
-                  <Shield className="w-6 h-6 text-yellow-400" />
+                <div className={`${
+                  isSmallScreen ? "w-12 h-12" : "w-14 h-14"
+                } bg-yellow-400/10 rounded-full flex items-center justify-center mb-1`}>
+                  <Shield className={`${
+                    isSmallScreen ? "w-6 h-6" : "w-7 h-7"
+                  } text-yellow-400`} />
                 </div>
-                <span className="text-xs text-gray-300">Anonymous</span>
+                <span className={`${
+                  isSmallScreen ? "text-xs" : "text-sm"
+                } text-gray-300`}>Anonymous</span>
               </div>
               <div className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-yellow-400/10 rounded-full flex items-center justify-center mb-2">
-                  <Zap className="w-6 h-6 text-yellow-400" />
+                <div className={`${
+                  isSmallScreen ? "w-12 h-12" : "w-14 h-14"
+                } bg-yellow-400/10 rounded-full flex items-center justify-center mb-1`}>
+                  <Zap className={`${
+                    isSmallScreen ? "w-6 h-6" : "w-7 h-7"
+                  } text-yellow-400`} />
                 </div>
-                <span className="text-xs text-gray-300">AI-Powered</span>
+                <span className={`${
+                  isSmallScreen ? "text-xs" : "text-sm"
+                } text-gray-300`}>AI-Powered</span>
               </div>
             </motion.div>
 
@@ -300,16 +326,22 @@ function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
-              className="w-full max-w-xs mx-auto mb-8"
+              className="w-full max-w-xs mx-auto"
             >
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="cursor-pointer group w-full flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30"
+                className={`cursor-pointer group w-full flex items-center justify-center space-x-2 ${
+                  isSmallScreen ? "px-5 py-2.5" : "px-7 py-3.5"
+                } bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30`}
                 onClick={() => router.push("/register")}
               >
-                <span className="text-base">Get Started</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <span className={`${
+                  isSmallScreen ? "text-base" : "text-lg"
+                }`}>Get Started</span>
+                <ArrowRight className={`${
+                  isSmallScreen ? "w-4 h-4" : "w-5 h-5"
+                } transition-transform group-hover:translate-x-1`} />
               </motion.button>
             </motion.div>
 
@@ -318,20 +350,30 @@ function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.7 }}
-              className="w-full max-w-xs mx-auto mb-8"
+              className="w-full max-w-xs mx-auto"
             >
-              <div className="bg-gradient-to-r from-yellow-500/10 to-yellow-400/5 rounded-xl p-4 border border-yellow-400/20">
+              <div className={`bg-gradient-to-r from-yellow-500/10 to-yellow-400/5 rounded-xl ${
+                isSmallScreen ? "p-3.5" : "p-4.5"
+              } border border-yellow-400/20`}>
                 <div className="flex justify-between items-center">
                   <div className="flex items-center">
-                    <ThumbsUp className="w-5 h-5 text-yellow-400 mr-2" />
-                    <span className="text-sm text-gray-300">
-                      98% Response Rate
+                    <ThumbsUp className={`${
+                      isSmallScreen ? "w-5 h-5" : "w-6 h-6"
+                    } text-yellow-400 mr-2`} />
+                    <span className={`${
+                      isSmallScreen ? "text-sm" : "text-base"
+                    } text-gray-300`}>
+                      Boost Customer Loyalty
                     </span>
                   </div>
                   <div className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-yellow-400 mr-2" />
-                    <span className="text-sm text-gray-300">
-                      100% Anonymous
+                    <CheckCircle className={`${
+                      isSmallScreen ? "w-5 h-5" : "w-6 h-6"
+                    } text-yellow-400 mr-2`} />
+                    <span className={`${
+                      isSmallScreen ? "text-sm" : "text-base"
+                    } text-gray-300`}>
+                      Increase Sales by 40%
                     </span>
                   </div>
                 </div>
