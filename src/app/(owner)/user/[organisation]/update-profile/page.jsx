@@ -218,7 +218,7 @@ function UpdateProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] py-8 px-4 sm:px-6">
+    <div className="min-h-screen bg-[#0A0A0A] py-8 px-4 sm:px-6 pt-24">
       <div className="max-w-2xl mx-auto">
         <div className="bg-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/20 rounded-xl shadow-lg shadow-yellow-400/5">
           <div className="p-6 sm:p-8">
