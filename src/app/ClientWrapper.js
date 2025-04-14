@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import MobileNav from "@/components/MobileNav";
 
 export default function ClientWrapper({ children }) {
   const pathname = usePathname();
@@ -22,6 +23,7 @@ export default function ClientWrapper({ children }) {
       {!isFeedbackPage && <Navbar />}
       <main>{children || <p>No children to render</p>}</main>
       {!isFeedbackPage && <Footer />}
+      {!isFeedbackPage && <MobileNav />}
     </>
   );
 }
