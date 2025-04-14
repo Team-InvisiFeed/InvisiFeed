@@ -26,7 +26,8 @@ function Navbar() {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isNavbarVisible, setIsNavbarVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  
+  const [isMobile, setIsMobile] = useState(false);
+
   const mobileMenuRef = useRef(null);
   const profileDropdownRef = useRef(null);
 
@@ -46,34 +47,60 @@ function Navbar() {
     }
   }, [pathname]);
 
+  // Check for mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // 768px is the md breakpoint in Tailwind
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   // Handle scroll behavior for navbar visibility
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scrolling down - hide navbar
-        setIsNavbarVisible(false);
+
+      if (isMobile) {
+        // Mobile behavior: Show on scroll up, hide on scroll down
+        if (currentScrollY > lastScrollY && currentScrollY > 100) {
+          setIsNavbarVisible(false);
+        } else {
+          setIsNavbarVisible(true);
+        }
       } else {
-        // Scrolling up - show navbar
-        setIsNavbarVisible(true);
+        // Desktop behavior: Hide on scroll down
+        if (currentScrollY > 100) {
+          setIsNavbarVisible(false);
+        } else {
+          setIsNavbarVisible(true);
+        }
       }
-      
+
       setLastScrollY(currentScrollY);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, [lastScrollY, isMobile]);
 
   // Close mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target)
+      ) {
         setIsMobileMenuOpen(false);
       }
-      
-      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(event.target)
+      ) {
         setIsProfileDropdownOpen(false);
       }
     };
@@ -125,9 +152,9 @@ function Navbar() {
   };
 
   return (
-    <nav 
+    <nav
       className={`fixed top-0 left-0 right-0 z-50 p-4 md:p-6 bg-[#0A0A0A] text-white shadow-lg border-b border-yellow-400/10 transition-transform duration-300 ${
-        isNavbarVisible ? 'translate-y-0' : '-translate-y-full'
+        isNavbarVisible ? "translate-y-0" : "-translate-y-full"
       }`}
     >
       <div className="container mx-auto flex items-center justify-between">
@@ -311,7 +338,6 @@ function Navbar() {
                 <DropdownMenuItem
                   className="text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 cursor-pointer focus:bg-yellow-400/5 focus:text-yellow-400"
                   onClick={onManageProfile}
-                  disabled={isNavigatingToProfile}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -332,7 +358,6 @@ function Navbar() {
                 <DropdownMenuItem
                   className="text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 cursor-pointer focus:bg-yellow-400/5 focus:text-yellow-400"
                   onClick={onManageCoupons}
-                  disabled={isNavigatingToCoupons}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -380,7 +405,7 @@ function Navbar() {
           {owner ? (
             <div className="flex items-center space-x-4">
               <div className="relative" ref={profileDropdownRef}>
-                <button 
+                <button
                   onClick={toggleProfileDropdown}
                   className="focus:outline-none"
                 >
@@ -390,7 +415,7 @@ function Navbar() {
                     </AvatarFallback>
                   </Avatar>
                 </button>
-                
+
                 {isProfileDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-56 bg-[#0A0A0A] border border-yellow-400/10 rounded-lg shadow-lg shadow-yellow-500/10 z-50">
                     <div className="px-2 py-1.5 border-b border-yellow-400/10">
@@ -412,8 +437,10 @@ function Navbar() {
                     </div>
                     <button
                       className="w-full text-left px-3 py-2 text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 cursor-pointer focus:bg-yellow-400/5 focus:text-yellow-400 flex items-center"
-                      onClick={onManageProfile}
-                      disabled={isNavigatingToProfile}
+                      onClick={() => {
+                        onManageProfile();
+                        setIsProfileDropdownOpen(false);
+                      }}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -433,8 +460,10 @@ function Navbar() {
                     </button>
                     <button
                       className="w-full text-left px-3 py-2 text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 cursor-pointer focus:bg-yellow-400/5 focus:text-yellow-400 flex items-center"
-                      onClick={onManageCoupons}
-                      disabled={isNavigatingToCoupons}
+                      onClick={() => {
+                        onManageCoupons();
+                        setIsProfileDropdownOpen(false);
+                      }}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -454,7 +483,10 @@ function Navbar() {
                     </button>
                     <button
                       className="w-full text-left px-3 py-2 text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 cursor-pointer focus:bg-yellow-400/5 focus:text-yellow-400 flex items-center"
-                      onClick={handleSignOut}
+                      onClick={() => {
+                        handleSignOut();
+                        setIsProfileDropdownOpen(false);
+                      }}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -492,8 +524,8 @@ function Navbar() {
               )}
             </Button>
           )}
-          
-          <button 
+
+          <button
             onClick={toggleMobileMenu}
             className="ml-4 text-gray-300 hover:text-yellow-400 focus:outline-none"
           >
