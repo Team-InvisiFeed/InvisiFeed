@@ -10,29 +10,13 @@ import { useRouter, usePathname } from "next/navigation";
 import UserRatingsGraph from "./components/UserRatingsGraph";
 import LoadingScreen from "@/components/LoadingScreen";
 import CustomerFeedbacks from "./components/CustomerFeedbacks";
-import { ArrowUp } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const Page = () => {
   const { data: session, status } = useSession();
   const owner = session?.user;
   const router = useRouter();
   const pathname = usePathname();
-  const [showScrollTop, setShowScrollTop] = useState(false);
-
-  // Handle scroll to show/hide scroll-to-top button
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 300) {
-        setShowScrollTop(true);
-      } else {
-        setShowScrollTop(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // Handle authentication redirect
   useEffect(() => {
@@ -67,14 +51,6 @@ const Page = () => {
     };
   }, []);
 
-  // Function to scroll to top
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
   // Show loading screen while checking authentication
   if (status === "loading") {
     return <LoadingScreen />;
@@ -101,22 +77,7 @@ const Page = () => {
         <CustomerFeedbacks />
       </div>
 
-      {/* Scroll to Top Button */}
-      <AnimatePresence>
-        {showScrollTop && (
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            onClick={scrollToTop}
-            className="fixed bottom-8 right-8 p-3 bg-white/10 backdrop-blur-md text-yellow-400 border border-yellow-400 rounded-full shadow-lg hover:bg-yellow-200/20 transition-colors duration-300 z-50 cursor-pointer"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <ArrowUp className="w-6 h-6" />
-          </motion.button>
-        )}
-      </AnimatePresence>
+      <ScrollToTop />
     </>
   );
 };
