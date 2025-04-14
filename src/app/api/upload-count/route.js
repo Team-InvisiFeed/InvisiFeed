@@ -37,6 +37,7 @@ export async function GET(req) {
       success: true,
       dailyUploads: owner.uploadedInvoiceCount.dailyUploads,
       timeLeft,
+      dailyLimit: 3,
     });
   } catch (error) {
     console.error("Error fetching upload count:", error);
