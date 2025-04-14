@@ -139,6 +139,22 @@ const Dashboard = () => {
     new Date().getFullYear().toString()
   );
   const [viewType, setViewType] = useState("currentYear");
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    // Check initially
+    checkMobile();
+
+    // Add event listener
+    window.addEventListener("resize", checkMobile);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const fetchMetrics = useCallback(async () => {
     try {
@@ -233,21 +249,21 @@ const Dashboard = () => {
   if (error) return <ErrorState error={error} />;
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] p-6">
+    <div className="min-h-screen bg-[#0A0A0A] p-2 sm:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <motion.div {...ANIMATION_CONFIG} className="mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
+        <motion.div {...ANIMATION_CONFIG} className="mb-4 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
             Dashboard
           </h1>
-          <p className="text-gray-400 mt-2">
+          <p className="text-gray-400 mt-2 text-sm sm:text-base">
             Comprehensive overview of your service performance and customer
             feedback
           </p>
         </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-4 sm:mb-8">
           <StatCard
             title="Feedback Ratio"
             value={`${metrics.feedbackRatio}%`}
@@ -279,7 +295,7 @@ const Dashboard = () => {
         </div>
 
         {/* Charts Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-8">
           {/* Feedback Ratio Chart */}
           <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -293,10 +309,10 @@ const Dashboard = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-1 pb-2">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-center justify-between">
                   <ChartContainer
                     config={CHART_CONFIG}
-                    className="mx-auto aspect-square max-h-[200px] w-[60%]"
+                    className="w-full sm:w-[60%] aspect-square max-h-[200px]"
                   >
                     <PieChart>
                       <ChartTooltip
@@ -327,7 +343,7 @@ const Dashboard = () => {
                                   <tspan
                                     x={viewBox.cx}
                                     y={viewBox.cy}
-                                    className="text-3xl font-bold text-yellow-400 fill-yellow-400"
+                                    className="text-2xl sm:text-3xl font-bold text-yellow-400 fill-yellow-400"
                                     style={{
                                       textShadow:
                                         "0 0 10px rgba(234, 179, 8, 0.5)",
@@ -340,7 +356,7 @@ const Dashboard = () => {
                                   <tspan
                                     x={viewBox.cx}
                                     y={(viewBox.cy || 0) + 24}
-                                    className="fill-muted-foreground"
+                                    className="fill-muted-foreground text-xs"
                                   >
                                     Feedback Rate
                                   </tspan>
@@ -352,16 +368,16 @@ const Dashboard = () => {
                       </Pie>
                     </PieChart>
                   </ChartContainer>
-                  <div className="w-[40%] space-y-4">
-                    <div className="text-right">
+                  <div className="w-full sm:w-[40%] space-y-4 mt-4 sm:mt-0">
+                    <div className="text-center sm:text-right">
                       <p className="text-gray-400 text-sm">Total Invoices</p>
-                      <p className="text-2xl font-bold text-white">
+                      <p className="text-xl sm:text-2xl font-bold text-white">
                         {metrics.totalInvoices}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-center sm:text-right">
                       <p className="text-gray-400 text-sm">Total Feedbacks</p>
-                      <p className="text-2xl font-bold text-white">
+                      <p className="text-xl sm:text-2xl font-bold text-white">
                         {metrics.totalFeedbacks}
                       </p>
                     </div>
@@ -384,10 +400,10 @@ const Dashboard = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-1 pb-2">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row items-center justify-between">
                   <ChartContainer
                     config={CHART_CONFIG}
-                    className="mx-auto aspect-square max-h-[200px] w-[60%]"
+                    className="w-full sm:w-[60%] aspect-square max-h-[200px]"
                   >
                     <PieChart>
                       <ChartTooltip
@@ -418,7 +434,7 @@ const Dashboard = () => {
                                   <tspan
                                     x={viewBox.cx}
                                     y={viewBox.cy}
-                                    className="text-3xl font-bold text-yellow-400 fill-yellow-400"
+                                    className="text-2xl sm:text-3xl font-bold text-yellow-400 fill-yellow-400"
                                     style={{
                                       textShadow:
                                         "0 0 10px rgba(234, 179, 8, 0.5)",
@@ -429,7 +445,7 @@ const Dashboard = () => {
                                   <tspan
                                     x={viewBox.cx}
                                     y={(viewBox.cy || 0) + 24}
-                                    className="fill-muted-foreground"
+                                    className="fill-muted-foreground text-xsm"
                                   >
                                     Positive Feedbacks
                                   </tspan>
@@ -441,20 +457,20 @@ const Dashboard = () => {
                       </Pie>
                     </PieChart>
                   </ChartContainer>
-                  <div className="w-[40%] space-y-4">
-                    <div className="text-right">
+                  <div className="w-full sm:w-[40%] space-y-4 mt-4 sm:mt-0">
+                    <div className="text-center sm:text-right">
                       <p className="text-gray-400 text-sm">
                         Positive Feedbacks
                       </p>
-                      <p className="text-2xl font-bold text-white">
+                      <p className="text-xl sm:text-2xl font-bold text-white">
                         {metrics.positiveFeedbacks}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-center sm:text-right">
                       <p className="text-gray-400 text-sm">
                         Negative Feedbacks
                       </p>
-                      <p className="text-2xl font-bold text-white">
+                      <p className="text-xl sm:text-2xl font-bold text-white">
                         {metrics.negativeFeedbacks}
                       </p>
                     </div>
@@ -466,13 +482,13 @@ const Dashboard = () => {
         </div>
 
         {/* Bar Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6 mb-4 sm:mb-8">
           {/* Service Ratings */}
           <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative">
               <CardHeader className="items-center pb-2">
-                <CardTitle className="text-yellow-400 text-base">
+                <CardTitle className="text-yellow-400 text-sm sm:text-base">
                   Service Ratings
                 </CardTitle>
                 <CardDescription className="text-xs">
@@ -480,54 +496,67 @@ const Dashboard = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-1 pb-2">
-                <div className="h-[300px]">
-                  <ChartContainer config={CHART_CONFIG} className="h-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={ratingData}
-                        layout="vertical"
-                        margin={{
-                          right: 16,
-                        }}
-                      >
-                        <CartesianGrid horizontal={false} stroke="#374151" />
-                        <YAxis
-                          dataKey="name"
-                          type="category"
-                          tickLine={false}
-                          tickMargin={10}
-                          axisLine={false}
-                          hide
-                        />
-                        <XAxis type="number" domain={[0, 5]} hide />
-                        <ChartTooltip
-                          cursor={false}
-                          content={<ChartTooltipContent indicator="line" />}
-                        />
-                        <Bar
-                          dataKey="value"
+                <div className="h-[200px] sm:h-[300px] w-full overflow-x-auto">
+                  <div className="min-w-[300px] sm:min-w-full h-full">
+                    <ChartContainer config={CHART_CONFIG} className="h-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={ratingData}
                           layout="vertical"
-                          fill="#FACC15"
-                          radius={4}
+                          margin={{
+                            top: 10,
+                            right: 50,
+                            left: isMobile ? 10 : 100,
+                            bottom: 10,
+                          }}
                         >
-                          <LabelList
+                          <CartesianGrid horizontal={false} stroke="#374151" />
+                          <YAxis
                             dataKey="name"
-                            position="insideLeft"
-                            offset={8}
-                            className="fill-[#000000] font-medium"
-                            fontSize={14}
+                            type="category"
+                            tickLine={false}
+                            tickMargin={10}
+                            axisLine={false}
+                            width={isMobile ? 0 : 100}
+                            tick={{
+                              fontSize: 10,
+                              fill: "#9CA3AF",
+                              display: isMobile ? "none" : "block",
+                            }}
                           />
-                          <LabelList
+                          <XAxis type="number" domain={[0, 5]} hide />
+                          <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent indicator="line" />}
+                          />
+                          <Bar
                             dataKey="value"
-                            position="right"
-                            offset={8}
-                            className="fill-[#facc15] font-bold"
-                            fontSize={14}
-                          />
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </ChartContainer>
+                            layout="vertical"
+                            fill="#FACC15"
+                            radius={4}
+                          >
+                            <LabelList
+                              dataKey="name"
+                              position="insideLeft"
+                              offset={8}
+                              className={`fill-[#000] font-medium ${
+                                isMobile ? "block" : "hidden sm:block"
+                              }`}
+                              fontSize={10}
+                            />
+                            <LabelList
+                              dataKey="value"
+                              position="right"
+                              offset={8}
+                              className="fill-yellow-400 font-bold"
+                              fontSize={12}
+                              formatter={(value) => `${value.toFixed(1)}`}
+                            />
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </ChartContainer>
+                  </div>
                 </div>
               </CardContent>
             </div>
@@ -537,17 +566,17 @@ const Dashboard = () => {
           <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative">
-              <CardHeader className="items-center pb-2">
-                <div className="flex items-center justify-between w-full">
-                  <div>
-                    <CardTitle className="text-yellow-400 text-base">
+              <CardHeader className="items-start pb-2">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-2">
+                  <div className="flex flex-col items-start">
+                    <CardTitle className="text-yellow-400 text-sm sm:text-base">
                       Rating Trend
                     </CardTitle>
                     <CardDescription className="text-xs">
                       Overall rating over time
                     </CardDescription>
                   </div>
-                  <div className="flex items-center space-x-4">
+                  <div className="flex flex-row items-center gap-2">
                     <Select
                       value={viewType}
                       onValueChange={(value) => {
@@ -555,25 +584,25 @@ const Dashboard = () => {
                         setSelectedYear(""); // Clear year selection when changing view type
                       }}
                     >
-                      <SelectTrigger className="w-[120px] bg-[#0A0A0A] border-yellow-400/20 text-yellow-400">
-                        <SelectValue placeholder="Select Time Period" />
+                      <SelectTrigger className="w-[120px] sm:w-[140px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400">
+                        <SelectValue placeholder="Select Time" />
                       </SelectTrigger>
                       <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
                         <SelectItem
                           value="currentMonth"
-                          className="text-yellow-400 hover:bg-yellow-400/10"
+                          className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
                         >
                           Current Month
                         </SelectItem>
                         <SelectItem
                           value="currentWeek"
-                          className="text-yellow-400 hover:bg-yellow-400/10"
+                          className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
                         >
                           Current Week
                         </SelectItem>
                         <SelectItem
                           value="currentYear"
-                          className="text-yellow-400 hover:bg-yellow-400/10"
+                          className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
                         >
                           Current Year
                         </SelectItem>
@@ -586,15 +615,15 @@ const Dashboard = () => {
                         setViewType(""); // Clear view type when selecting a year
                       }}
                     >
-                      <SelectTrigger className="w-[120px] bg-[#0A0A0A] border-yellow-400/20 text-yellow-400">
-                        <SelectValue placeholder="Select Year" />
+                      <SelectTrigger className="w-[100px] sm:w-[120px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400">
+                        <SelectValue placeholder="Year" />
                       </SelectTrigger>
                       <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
                         {metrics?.availableYears?.map((year) => (
                           <SelectItem
                             key={year}
                             value={year.toString()}
-                            className="text-yellow-400 hover:bg-yellow-400/10"
+                            className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
                           >
                             {year}
                           </SelectItem>
@@ -605,52 +634,59 @@ const Dashboard = () => {
                 </div>
               </CardHeader>
               <CardContent className="flex-1 pb-2">
-                <div className="h-[300px]">
-                  <ChartContainer config={CHART_CONFIG} className="h-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart
-                        data={historicalData}
-                        margin={{
-                          top: 20,
-                          right: 20,
-                          left: 20,
-                          bottom: 40,
-                        }}
-                      >
-                        <CartesianGrid vertical={false} stroke="#374151" />
-                        <XAxis
-                          dataKey="date"
-                          stroke="#9CA3AF"
-                          tickLine={false}
-                          tickMargin={10}
-                          axisLine={false}
-                          interval={0}
-                          angle={-45}
-                          textAnchor="end"
-                          height={60}
-                          tick={{ fill: "#9CA3AF" }}
-                        />
-                        <YAxis
-                          stroke="#9CA3AF"
-                          domain={[0, 5]}
-                          tickLine={false}
-                          axisLine={false}
-                          tick={{ fill: "#9CA3AF" }}
-                        />
-                        <ChartTooltip
-                          cursor={false}
-                          content={<ChartTooltipContent hideLabel />}
-                        />
-                        <Line
-                          type="monotone"
-                          dataKey="rating"
-                          stroke="#FACC15"
-                          strokeWidth={2}
-                          dot={{ fill: "#FACC15", r: 4 }}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </ChartContainer>
+                <div className="h-[200px] sm:h-[300px] w-full overflow-x-auto">
+                  <div className="min-w-[300px] sm:min-w-full h-full">
+                    <ChartContainer config={CHART_CONFIG} className="h-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart
+                          data={historicalData}
+                          margin={{
+                            top: 20,
+                            right: 20,
+                            left: isMobile ? 10 : 20,
+                            bottom: 60,
+                          }}
+                        >
+                          <CartesianGrid vertical={false} stroke="#374151" />
+                          <XAxis
+                            dataKey="date"
+                            stroke="#9CA3AF"
+                            tickLine={false}
+                            tickMargin={10}
+                            axisLine={false}
+                            interval={0}
+                            angle={-45}
+                            textAnchor="end"
+                            height={60}
+                            tick={{ fill: "#9CA3AF", fontSize: 8 }}
+                          />
+                          <YAxis
+                            stroke="#9CA3AF"
+                            domain={[0, 5]}
+                            tickLine={false}
+                            axisLine={false}
+                            tick={{
+                              fill: "#9CA3AF",
+                              fontSize: 10,
+                              display: isMobile ? "none" : "block",
+                            }}
+                            width={isMobile ? 0 : 30}
+                          />
+                          <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel />}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="rating"
+                            stroke="#FACC15"
+                            strokeWidth={2}
+                            dot={{ fill: "#FACC15", r: 3 }}
+                          ></Line>
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </ChartContainer>
+                  </div>
                 </div>
               </CardContent>
             </div>
@@ -658,7 +694,7 @@ const Dashboard = () => {
         </div>
 
         {/* Performance Metrics */}
-        <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden mb-8">
+        <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden mb-4 sm:mb-8">
           <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           <div className="relative">
             <CardHeader className="items-center pb-2">
@@ -706,7 +742,7 @@ const Dashboard = () => {
         </Card>
 
         {/* Insights Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
           {/* Improvements */}
           <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
