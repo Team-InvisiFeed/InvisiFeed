@@ -1,14 +1,30 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from "lucide-react";
+import {
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Mail,
+  Phone,
+  MapPin,
+} from "lucide-react";
+import LinkedInPopup from "./LinkedInPopup";
 
 function Footer() {
+  const [isLinkedInPopupOpen, setIsLinkedInPopupOpen] = useState(false);
+
   const socialLinks = [
-    { name: 'facebook', icon: Facebook, href: "#" },
-    { name: 'twitter', icon: Twitter, href: "#" },
-    { name: 'instagram', icon: Instagram, href: "#" },
-    { name: 'linkedin', icon: Linkedin, href: "#" },
+    { name: "facebook", icon: Facebook, href: "#" },
+    { name: "twitter", icon: Twitter, href: "#" },
+    { name: "instagram", icon: Instagram, href: "#" },
+    {
+      name: "linkedin",
+      icon: Linkedin,
+      href: "#",
+      onClick: () => setIsLinkedInPopupOpen(true),
+    },
   ];
 
   return (
@@ -17,51 +33,61 @@ function Footer() {
       <div className="container mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand Section */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
             className="space-y-4"
           >
-            <a href="#" className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
+            <a
+              href="#"
+              className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent"
+            >
               InvisiFeed
             </a>
             <p className="text-gray-400 text-sm leading-relaxed">
-              Connecting people with invisible threads of care and connection. Empowering organizations with honest, anonymous feedback.
+              Connecting people with invisible threads of care and connection.
+              Empowering organizations with honest, anonymous feedback.
             </p>
           </motion.div>
 
           {/* Quick Links */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.1 }}
             className="space-y-4"
           >
-            <h4 className="text-lg font-semibold text-yellow-400">Quick Links</h4>
+            <h4 className="text-lg font-semibold text-yellow-400">
+              Quick Links
+            </h4>
             <ul className="space-y-3">
-              {["Home", "About Us", "Contact Us", "Privacy Policy"].map((link) => (
-                <li key={link}>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-yellow-400 transition-colors duration-200 flex items-center space-x-2 group"
-                  >
-                    <span className="w-1 h-1 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                    <span>{link}</span>
-                  </a>
-                </li>
-              ))}
+              {["Home", "About Us", "Contact Us", "Privacy Policy"].map(
+                (link) => (
+                  <li key={link}>
+                    <a
+                      href="#"
+                      className="text-gray-400 hover:text-yellow-400 transition-colors duration-200 flex items-center space-x-2 group"
+                    >
+                      <span className="w-1 h-1 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                      <span>{link}</span>
+                    </a>
+                  </li>
+                )
+              )}
             </ul>
           </motion.div>
 
           {/* Contact Info */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.2 }}
             className="space-y-4"
           >
-            <h4 className="text-lg font-semibold text-yellow-400">Contact Us</h4>
+            <h4 className="text-lg font-semibold text-yellow-400">
+              Contact Us
+            </h4>
             <ul className="space-y-3">
               <li className="flex items-center space-x-3 text-gray-400 hover:text-yellow-400 transition-colors">
                 <Mail className="h-4 w-4" />
@@ -79,7 +105,7 @@ function Footer() {
           </motion.div>
 
           {/* Social Media */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.3 }}
@@ -91,6 +117,7 @@ function Footer() {
                 <a
                   key={social.name}
                   href={social.href}
+                  onClick={social.onClick}
                   className="p-2 bg-[#0A0A0A]/50 backdrop-blur-sm rounded-lg text-gray-400 hover:text-yellow-400 hover:bg-[#0A0A0A]/70 transition-all duration-200 border border-yellow-400/10"
                 >
                   <social.icon className="h-5 w-5" />
@@ -109,16 +136,28 @@ function Footer() {
               © 2025 InvisiFeed. All rights reserved.
             </p>
             <div className="flex space-x-6">
-              <a href="#" className="text-sm text-gray-500 hover:text-yellow-400 transition-colors">
+              <a
+                href="#"
+                className="text-sm text-gray-500 hover:text-yellow-400 transition-colors"
+              >
                 Terms of Service
               </a>
-              <a href="#" className="text-sm text-gray-500 hover:text-yellow-400 transition-colors">
+              <a
+                href="#"
+                className="text-sm text-gray-500 hover:text-yellow-400 transition-colors"
+              >
                 Privacy Policy
               </a>
             </div>
           </div>
         </div>
       </div>
+
+      {/* LinkedIn Popup */}
+      <LinkedInPopup
+        isOpen={isLinkedInPopupOpen}
+        onClose={() => setIsLinkedInPopupOpen(false)}
+      />
     </footer>
   );
 }
