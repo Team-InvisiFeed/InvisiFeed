@@ -7,7 +7,7 @@ export const config = {
     "/user/:path*",
     "/sign-in",
     "/register",
-    "/",
+    // "/",
     "/verify/:path*",
     "/complete-profile",
   ],
@@ -53,11 +53,11 @@ export async function middleware(request) {
   }
 
   // Redirect logged-in users from home page to their user page
-  if (token && url.pathname === "/") {
-    return NextResponse.redirect(
-      new URL(`/user/${token.username}`, request.url)
-    );
-  }
+  // if (token && url.pathname === "/") {
+  //   return NextResponse.redirect(
+  //     new URL(`/user/${token.username}`, request.url)
+  //   );
+  // }
 
   // Redirect logged-in users from auth pages to user page
   if (
