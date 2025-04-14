@@ -34,24 +34,47 @@ function Navbar() {
     <nav className="p-4 md:p-6 bg-[#0A0A0A] text-white shadow-lg border-b border-yellow-400/10">
       <div className="container mx-auto flex items-center justify-between">
         {/* Logo/Brand Name */}
-        <motion.button
-          onClick={() => {
-            if (owner) {
-              handleNavigation(`/user/${owner?.username}`);
-            } else {
-              handleNavigation("/");
-            }
-          }}
-          className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+        <div
+          onClick={() => handleNavigation("/")}
+          className="flex items-center space-x-2 cursor-pointer"
         >
-          InvisiFeed
-        </motion.button>
+          <span className="text-2xl font-bold text-yellow-400 cursor-pointer">
+            InvisiFeed
+          </span>
+        </div>
 
         {/* Navigation Links - Desktop */}
         <div className="hidden md:flex space-x-6 absolute left-1/2 -translate-x-1/2">
-          {owner ? (
+          {pathname === "/" ? (
+            <>
+              <Link
+                href="/"
+                className={`text-gray-300 hover:text-yellow-400 transition-colors ${
+                  pathname === "/" ? "font-bold text-yellow-400" : ""
+                }`}
+              >
+                Home
+              </Link>
+              <Link
+                href="#about"
+                className="text-gray-300 hover:text-yellow-400 transition-colors"
+              >
+                About
+              </Link>
+              <Link
+                href="#contact"
+                className="text-gray-300 hover:text-yellow-400 transition-colors"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document
+                    .getElementById("contact")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                }}
+              >
+                Contact
+              </Link>
+            </>
+          ) : owner ? (
             <>
               <motion.button
                 onClick={() => {
