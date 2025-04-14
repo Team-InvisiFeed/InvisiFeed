@@ -14,15 +14,15 @@ import PricingSection from "@/components/PricingSection";
 import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
 import GetStartedPopup from "@/components/GetStartedPopup";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-[#0A0A0A] text-white overflow-x-hidden">
-      
       <div className="relative">
         {/* Background gradient for the entire page */}
         <div className="fixed inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#0A0A0A] via-[#0A0A0A] to-[#000000] opacity-50 z-[-1]" />
-        
+
         {/* Content sections */}
         <div className="relative">
           <HeroSection />
@@ -37,7 +37,8 @@ export default function Home() {
           <CTASection />
         </div>
       </div>
-            <GetStartedPopup />
+      <GetStartedPopup />
+      <ScrollToTop />
     </main>
   );
 }
