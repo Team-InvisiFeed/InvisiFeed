@@ -28,7 +28,7 @@ function MobileNav() {
   };
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0A0A0A] border-t border-yellow-400/10">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0A0A0A] border-t border-yellow-400/10 z-1000">
       <div className="flex items-center justify-around py-3 px-4">
         {owner ? (
           <>
