@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 import { useRouter } from "next/navigation";
 import { Country, State, City } from "country-state-city";
 import axios from "axios";
@@ -61,6 +61,9 @@ function Page() {
   const [searchState, setSearchState] = useState("");
   const [searchCity, setSearchCity] = useState("");
 
+  // Add state to control when to show validation
+  const [showValidation, setShowValidation] = useState(false);
+
   // Redirect authenticated users with completed profiles
   useEffect(() => {
     if (status === "loading") return;
@@ -70,7 +73,10 @@ function Page() {
       return;
     }
 
-    if (session.user.isProfileCompleted === "completed" || session.user.isProfileCompleted === "skipped") {
+    if (
+      session.user.isProfileCompleted === "completed" ||
+      session.user.isProfileCompleted === "skipped"
+    ) {
       router.push(`/user/${session.user.username}`);
     }
   }, [session, status, router]);
@@ -102,14 +108,14 @@ function Page() {
   // Fetch states based on country
   useEffect(() => {
     if (selectedCountry) {
-      const countryCode = countries.find(
+      const countryData = countries.find(
         (country) => country.name === selectedCountry
-      )?.isoCode;
-
-      if (countryCode) {
-        const fetchedStates = State.getStatesOfCountry(countryCode);
+      );
+      if (countryData) {
+        const fetchedStates = State.getStatesOfCountry(countryData.isoCode);
         setStates(fetchedStates);
         setSelectedState("");
+        setSelectedCity("");
         setCities([]);
       }
     }
@@ -118,21 +124,21 @@ function Page() {
   // Fetch cities based on state
   useEffect(() => {
     if (selectedCountry && selectedState) {
-      const countryCode = countries.find(
+      const countryData = countries.find(
         (country) => country.name === selectedCountry
-      )?.isoCode;
+      );
+      const stateData = states.find((state) => state.name === selectedState);
 
-      const stateCode = states.find(
-        (state) => state.name === selectedState
-      )?.isoCode;
-
-      if (countryCode && stateCode) {
-        const fetchedCities = City.getCitiesOfState(countryCode, stateCode);
+      if (countryData && stateData) {
+        const fetchedCities = City.getCitiesOfState(
+          countryData.isoCode,
+          stateData.isoCode
+        );
         setCities(fetchedCities);
         setSelectedCity("");
       }
     }
-  }, [selectedState, selectedCountry, states]);
+  }, [selectedState, selectedCountry, states, countries]);
 
   // Filter functions
   const filteredCountries = countries.filter((country) =>
@@ -170,19 +176,72 @@ function Page() {
       form.setValue("organizationName", session.user.organizationName || "");
     }
   }, [session, form]);
+  console.log(session);
+
+  // Add validation state for each field
+  const [fieldErrors, setFieldErrors] = useState({
+    organizationName: false,
+    phoneNumber: false,
+    country: false,
+    state: false,
+    city: false,
+    localAddress: false,
+    pincode: false,
+  });
+
+  // Function to validate all fields
+  const validateFields = () => {
+    const newErrors = {
+      organizationName:
+        !form.getValues("organizationName")?.trim() &&
+        !session?.user?.organizationName,
+      phoneNumber: !form.getValues("phoneNumber")?.trim(),
+      country: !selectedCountry?.trim(),
+      state: !selectedState?.trim(),
+      city: !selectedCity?.trim(),
+      localAddress: !localAddress?.trim(),
+      pincode: !pincode?.trim(),
+    };
+    setFieldErrors(newErrors);
+    return !Object.values(newErrors).some((error) => error);
+  };
+
+  // Update useEffect to validate fields when values change and showValidation is true
+  useEffect(() => {
+    if (showValidation) {
+      validateFields();
+    }
+  }, [
+    form.getValues("organizationName"),
+    form.getValues("phoneNumber"),
+    selectedCountry,
+    selectedState,
+    selectedCity,
+    localAddress,
+    pincode,
+    showValidation,
+  ]);
 
   // Form Submit
   const onSubmit = async (data) => {
+    setShowValidation(true);
+
+    // Move validation check after setting showValidation
+    const isValid = validateFields();
+    if (!isValid) {
+      return;
+    }
+
     try {
-    setIsSubmitting(true);
+      setIsSubmitting(true);
 
       // Format the address data
       const formattedAddress = {
-        localAddress: data.address.localAddress || "",
-        city: data.address.city || "",
-        state: data.address.state || "",
-        country: data.address.country || "",
-        pincode: data.address.pincode || "",
+        localAddress: localAddress,
+        city: selectedCity,
+        state: selectedState,
+        country: selectedCountry,
+        pincode: pincode,
       };
 
       // Submit the profile data
@@ -194,8 +253,8 @@ function Page() {
       });
 
       if (response.data.success) {
-        toast.success(response.data.message);
-        
+        toast.success("Profile completed successfully!");
+
         // Update the session to reflect the new profile status
         await update({
           ...session,
@@ -207,25 +266,48 @@ function Page() {
             isProfileCompleted: response.data.profileStatus,
           },
         });
-        
+
         // Redirect to user page
         router.push(`/user/${session.user.username}`);
       } else {
-        toast.error("Failed to complete profile");
+        toast.error(response.data.message || "Failed to complete profile");
       }
     } catch (error) {
       console.error("Error completing profile:", error);
-      toast.error("An error occurred while completing your profile");
+      toast.error(
+        error.response?.data?.message ||
+          "An error occurred while completing your profile"
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // Update form values when dropdowns change
+  useEffect(() => {
+    if (selectedCountry) {
+      form.setValue("address.country", selectedCountry);
+    }
+    if (selectedState) {
+      form.setValue("address.state", selectedState);
+    }
+    if (selectedCity) {
+      form.setValue("address.city", selectedCity);
+    }
+  }, [selectedCountry, selectedState, selectedCity, form]);
+
+  // Update form values when local address and pincode change
+  useEffect(() => {
+    form.setValue("address.localAddress", localAddress);
+    form.setValue("address.pincode", pincode);
+  }, [localAddress, pincode, form]);
+
   // Handle "I'll do it later" button click
   const handleSkipProfile = async () => {
+    setShowValidation(false);
     try {
       setIsSubmitting(true);
-      
+
       // Submit empty data with skipProfile flag
       const response = await axios.post("/api/complete-profile", {
         organizationName: session.user.organizationName || "",
@@ -243,18 +325,18 @@ function Page() {
 
       if (response.data.success) {
         toast.success(response.data.message);
-        
+
         // Update the session to reflect the new profile status
-      await update({
+        await update({
           ...session,
-        user: {
-          ...session.user,
+          user: {
+            ...session.user,
             isProfileCompleted: response.data.profileStatus,
-        },
-      });
+          },
+        });
 
         // Redirect to user page
-      router.push(`/user/${session.user.username}`);
+        router.push(`/user/${session.user.username}`);
       } else {
         toast.error("Failed to skip profile completion");
       }
@@ -266,6 +348,13 @@ function Page() {
     }
   };
 
+  // Set initial organization name from session
+  useEffect(() => {
+    if (session?.user?.organizationName) {
+      form.setValue("organizationName", session.user.organizationName);
+    }
+  }, [session, form]);
+
   if (status === "loading" || !session) {
     return (
       <div className="flex h-screen items-center justify-center bg-[#0A0A0A]">
@@ -276,6 +365,7 @@ function Page() {
 
   return (
     <div className="flex h-screen overflow-hidden">
+      <Toaster position="top-center" richColors />
       {/* Left Section with Gradient */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#000000] p-8 flex-col justify-center items-center text-white">
         <div className="max-w-md space-y-4">
@@ -331,13 +421,25 @@ function Page() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input
-                          placeholder="Enter Organisation Name"
-                          {...field}
-                          className="bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9 &[-webkit-autofill]:bg-[#0A0A0A]/50"
-                        />
+                        <div className="relative">
+                          <Input
+                            placeholder="Enter Organisation Name"
+                            {...field}
+                            onChange={(e) => {
+                              field.onChange(e);
+                              if (showValidation) {
+                                validateFields();
+                              }
+                            }}
+                            className="bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9 outline-none rounded-md"
+                          />
+                          {showValidation && fieldErrors.organizationName && (
+                            <p className="text-[11px] text-red-500 mt-1">
+                              Organization name is required
+                            </p>
+                          )}
+                        </div>
                       </FormControl>
-                      <FormMessage className="text-xs" />
                     </FormItem>
                   )}
                 />
@@ -347,13 +449,25 @@ function Page() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input
-                          placeholder="Enter Phone Number"
-                          {...field}
-                          className="bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9 &[-webkit-autofill]:bg-[#0A0A0A]/50"
-                        />
+                        <div className="relative">
+                          <Input
+                            placeholder="Enter Phone Number"
+                            {...field}
+                            onChange={(e) => {
+                              field.onChange(e);
+                              if (showValidation) {
+                                validateFields();
+                              }
+                            }}
+                            className="bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9 outline-none rounded-md"
+                          />
+                          {showValidation && fieldErrors.phoneNumber && (
+                            <p className="text-[11px] text-red-500 mt-1">
+                              Phone number is required
+                            </p>
+                          )}
+                        </div>
                       </FormControl>
-                      <FormMessage className="text-xs" />
                     </FormItem>
                   )}
                 />
@@ -362,7 +476,7 @@ function Page() {
                 <div className="relative" ref={countryRef}>
                   <div
                     onClick={() => setIsCountryOpen(!isCountryOpen)}
-                    className="w-full p-2 border rounded bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200"
+                    className="w-full p-2 border rounded-md bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200 outline-none"
                   >
                     <span
                       className={
@@ -387,6 +501,11 @@ function Page() {
                       />
                     </svg>
                   </div>
+                  {showValidation && fieldErrors.country && (
+                    <p className="text-[11px] text-red-500 mt-1">
+                      Country is required
+                    </p>
+                  )}
                   {isCountryOpen && (
                     <div className="absolute z-50 w-full mt-1 bg-[#0A0A0A]/95 backdrop-blur-md border border-yellow-400/10 rounded-md shadow-lg shadow-black/20 max-h-60 overflow-hidden">
                       <div className="sticky top-0 bg-[#0A0A0A]/95 p-2 border-b border-yellow-400/10">
@@ -430,7 +549,7 @@ function Page() {
                       onClick={() =>
                         !selectedCountry || setIsStateOpen(!isStateOpen)
                       }
-                      className={`w-full p-2 border rounded bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200 ${
+                      className={`w-full p-2 border rounded-md bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200 outline-none ${
                         !selectedCountry ? "opacity-50 cursor-not-allowed" : ""
                       }`}
                     >
@@ -457,7 +576,12 @@ function Page() {
                         />
                       </svg>
                     </div>
-                    {isStateOpen && selectedCountry && (
+                    {showValidation && fieldErrors.state && (
+                      <p className="text-[11px] text-red-500 mt-1">
+                        State is required
+                      </p>
+                    )}
+                    {isStateOpen && states.length > 0 && (
                       <div className="absolute z-50 w-full mt-1 bg-[#0A0A0A]/95 backdrop-blur-md border border-yellow-400/10 rounded-md shadow-lg shadow-black/20 max-h-60 overflow-hidden">
                         <div className="sticky top-0 bg-[#0A0A0A]/95 p-2 border-b border-yellow-400/10">
                           <input
@@ -498,7 +622,7 @@ function Page() {
                       onClick={() =>
                         !selectedState || setIsCityOpen(!isCityOpen)
                       }
-                      className={`w-full p-2 border rounded bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200 ${
+                      className={`w-full p-2 border rounded-md bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200 outline-none ${
                         !selectedState ? "opacity-50 cursor-not-allowed" : ""
                       }`}
                     >
@@ -525,7 +649,12 @@ function Page() {
                         />
                       </svg>
                     </div>
-                    {isCityOpen && selectedState && (
+                    {showValidation && fieldErrors.city && (
+                      <p className="text-[11px] text-red-500 mt-1">
+                        City is required
+                      </p>
+                    )}
+                    {isCityOpen && cities.length > 0 && (
                       <div className="absolute z-50 w-full mt-1 bg-[#0A0A0A]/95 backdrop-blur-md border border-yellow-400/10 rounded-md shadow-lg shadow-black/20 max-h-60 overflow-hidden">
                         <div className="sticky top-0 bg-[#0A0A0A]/95 p-2 border-b border-yellow-400/10">
                           <input
@@ -562,26 +691,55 @@ function Page() {
                 </div>
 
                 {/* Local Address */}
-                <Input
-                  value={localAddress}
-                  onChange={(e) => setLocalAddress(e.target.value)}
-                  placeholder="Enter Local Address"
-                  className="w-full p-2 border rounded bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9 &[-webkit-autofill]:bg-[#0A0A0A]/50"
-                />
+                <div className="relative">
+                  <Input
+                    value={localAddress}
+                    onChange={(e) => {
+                      setLocalAddress(e.target.value);
+                      if (showValidation) {
+                        validateFields();
+                      }
+                    }}
+                    placeholder="Enter Local Address"
+                    className="w-full p-2 border rounded-md bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9 outline-none"
+                  />
+                  {showValidation && fieldErrors.localAddress && (
+                    <p className="text-[11px] text-red-500 mt-1">
+                      Local address is required
+                    </p>
+                  )}
+                </div>
 
                 {/* Pincode */}
-                <Input
-                  value={pincode}
-                  onChange={(e) => setPincode(e.target.value)}
-                  placeholder="Enter Pincode"
-                  className="w-full p-2 border rounded bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9 &[-webkit-autofill]:bg-[#0A0A0A]/50"
-                />
+                <div className="relative">
+                  <Input
+                    value={pincode}
+                    onChange={(e) => {
+                      setPincode(e.target.value);
+                      if (showValidation) {
+                        validateFields();
+                      }
+                    }}
+                    placeholder="Enter Pincode"
+                    className="w-full p-2 border rounded-md bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9 outline-none"
+                  />
+                  {showValidation && fieldErrors.pincode && (
+                    <p className="text-[11px] text-red-500 mt-1">
+                      Pincode is required
+                    </p>
+                  )}
+                </div>
 
                 <div className="flex flex-col gap-2">
                   <Button
                     type="submit"
                     disabled={isSubmitting}
                     className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium cursor-pointer h-9 shadow-lg shadow-yellow-500/20"
+                    onClick={() => {
+                      if (!form.formState.isValid) {
+                        setShowValidation(true);
+                      }
+                    }}
                   >
                     {isSubmitting ? (
                       <>
@@ -592,7 +750,7 @@ function Page() {
                       "Complete Profile"
                     )}
                   </Button>
-                  
+
                   <Button
                     type="button"
                     onClick={handleSkipProfile}
