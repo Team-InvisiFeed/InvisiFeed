@@ -97,23 +97,6 @@ export async function POST(req) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Upload Invoice PDF to Cloudinary
-    const uploadResult = await new Promise((resolve, reject) => {
-      cloudinary.v2.uploader
-        .upload_stream(
-          {
-            folder: "pdf_uploads",
-            resource_type: "raw",
-            public_id: `${file.name.split(".")[0]}_${username}_${Date.now()}`,
-            format: "pdf",
-          },
-          (error, result) => (error ? reject(error) : resolve(result))
-        )
-        .end(buffer);
-    });
-
-    const pdfUrl = uploadResult.secure_url;
-
     // Handle coupon data if provided
     let modifiedCouponCode = null;
     const expiryDate = new Date();
@@ -142,7 +125,7 @@ export async function POST(req) {
       username,
       modifiedCouponCode
     );
-    const mergedPdfBuffer = await mergePdfs(pdfUrl, qrPdfBuffer);
+    const mergedPdfBuffer = await mergePdfs(buffer, qrPdfBuffer);
 
     // Upload Final Merged PDF to Cloudinary
     const finalUpload = await new Promise((resolve, reject) => {
@@ -170,7 +153,6 @@ export async function POST(req) {
     // Add new invoice with initial AIuseCount, coupon if provided, and PDF URLs
     owner.invoices.push({
       invoiceId: invoiceNumber,
-      invoicePdfUrl: pdfUrl,
       mergedPdfUrl: finalPdfUrl,
       AIuseCount: 0,
       couponAttached: couponData
@@ -349,16 +331,8 @@ async function generateQrPdf(
   }
 }
 
-
-
-
-async function mergePdfs(invoicePdfUrl, qrPdfBuffer) {
+async function mergePdfs(invoicePdfBuffer, qrPdfBuffer) {
   try {
-    const invoicePdfResponse = await axios.get(invoicePdfUrl, {
-      responseType: "arraybuffer",
-    });
-    const invoicePdfBuffer = invoicePdfResponse.data;
-
     const invoicePdf = await PDFDocument.load(invoicePdfBuffer);
     const qrPdf = await PDFDocument.load(qrPdfBuffer);
 
@@ -376,16 +350,3 @@ async function mergePdfs(invoicePdfUrl, qrPdfBuffer) {
   }
 }
 
-/*
-
-invoice+qr+1.pdf => kanha
-
-kanha filled it submitted it. 
-then feedback count ===1
-and feedback page => useeffect (check feedback count) => 
-  if (feedback count === 1) => show regenerate button
-if (feedback count >= 2) => show "you reached the limit to give feedback"
-
-now kanha wants to give feedback again
-
-*/
