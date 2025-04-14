@@ -18,6 +18,46 @@ cloudinary.v2.config({
 // Google Gemini AI Setup
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// Validate coupon data against schema
+function validateCouponData(couponData) {
+  if (!couponData) return null;
+
+  // Required fields validation
+  if (!couponData.couponCode || typeof couponData.couponCode !== "string") {
+    throw new Error("Invalid coupon code format");
+  }
+
+  if (!couponData.description || typeof couponData.description !== "string") {
+    throw new Error("Invalid coupon description format");
+  }
+
+  // Length validations
+  if (couponData.couponCode.length < 3 || couponData.couponCode.length > 10) {
+    throw new Error("Coupon code must be between 3 and 10 characters");
+  }
+
+  if (
+    couponData.description.length < 10 ||
+    couponData.description.length > 200
+  ) {
+    throw new Error("Coupon description must be between 10 and 200 characters");
+  }
+
+  // Expiry days validation
+  if (couponData.expiryDays < 1 || couponData.expiryDays > 365) {
+    throw new Error("Expiry days must be between 1 and 365");
+  }
+
+  // Format validations
+  if (!/^[A-Z0-9]+$/.test(couponData.couponCode)) {
+    throw new Error(
+      "Coupon code must contain only uppercase letters and numbers"
+    );
+  }
+
+  return true;
+}
+
 export async function POST(req) {
   await dbConnect();
   try {
@@ -28,7 +68,16 @@ export async function POST(req) {
 
     let couponData = null;
     if (couponDataStr) {
-      couponData = JSON.parse(couponDataStr);
+      try {
+        couponData = JSON.parse(couponDataStr);
+        // Validate coupon data against schema
+        validateCouponData(couponData);
+      } catch (error) {
+        return NextResponse.json(
+          { error: `Invalid coupon data: ${error.message}` },
+          { status: 400 }
+        );
+      }
     }
 
     if (!file) {
@@ -118,7 +167,7 @@ export async function POST(req) {
       // Calculate expiry date
       expiryDate.setDate(expiryDate.getDate() + Number(couponData.expiryDays));
     }
-    
+
     // Generate QR Code PDF with modified coupon code if provided
     const qrPdfBuffer = await generateQrPdf(
       invoiceNumber,
@@ -149,7 +198,7 @@ export async function POST(req) {
     });
 
     const finalPdfUrl = finalUpload.secure_url;
-    
+
     // Add new invoice with initial AIuseCount, coupon if provided, and PDF URLs
     owner.invoices.push({
       invoiceId: invoiceNumber,
@@ -237,7 +286,9 @@ async function generateQrPdf(
     });
 
     const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const helveticaBoldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const helveticaBoldFont = await pdfDoc.embedFont(
+      StandardFonts.HelveticaBold
+    );
 
     const centerText = (text, y, size, font, color = rgb(0.2, 0.2, 0.2)) => {
       const textWidth = font.widthOfTextAtSize(text, size);
@@ -309,8 +360,19 @@ async function generateQrPdf(
         borderWidth: 1,
       });
 
-      centerText("WIN EXCLUSIVE COUPONS!", couponBoxY + 40, 16, helveticaBoldFont, rgb(1, 0.843, 0)); // golden yellow text
-      centerText("Complete the feedback form for a chance to win special discounts", couponBoxY + 20, 12, helveticaFont);
+      centerText(
+        "WIN EXCLUSIVE COUPONS!",
+        couponBoxY + 40,
+        16,
+        helveticaBoldFont,
+        rgb(1, 0.843, 0)
+      ); // golden yellow text
+      centerText(
+        "Complete the feedback form for a chance to win special discounts",
+        couponBoxY + 20,
+        12,
+        helveticaFont
+      );
     }
 
     // Footer
@@ -322,7 +384,13 @@ async function generateQrPdf(
       color: rgb(0.95, 0.95, 0.95),
     });
 
-    centerText("© 2024 InvisiFeed. All rights reserved.", 25, 10, helveticaFont, rgb(0.5, 0.5, 0.5));
+    centerText(
+      "© 2024 InvisiFeed. All rights reserved.",
+      25,
+      10,
+      helveticaFont,
+      rgb(0.5, 0.5, 0.5)
+    );
 
     return await pdfDoc.save();
   } catch (error) {
@@ -349,4 +417,3 @@ async function mergePdfs(invoicePdfBuffer, qrPdfBuffer) {
     throw error;
   }
 }
-
