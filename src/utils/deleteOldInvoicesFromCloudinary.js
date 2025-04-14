@@ -8,11 +8,7 @@ cloudinary.v2.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-/**
- * Deletes invoice PDFs older than 1 hour from Cloudinary
- * @param {string} username - The username of the owner
- * @returns {Promise<{deleted: number, errors: number}>} - Number of deleted files and errors
- */
+
 export async function deleteOldInvoicePdfs(username) {
   try {
     // Find the owner
@@ -32,29 +28,6 @@ export async function deleteOldInvoicePdfs(username) {
       // Skip if invoice is less than 1 hour old
       if (invoiceCreatedAt > oneHourAgo) {
         continue;
-      }
-
-      // Delete invoicePdfUrl if it exists and is older than 1 hour
-      if (invoice.invoicePdfUrl) {
-        try {
-          // Extract public_id from URL
-          const publicId = extractPublicIdFromUrl(invoice.invoicePdfUrl);
-          if (publicId) {
-            const result = await cloudinary.v2.uploader.destroy(publicId, {
-              resource_type: "raw",
-            });
-            if (result.result === "ok" || result.result === "not found") {
-              invoice.invoicePdfUrl = null;
-              deletedCount++;
-            }
-          }
-        } catch (error) {
-          console.error(
-            `Error deleting invoicePdfUrl for invoice ${invoice.invoiceId}:`,
-            error
-          );
-          errorCount++;
-        }
       }
 
       // Delete mergedPdfUrl if it exists and is older than 1 hour
@@ -90,11 +63,6 @@ export async function deleteOldInvoicePdfs(username) {
   }
 }
 
-/**
- * Extracts the public_id from a Cloudinary URL
- * @param {string} url - The Cloudinary URL
- * @returns {string|null} - The public_id or null if not found
- */
 function extractPublicIdFromUrl(url) {
   try {
     const parts = url.split("/");
