@@ -92,13 +92,13 @@ export default function Home() {
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
-    
+
     // Check if file size is greater than 3MB
     if (selectedFile && selectedFile.size > 3 * 1024 * 1024) {
       toast.error("File size exceeds 3MB limit. Please select a smaller file.");
       return;
     }
-    
+
     setFile(selectedFile);
     setEmailSent(false);
     setCustomerEmail("");
@@ -123,10 +123,12 @@ export default function Home() {
       // Fetch the sample invoice PDF
       const response = await fetch(sampleInvoice.url);
       const blob = await response.blob();
-      
+
       // Check if file size is greater than 3MB
       if (blob.size > 3 * 1024 * 1024) {
-        toast.error("Sample invoice size exceeds 3MB limit. Please select a different sample invoice.");
+        toast.error(
+          "Sample invoice size exceeds 3MB limit. Please select a different sample invoice."
+        );
         return;
       }
 
@@ -374,20 +376,35 @@ export default function Home() {
               )}
 
               {couponSaved && (
-                <div className="w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-lg transition-all duration-200 shadow-lg  ">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
+                <div className="w-full max-w-md flex flex-col items-center space-y-2">
+                  <button
+                    onClick={() => setShowCouponForm(true)}
+                    className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-lg transition-all duration-200 shadow-lg cursor-pointer"
                   >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span>Coupon Saved</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                    </svg>
+                    <span>Edit Coupon</span>
+                  </button>
+                  <p
+                    onClick={() => {
+                      setCouponSaved(false);
+                      setCouponData({
+                        couponCode: "",
+                        description: "",
+                        expiryDays: "30",
+                      });
+                      toast.success("Coupon deleted successfully");
+                    }}
+                    className="text-gray-400 hover:text-yellow-400 text-sm cursor-pointer transition-colors"
+                  >
+                    Delete Coupon
+                  </p>
                 </div>
               )}
 
@@ -669,13 +686,13 @@ export default function Home() {
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   onClick={() => setShowCouponForm(false)}
-                  className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
+                  className="px-4 py-2 text-gray-300 hover:text-white transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCouponSave}
-                  className="px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg hover:bg-yellow-500 transition-colors"
+                  className="px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg hover:bg-yellow-500 transition-colors cursor-pointer"
                 >
                   Save
                 </button>
