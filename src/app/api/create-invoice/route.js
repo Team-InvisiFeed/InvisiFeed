@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import QRCode from "qrcode";
 import cloudinary from "cloudinary";
 import OwnerModel from "@/model/Owner";
 import dbConnect from "@/lib/dbConnect";
 import crypto from "crypto";
+import { createInvoiceHtml } from "@/utils/invoiceTemplate";
+import { convertHtmlToPdf } from "@/utils/htmlToPdf";
 
 // Cloudinary Config
 cloudinary.v2.config({
@@ -93,7 +94,8 @@ export async function POST(req) {
       qrData += `&cpcd=${modifiedCouponCode}`;
     }
 
-    const qrBuffer = await QRCode.toBuffer(qrData, { width: 300 });
+    // Generate QR code as data URL
+    const qrDataUrl = await QRCode.toDataURL(qrData, { width: 300 });
 
     // Calculate totals
     const subtotal = invoiceData.items.reduce((sum, item) => sum + item.amount, 0);
@@ -104,195 +106,19 @@ export async function POST(req) {
     const taxTotal = ((subtotal - discountTotal) * invoiceData.taxRate) / 100;
     const grandTotal = subtotal - discountTotal + taxTotal;
 
-    // Create PDF
-    const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([595.28, 841.89]); // A4
+    // Create HTML invoice
+    const html = createInvoiceHtml(
+      invoiceData, 
+      invoiceNumber, 
+      qrDataUrl, 
+      subtotal, 
+      discountTotal, 
+      taxTotal, 
+      grandTotal
+    );
 
-    // Embed fonts
-    const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const helveticaBoldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-
-    // Helper function to draw text
-    const drawText = (text, x, y, size, font, color = rgb(0, 0, 0)) => {
-      page.drawText(text, {
-        x,
-        y,
-        size,
-        font,
-        color,
-      });
-    };
-
-    // Helper function to draw line
-    const drawLine = (x1, y1, x2, y2, color = rgb(0.8, 0.8, 0.8)) => {
-      page.drawLine({
-        start: { x: x1, y: y1 },
-        end: { x: x2, y: y2 },
-        color,
-        thickness: 1,
-      });
-    };
-
-    // Header
-    drawText("INVOICE", 50, 750, 24, helveticaBoldFont);
-    drawText(`Invoice #: ${invoiceNumber}`, 50, 720, 12, helveticaFont);
-    drawText(`Date: ${invoiceData.invoiceDate}`, 50, 700, 12, helveticaFont);
-    if (invoiceData.dueDate) {
-      drawText(`Due Date: ${invoiceData.dueDate}`, 50, 680, 12, helveticaFont);
-    }
-    drawText(`Payment Terms: ${invoiceData.paymentTerms}`, 50, 660, 12, helveticaFont);
-
-    // Business Details
-    drawText("From:", 50, 620, 12, helveticaBoldFont);
-    drawText(invoiceData.businessName, 50, 600, 12, helveticaFont);
-    drawText(invoiceData.businessEmail, 50, 580, 12, helveticaFont);
-    if (invoiceData.businessPhone) {
-      drawText(invoiceData.businessPhone, 50, 560, 12, helveticaFont);
-    }
-    const businessAddressLines = invoiceData.businessAddress.split("\n");
-    businessAddressLines.forEach((line, index) => {
-      drawText(line, 50, 540 - index * 20, 12, helveticaFont);
-    });
-
-    // Customer Details
-    drawText("To:", 300, 620, 12, helveticaBoldFont);
-    drawText(invoiceData.customerName, 300, 600, 12, helveticaFont);
-    drawText(invoiceData.customerEmail, 300, 580, 12, helveticaFont);
-    if (invoiceData.customerPhone) {
-      drawText(invoiceData.customerPhone, 300, 560, 12, helveticaFont);
-    }
-    const customerAddressLines = invoiceData.customerAddress.split("\n");
-    customerAddressLines.forEach((line, index) => {
-      drawText(line, 300, 540 - index * 20, 12, helveticaFont);
-    });
-
-    // Items Table Header
-    const tableTop = 480;
-    drawLine(50, tableTop, 545, tableTop);
-    drawText("Description", 50, tableTop - 15, 10, helveticaBoldFont);
-    drawText("Quantity", 250, tableTop - 15, 10, helveticaBoldFont);
-    drawText("Rate", 320, tableTop - 15, 10, helveticaBoldFont);
-    drawText("Amount", 390, tableTop - 15, 10, helveticaBoldFont);
-    drawText("Discount", 460, tableTop - 15, 10, helveticaBoldFont);
-
-    // Items Table
-    let currentY = tableTop - 40;
-    invoiceData.items.forEach((item) => {
-      drawText(item.description, 50, currentY, 10, helveticaFont);
-      drawText(item.quantity.toString(), 250, currentY, 10, helveticaFont);
-      drawText(`${item.rate.toFixed(2)}`, 320, currentY, 10, helveticaFont);
-      drawText(`${item.amount.toFixed(2)}`, 390, currentY, 10, helveticaFont);
-      drawText(`${item.discount}%`, 460, currentY, 10, helveticaFont);
-
-      currentY -= 30;
-    });
-
-    // Totals
-    currentY -= 20;
-    drawLine(50, currentY, 545, currentY);
-    drawText("Subtotal:", 390, currentY - 15, 10, helveticaBoldFont);
-    drawText(`${subtotal.toFixed(2)}`, 460, currentY - 15, 10, helveticaFont);
-
-    currentY -= 30;
-    drawText("Discount:", 390, currentY - 15, 10, helveticaBoldFont);
-    drawText(`-${discountTotal.toFixed(2)}`, 460, currentY - 15, 10, helveticaFont);
-
-    currentY -= 30;
-    drawText("Tax:", 390, currentY - 15, 10, helveticaBoldFont);
-    drawText(`${taxTotal.toFixed(2)}`, 460, currentY - 15, 10, helveticaFont);
-
-    currentY -= 30;
-    drawLine(50, currentY, 545, currentY);
-    drawText("Grand Total:", 390, currentY - 15, 12, helveticaBoldFont);
-    drawText(`${grandTotal.toFixed(2)}`, 460, currentY - 15, 12, helveticaBoldFont);
-
-    // Payment Information
-    currentY -= 60;
-    drawText("Payment Information", 50, currentY, 12, helveticaBoldFont);
-    if (invoiceData.bankDetails) {
-      currentY -= 20;
-      drawText(`Bank Details / UPI ID: ${invoiceData.bankDetails}`, 50, currentY, 10, helveticaFont);
-    }
-    if (invoiceData.paymentMethod) {
-      currentY -= 20;
-      drawText(`Payment Method: ${invoiceData.paymentMethod}`, 50, currentY, 10, helveticaFont);
-    }
-    if (invoiceData.paymentInstructions) {
-      currentY -= 20;
-      drawText("Payment Instructions:", 50, currentY, 10, helveticaBoldFont);
-      currentY -= 20;
-      const instructions = invoiceData.paymentInstructions.split("\n");
-      instructions.forEach((line) => {
-        drawText(line, 50, currentY, 10, helveticaFont);
-        currentY -= 20;
-      });
-    }
-
-    // Notes
-    if (invoiceData.notes) {
-      currentY -= 20;
-      drawText("Notes:", 50, currentY, 10, helveticaBoldFont);
-      currentY -= 20;
-      const notes = invoiceData.notes.split("\n");
-      notes.forEach((line) => {
-        drawText(line, 50, currentY, 10, helveticaFont);
-        currentY -= 20;
-      });
-    }
-
-    // QR Code
-    const qrImage = await pdfDoc.embedPng(qrBuffer);
-    const { width, height } = qrImage.scale(0.5);
-    page.drawImage(qrImage, {
-      x: 50,
-      y: 50,
-      width,
-      height,
-    });
-
-    // Feedback Form Section (if requested)
-    if (invoiceData.includeFeedbackForm) {
-      // Draw a separator line
-      drawLine(50, 200, 545, 200, rgb(0.9, 0.9, 0.9));
-
-      // Header
-      drawText("InvisiFeed", 50, 180, 16, helveticaBoldFont, rgb(1, 0.843, 0));
-      drawText("Your Feedback Matters", 50, 160, 12, helveticaFont);
-
-      // Instructions
-      const instructions = [
-        "Scan the QR code above or click the link below to share your valuable feedback.",
-        "Your insights help us deliver exceptional service.",
-        "Thank you for choosing InvisiFeed!",
-      ];
-
-      instructions.forEach((text, index) => {
-        drawText(text, 50, 140 - index * 20, 10, helveticaFont);
-      });
-
-      // Link
-      drawText("Or click the link below:", 50, 80, 10, helveticaFont);
-      drawText(qrData, 50, 60, 8, helveticaFont, rgb(0, 0, 0.8));
-
-      // Coupon Section
-      if (invoiceData.addCoupon && invoiceData.coupon) {
-        // Draw a coupon box
-        page.drawRectangle({
-          x: 50,
-          y: 30,
-          width: 495,
-          height: 20,
-          color: rgb(0.95, 0.95, 0.95),
-          borderColor: rgb(1, 0.843, 0),
-          borderWidth: 1,
-        });
-
-        drawText("WIN EXCLUSIVE COUPONS! Complete the feedback form for a chance to win special discounts", 55, 35, 8, helveticaBoldFont, rgb(1, 0.843, 0));
-      }
-    }
-
-    // Save PDF
-    const pdfBytes = await pdfDoc.save();
+    // Convert HTML to PDF
+    const pdfBuffer = await convertHtmlToPdf(html);
 
     // Upload to Cloudinary
     const uploadResponse = await new Promise((resolve, reject) => {
@@ -307,10 +133,9 @@ export async function POST(req) {
         }
       );
 
-      const buffer = Buffer.from(pdfBytes);
       const stream = require("stream");
       const bufferStream = new stream.PassThrough();
-      bufferStream.end(buffer);
+      bufferStream.end(pdfBuffer);
       bufferStream.pipe(uploadStream);
     });
 
