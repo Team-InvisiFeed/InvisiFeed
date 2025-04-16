@@ -73,6 +73,11 @@ export const authOptions = {
 
           // Store refresh token in database
           user.refreshToken = refreshToken;
+          user.gstinDetails = {
+            gstinVerificationStatus: false,
+            gstinNumber: "",
+            gstinVerificationResponse: null,
+          };
           await user.save();
 
           return {
@@ -113,6 +118,7 @@ export const authOptions = {
             user.isProfileCompleted = existingUser.isProfileCompleted;
             user.phoneNumber = existingUser.phoneNumber;
             user.address = existingUser.address;
+            user.gstinDetails = existingUser.gstinDetails;
 
             return true;
           }
@@ -135,6 +141,11 @@ export const authOptions = {
             verifyCode: "GOOGLE_AUTH",
             verifyCodeExpiry: new Date(),
             isVerified: true,
+            gstinDetails: {
+              gstinVerificationStatus: false,
+              gstinNumber: "",
+              gstinVerificationResponse: null,
+            },
             isGoogleAuth: true,
             isProfileCompleted: "pending",
             phoneNumber: "",
@@ -152,6 +163,7 @@ export const authOptions = {
           user.isProfileCompleted = newUser.isProfileCompleted;
           user.phoneNumber = newUser.phoneNumber;
           user.address = newUser.address;
+          user.gstinDetails = newUser.gstinDetails;
           return true;
         } catch (error) {
           console.error("Google Sign-In Error:", error);
@@ -168,11 +180,13 @@ export const authOptions = {
         token.id = user.id;
         token.provider = account.provider;
         token.username = user.username;
+        token.gstinDetails = user.gstinDetails;
 
         if (account.provider === "google") {
           token.email = profile.email;
           token.organizationName = profile.name;
           token.isProfileCompleted = user.isProfileCompleted || "pending";
+          token.gstinDetails = user.gstinDetails;
           token.phoneNumber = user.phoneNumber;
           token.address = user.address;
 
@@ -185,6 +199,7 @@ export const authOptions = {
               token.username = existingUser.username;
               token.isProfileCompleted =
                 existingUser.isProfileCompleted || "pending";
+              token.gstinDetails = existingUser.gstinDetails;
             }
           } catch (error) {
             console.error("Error finding user in JWT callback:", error);
@@ -193,6 +208,7 @@ export const authOptions = {
           // Existing credentials logic
           token.accessToken = user.accessToken;
           token.refreshToken = user.refreshToken;
+          token.gstinDetails = user.gstinDetails;
           token.organizationName = user.organizationName;
           token.phoneNumber = user.phoneNumber;
           token.address = user.address;
@@ -206,6 +222,7 @@ export const authOptions = {
       if (trigger === "update" && session?.user) {
         token.isProfileCompleted = session.user.isProfileCompleted || "pending";
         token.organizationName = session.user.organizationName;
+        token.gstinDetails = session.user.gstinDetails;
         token.phoneNumber = session.user.phoneNumber;
         token.address = session.user.address;
       }
@@ -219,6 +236,7 @@ export const authOptions = {
         session.user.email = token.email;
         session.user.organizationName = token.organizationName;
         session.user.isProfileCompleted = token.isProfileCompleted || "pending";
+        session.user.gstinDetails = token.gstinDetails;
         session.user.username = token.username;
         session.user.phoneNumber = token.phoneNumber;
         session.user.address = token.address;
