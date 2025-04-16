@@ -21,6 +21,7 @@ import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import * as z from "zod";
 import MobileLogo from "@/components/MobileLogo";
+import GSTINVerificationDialog from "@/components/GSTINVerificationDialog";
 
 // Profile completion schema
 const completeProfileSchema = z.object({
@@ -64,6 +65,8 @@ function Page() {
 
   // Add state to control when to show validation
   const [showValidation, setShowValidation] = useState(false);
+
+  const [isGSTINDialogOpen, setIsGSTINDialogOpen] = useState(false);
 
   // Redirect authenticated users with completed profiles
   useEffect(() => {
@@ -410,6 +413,17 @@ function Page() {
               <p className="mt-1 text-sm text-gray-400">
                 We need a few more details to set up your account
               </p>
+            </div>
+
+            <div className="flex justify-center mb-4">
+              <Button
+                onClick={() => setIsGSTINDialogOpen(true)}
+                className="bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium"
+              >
+                {session?.user?.gstinDetails?.gstinVerificationStatus
+                  ? "GSTIN Verified"
+                  : "Verify GSTIN"}
+              </Button>
             </div>
 
             <Form {...form}>
@@ -776,6 +790,11 @@ function Page() {
           </motion.div>
         </div>
       </div>
+
+      <GSTINVerificationDialog
+        open={isGSTINDialogOpen}
+        onOpenChange={setIsGSTINDialogOpen}
+      />
     </div>
   );
 }
