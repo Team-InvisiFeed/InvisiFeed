@@ -42,27 +42,27 @@ export default function Home() {
     {
       id: 1,
       name: "Sample Invoice 1",
-      url: "https://res.cloudinary.com/dzcrmyin0/image/upload/v1744027611/sample_invoice_2_cloudinary_ar8q9t.pdf",
+      url: "https://res.cloudinary.com/dqma4eudc/image/upload/v1744806047/sample_invoice_5_cloudinary_e8ua1u.pdf",
     },
     {
       id: 2,
       name: "Sample Invoice 2",
-      url: "https://res.cloudinary.com/dzcrmyin0/image/upload/v1744027612/sample_invoice_1_cloudinary_k8khff.pdf",
+      url: "https://res.cloudinary.com/dqma4eudc/image/upload/v1744806048/sample_invoice_1_cloudinary_efgvcf.pdf",
     },
     {
       id: 3,
       name: "Sample Invoice 3",
-      url: "https://res.cloudinary.com/dzcrmyin0/image/upload/v1744027612/sample_invoice_4_cloudinary_ysupfs.pdf",
+      url: "https://res.cloudinary.com/dqma4eudc/image/upload/v1744806048/sample_invoice_2_cloudinary_sbitwu.pdf",
     },
     {
       id: 4,
       name: "Sample Invoice 4",
-      url: "https://res.cloudinary.com/dzcrmyin0/image/upload/v1744027612/sample_invoice_5_cloudinary_d7lpvv.pdf",
+      url: "https://res.cloudinary.com/dqma4eudc/image/upload/v1744806048/sample_invoice_4_cloudinary_owmwhz.pdf",
     },
     {
       id: 5,
       name: "Sample Invoice 5",
-      url: "https://res.cloudinary.com/dzcrmyin0/image/upload/v1744027612/sample_invoice_3_cloudinary_pxnvlb.pdf",
+      url: "https://res.cloudinary.com/dqma4eudc/image/upload/v1744806048/sample_invoice_3_cloudinary_n5hif6.pdf",
     },
   ];
 
