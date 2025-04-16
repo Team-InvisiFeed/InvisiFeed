@@ -111,6 +111,9 @@ export const authOptions = {
             user.id = existingUser._id.toString();
             user.username = existingUser.username;
             user.isProfileCompleted = existingUser.isProfileCompleted;
+            user.phoneNumber = existingUser.phoneNumber;
+            user.address = existingUser.address;
+
             return true;
           }
 
@@ -147,6 +150,8 @@ export const authOptions = {
           user.id = newUser._id.toString();
           user.username = username;
           user.isProfileCompleted = newUser.isProfileCompleted;
+          user.phoneNumber = newUser.phoneNumber;
+          user.address = newUser.address;
           return true;
         } catch (error) {
           console.error("Google Sign-In Error:", error);
@@ -168,6 +173,8 @@ export const authOptions = {
           token.email = profile.email;
           token.organizationName = profile.name;
           token.isProfileCompleted = user.isProfileCompleted || "pending";
+          token.phoneNumber = user.phoneNumber;
+          token.address = user.address;
 
           // For Google sign-in, ensure we have the username
           try {
