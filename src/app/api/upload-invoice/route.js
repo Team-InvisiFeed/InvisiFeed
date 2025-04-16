@@ -186,7 +186,7 @@ export async function POST(req) {
       cloudinary.v2.uploader
         .upload_stream(
           {
-            folder: "pdf_uploads",
+            folder: "invoice_pdf_uploads",
             resource_type: "raw",
             public_id: `invoice_${sanitizedInvoiceNumber}_${username}_${Date.now()}`,
             format: "pdf",

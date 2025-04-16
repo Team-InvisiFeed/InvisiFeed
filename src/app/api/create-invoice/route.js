@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import QRCode from "qrcode";
 import cloudinary from "cloudinary";
 import OwnerModel from "@/model/Owner";
 import dbConnect from "@/lib/dbConnect";
@@ -18,6 +17,7 @@ export async function POST(req) {
     await dbConnect();
     const data = await req.json();
     const { username, ...invoiceData } = data;
+    console.log("recieved invoiceData:", invoiceData);
 
     // Find owner
     const owner = await OwnerModel.findOne({ username });
@@ -99,6 +99,13 @@ export async function POST(req) {
     }, 0);
     const taxTotal = ((subtotal - discountTotal) * invoiceData.taxRate) / 100;
     const grandTotal = subtotal - discountTotal + taxTotal;
+    console.log("invoiceData:", invoiceData);
+    console.log("invoiceNumber:", invoiceNumber);
+    console.log("qrData:", qrData);
+    console.log("subtotal:", subtotal);
+    console.log("discountTotal:", discountTotal);
+    console.log("taxTotal:", taxTotal);
+    console.log("grandTotal:", grandTotal);
 
     // Generate PDF using react-pdf/renderer
     const pdfBuffer = await generateInvoicePdf(
@@ -113,10 +120,20 @@ export async function POST(req) {
 
     // Upload to Cloudinary
     const uploadResponse = await new Promise((resolve, reject) => {
+
+      const sanitiseString = (str) => {
+        return str.replace(/[^a-zA-Z0-9-_\.]/g, "_");
+      };
+
+      const sanitizedInvoiceNumber = sanitiseString(invoiceNumber);
+
       const uploadStream = cloudinary.v2.uploader.upload_stream(
         {
+          folder: "invoice_pdf_uploads",
           resource_type: "raw",
           format: "pdf",
+          public_id: `invoice_${sanitizedInvoiceNumber}_${username}_${Date.now()}`,
+          context: "ttl=20",
         },
         (error, result) => {
           if (error) reject(error);
