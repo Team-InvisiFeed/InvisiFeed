@@ -160,6 +160,23 @@ const OwnerSchema = new Schema({
     required: [true, "Verify code is required"],
   },
 
+  gstinDetails: {
+    gstinNumber: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    gstinHolderName: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    gstinVerificationStatus: {
+      type: Boolean,
+      default: false,
+    },
+  },
+
   verifyCodeExpiry: {
     type: Date,
     required: [true, "Verify code expiry is required"],
