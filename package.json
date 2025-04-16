@@ -20,6 +20,7 @@
     "@radix-ui/react-select": "^2.1.6",
     "@radix-ui/react-slider": "^1.2.3",
     "@radix-ui/react-slot": "^1.1.2",
+    "@react-pdf/renderer": "^4.3.0",
     "@sparticuz/chromium": "^133.0.0",
     "axios": "^1.8.3",
     "bcryptjs": "^3.0.2",
