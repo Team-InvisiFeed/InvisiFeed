@@ -1,15 +1,13 @@
 "use client";
 
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
-import React, { useEffect, useState } from "react";
-import Dashboard from "./components/Dashboard";
-import GenerateInvoiceQR from "./components/GenerateInvoiceQR";
+import React, { useEffect } from "react";
+import Dashboard from "@/components/owner-page-components/Dashboard";
+import GenerateInvoiceQR from "@/components/owner-page-components/GenerateInvoiceQR";
 import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
-import UserRatingsGraph from "./components/UserRatingsGraph";
+import UserRatingsGraph from "@/components/owner-page-components/UserRatingsGraph";
 import LoadingScreen from "@/components/LoadingScreen";
-import CustomerFeedbacks from "./components/CustomerFeedbacks";
+import CustomerFeedbacks from "@/components/owner-page-components/CustomerFeedbacks";
 import ScrollToTop from "@/components/ScrollToTop";
 
 const Page = () => {

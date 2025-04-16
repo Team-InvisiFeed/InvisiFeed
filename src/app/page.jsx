@@ -2,18 +2,18 @@
 
 import React from "react";
 
-import HeroSection from "@/components/HeroSection";
-import HowItWorksSection from "@/components/HowItWorksSection";
-import FeaturesSection from "@/components/FeaturesSection";
-import DashboardShowcaseSection from "@/components/DashboardShowcaseSection";
-import BenefitsSection from "@/components/BenefitsSection";
-import SampleInvoiceSection from "@/components/SampleInvoiceSection";
-import TestimonialsSection from "@/components/TestimonialsSection";
-import SecuritySection from "@/components/SecuritySection";
-import PricingSection from "@/components/PricingSection";
-import FAQSection from "@/components/FAQSection";
-import CTASection from "@/components/CTASection";
-import GetStartedPopup from "@/components/GetStartedPopup";
+import HeroSection from "@/components/landing-page-components/HeroSection";
+import HowItWorksSection from "@/components/landing-page-components/HowItWorksSection";
+import FeaturesSection from "@/components/landing-page-components/FeaturesSection";
+import DashboardShowcaseSection from "@/components/landing-page-components/DashboardShowcaseSection";
+import BenefitsSection from "@/components/landing-page-components/BenefitsSection";
+import SampleInvoiceSection from "@/components/landing-page-components/SampleInvoiceSection";
+import TestimonialsSection from "@/components/landing-page-components/TestimonialsSection";
+import SecuritySection from "@/components/landing-page-components/SecuritySection";
+
+import FAQSection from "@/components/landing-page-components/FAQSection";
+import CTASection from "@/components/landing-page-components/CTASection";
+import GetStartedPopup from "@/components/landing-page-components/GetStartedPopup";
 import ScrollToTop from "@/components/ScrollToTop";
 
 export default function Home() {
