@@ -12,6 +12,7 @@ import {
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Loader2, UserCircle2 } from "lucide-react";
+import GSTINVerificationDialog from "@/components/owner-page-components/GSTINVerificationDialog";
 
 function UserNav({ isMobile = false }) {
   const { data: session } = useSession();
@@ -24,7 +25,11 @@ function UserNav({ isMobile = false }) {
   const profileDropdownRef = useRef(null);
   const router = useRouter();
   const [isNavigatingToUsername, setIsNavigatingToUsername] = useState(false);
+  const [isGSTINDialogOpen, setIsGSTINDialogOpen] = useState(false);
 
+  useEffect(() => {
+    console.log(owner);
+  }, [owner]);
   const onManageProfile = () => {
     setIsNavigatingToProfile(true);
     router.push(`/user/${owner?.username}/update-profile`);
@@ -169,6 +174,31 @@ function UserNav({ isMobile = false }) {
                 </svg>
                 Manage Coupons
               </button>
+              {!owner?.gstinDetails?.gstinVerificationStatus && (
+                <button
+                  className="w-full text-left px-3 py-2 text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 cursor-pointer focus:bg-yellow-400/5 focus:text-yellow-400 flex items-center"
+                  onClick={() => {
+                    setIsGSTINDialogOpen(true);
+                    setIsProfileDropdownOpen(false);
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-2 text-yellow-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Verify GSTIN
+                </button>
+              )}
               <button
                 className="w-full text-left px-3 py-2 text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 cursor-pointer focus:bg-yellow-400/5 focus:text-yellow-400 flex items-center"
                 onClick={() => {
@@ -272,6 +302,28 @@ function UserNav({ isMobile = false }) {
             </svg>
             Manage Coupons
           </DropdownMenuItem>
+          {!owner?.gstinDetails?.gstinVerificationStatus && (
+            <DropdownMenuItem
+              className="text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 cursor-pointer focus:bg-yellow-400/5 focus:text-yellow-400"
+              onClick={() => setIsGSTINDialogOpen(true)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 mr-2 text-yellow-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              Verify GSTIN
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             className="text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 cursor-pointer focus:bg-yellow-400/5 focus:text-yellow-400"
             onClick={handleSignOut}
@@ -294,6 +346,11 @@ function UserNav({ isMobile = false }) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <GSTINVerificationDialog
+        open={isGSTINDialogOpen}
+        onOpenChange={setIsGSTINDialogOpen}
+      />
     </div>
   );
 }
