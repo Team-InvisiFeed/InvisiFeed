@@ -4,8 +4,7 @@ import cloudinary from "cloudinary";
 import OwnerModel from "@/model/Owner";
 import dbConnect from "@/lib/dbConnect";
 import crypto from "crypto";
-import { createInvoiceHtml } from "@/utils/invoiceTemplate";
-import { convertHtmlToPdf } from "@/utils/htmlToPdf";
+import { generateInvoicePdf } from "@/utils/pdfGenerator";
 
 // Cloudinary Config
 cloudinary.v2.config({
@@ -86,16 +85,11 @@ export async function POST(req) {
 
       // Modify coupon code by adding random chars at start and invoice count
       dbCouponCode = `${invoiceData.coupon.code}${owner.invoices.length + 1}`;
-      modifiedCouponCode = `${randomChars}${invoiceData.coupon.code}${
-        owner.invoices.length + 1
-      }`;
+      modifiedCouponCode = `${randomChars}${invoiceData.coupon.code}${owner.invoices.length + 1}`;
       expiryDate.setDate(expiryDate.getDate() + Number(invoiceData.coupon.expiryDays));
 
       qrData += `&cpcd=${modifiedCouponCode}`;
     }
-
-    // Generate QR code as data URL
-    const qrDataUrl = await QRCode.toDataURL(qrData, { width: 300 });
 
     // Calculate totals
     const subtotal = invoiceData.items.reduce((sum, item) => sum + item.amount, 0);
@@ -106,19 +100,16 @@ export async function POST(req) {
     const taxTotal = ((subtotal - discountTotal) * invoiceData.taxRate) / 100;
     const grandTotal = subtotal - discountTotal + taxTotal;
 
-    // Create HTML invoice
-    const html = createInvoiceHtml(
-      invoiceData, 
-      invoiceNumber, 
-      qrDataUrl, 
-      subtotal, 
-      discountTotal, 
-      taxTotal, 
+    // Generate PDF using react-pdf/renderer
+    const pdfBuffer = await generateInvoicePdf(
+      invoiceData,
+      invoiceNumber,
+      qrData,
+      subtotal,
+      discountTotal,
+      taxTotal,
       grandTotal
     );
-
-    // Convert HTML to PDF
-    const pdfBuffer = await convertHtmlToPdf(html);
 
     // Upload to Cloudinary
     const uploadResponse = await new Promise((resolve, reject) => {
@@ -141,18 +132,18 @@ export async function POST(req) {
 
     // Save invoice to database
     owner.invoices.push({
-        invoiceId: invoiceNumber,
-        mergedPdfUrl: uploadResponse.secure_url,
-        AIuseCount: 0,
-        couponAttached: invoiceData.addCoupon
-          ? {
-              couponCode: dbCouponCode,
-              couponDescription: invoiceData.coupon.description,
-              couponExpiryDate: expiryDate,
-              isCouponUsed: false,
-            }
-          : null,
-      });
+      invoiceId: invoiceNumber,
+      mergedPdfUrl: uploadResponse.secure_url,
+      AIuseCount: 0,
+      couponAttached: invoiceData.addCoupon
+        ? {
+            couponCode: dbCouponCode,
+            couponDescription: invoiceData.coupon.description,
+            couponExpiryDate: expiryDate,
+            isCouponUsed: false,
+          }
+        : null,
+    });
 
     // Update upload counts
     owner.uploadedInvoiceCount.count += 1;
