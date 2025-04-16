@@ -21,7 +21,7 @@ import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import * as z from "zod";
 import MobileLogo from "@/components/MobileLogo";
-import GSTINVerificationDialog from "@/components/GSTINVerificationDialog";
+import GSTINVerificationDialog from "@/components/owner-page-components/GSTINVerificationDialog";
 
 // Profile completion schema
 const completeProfileSchema = z.object({
