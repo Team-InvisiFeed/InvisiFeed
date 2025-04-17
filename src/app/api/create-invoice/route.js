@@ -92,13 +92,32 @@ export async function POST(req) {
     }
 
     // Calculate totals
-    const subtotal = invoiceData.items.reduce((sum, item) => sum + item.amount, 0);
-    const discountTotal = invoiceData.items.reduce((sum, item) => {
-      const itemDiscount = (item.amount * item.discount) / 100;
-      return sum + itemDiscount;
-    }, 0);
-    const taxTotal = ((subtotal - discountTotal) * invoiceData.taxRate) / 100;
-    const grandTotal = subtotal - discountTotal + taxTotal;
+   
+    // const subtotal = invoiceData.items.reduce((sum, item) => sum + item.amount, 0);
+    // const discountTotal = invoiceData.items.reduce((sum, item) => {
+    //   const itemDiscount = (item.amount * item.discount) / 100;
+    //   return sum + itemDiscount;
+    // }, 0);
+    // const taxTotal = ((subtotal - discountTotal) * invoiceData.taxRate) / 100;
+    // const grandTotal = subtotal - discountTotal + taxTotal;
+
+    let sub = 0;
+    let discount = 0;
+    let tax = 0;
+    invoiceData.items.forEach((item) => {
+      const itemAmount = item.quantity * item.rate;
+      const itemDiscount = (itemAmount * item.discount) / 100;
+      const itemAfterDiscount = itemAmount - itemDiscount;
+      const itemTax = (itemAfterDiscount * item.tax) / 100;
+
+      sub += itemAmount;
+      discount += itemDiscount;
+      tax += itemTax;
+    });
+    const subtotal = sub;
+    const discountTotal = discount;
+    const grandTotal = sub - discount + tax;
+    const taxTotal = tax;
     console.log("invoiceData:", invoiceData);
     console.log("invoiceNumber:", invoiceNumber);
     console.log("qrData:", qrData);
@@ -116,6 +135,7 @@ export async function POST(req) {
       discountTotal,
       taxTotal,
       grandTotal
+      
     );
 
     // Upload to Cloudinary
