@@ -253,10 +253,10 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <motion.div {...ANIMATION_CONFIG} className="mb-4 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
+          <h1 className="text-2xl text-center sm:text-3xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
             Dashboard
           </h1>
-          <p className="text-gray-400 mt-2 text-sm sm:text-base">
+          <p className="text-gray-400 text-center mt-2 text-sm sm:text-base">
             Comprehensive overview of your service performance and customer
             feedback
           </p>
