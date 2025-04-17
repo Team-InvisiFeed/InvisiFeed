@@ -78,6 +78,14 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
+  sectionTitleBold: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#6b7280',
+    marginBottom: 5,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
   infoText: {
     fontSize: 8,
     marginBottom: 2,
@@ -91,10 +99,11 @@ const styles = StyleSheet.create({
   table: {
     width: '100%',
     marginBottom: 10,
+    borderCollapse: 'collapse',
   },
   tableHeader: {
     backgroundColor: '#f9fafb',
-    padding: '4 8',
+    padding: '8 10',
     fontSize: 8,
     fontWeight: 'semibold',
     color: '#6b7280',
@@ -102,10 +111,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   tableCell: {
-    padding: '6 8',
+    padding: '8 10',
     fontSize: 8,
     color: '#4b5563',
-    borderBottom: '1px solid #eaeaea',
   },
   tableCellBold: {
     fontWeight: 'medium',
@@ -148,17 +156,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f9fafb',
-    padding: 10,
-    borderRadius: 4,
+    padding: 15,
+    borderRadius: 6,
     border: '1px solid #eaeaea',
-    marginTop: 10,
+    marginTop: 20,
+    marginBottom: 15
   },
   feedbackText: {
     flex: 1,
-    fontSize: 8,
+    fontSize: 9,
     color: '#4b5563',
-    lineHeight: 1.4,
-    marginRight: 10,
+    lineHeight: 1.5,
+    marginRight: 15,
   },
   qrCode: {
     width: 60,
@@ -214,6 +223,11 @@ const InvoiceDocument = ({ invoiceData, invoiceNumber, qrDataUrl, subtotal, disc
     day: 'numeric'
   });
 
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', options);
+  };
   // Filter out empty fields
   const filteredInvoiceData = {
     ...invoiceData,
@@ -221,11 +235,21 @@ const InvoiceDocument = ({ invoiceData, invoiceNumber, qrDataUrl, subtotal, disc
     businessAddress: invoiceData.businessAddress || undefined,
     businessPhone: invoiceData.businessPhone || undefined,
     businessEmail: invoiceData.businessEmail || undefined,
+    gstin: invoiceData.gstin || undefined,
+    gstinHolderName: invoiceData.gstinHolderName || undefined,
     customerName: invoiceData.customerName || undefined,
     customerAddress: invoiceData.customerAddress || undefined,
     customerPhone: invoiceData.customerPhone || undefined,
     customerEmail: invoiceData.customerEmail || undefined,
+    invoiceDate: invoiceData.invoiceDate || undefined,
+    dueDate:  invoiceData.dueDate ? formatDate(invoiceData.dueDate) : undefined,
+    paymentTerms: invoiceData.paymentTerms || undefined,
     bankDetails: invoiceData.bankDetails || undefined,
+    paymentMethod: invoiceData.paymentMethod || undefined,
+    paymentInstructions: invoiceData.paymentInstructions || undefined,
+    notes: invoiceData.notes || undefined,
+    addCoupon: invoiceData.addCoupon || false,
+    coupon: invoiceData.coupon || undefined
   };
 
   return (
@@ -243,15 +267,17 @@ const InvoiceDocument = ({ invoiceData, invoiceNumber, qrDataUrl, subtotal, disc
               <Text style={styles.companyName}>
                 {filteredInvoiceData.businessName || 'Company Name'}
               </Text>
-              <Text style={styles.companyAddress}>
-                {filteredInvoiceData.businessAddress || 'Company Address'}
-              </Text>
+              
+              {filteredInvoiceData.gstin !== 'Unregistered' && (
+                <Text style={styles.companyAddress}>GSTIN: {filteredInvoiceData.gstin}</Text>
+              )}
             </View>
           </View>
           <View style={styles.invoiceTitle}>
             <Text style={styles.invoiceHeading}>INVOICE</Text>
             <Text style={styles.invoiceNumber}>#{invoiceNumber}</Text>
-            <Text style={styles.invoiceDate}>{currentDate}</Text>
+            <Text style={styles.invoiceDate}>Issued on: {currentDate}</Text>
+            <Text style={styles.invoiceDate}>Due Date: {filteredInvoiceData.dueDate}</Text>
           </View>
         </View>
 
@@ -273,6 +299,9 @@ const InvoiceDocument = ({ invoiceData, invoiceNumber, qrDataUrl, subtotal, disc
             )}
             {filteredInvoiceData.businessEmail && (
               <Text style={styles.infoText}>{filteredInvoiceData.businessEmail}</Text>
+            )}
+            {filteredInvoiceData.gstinHolderName && (
+              <Text style={styles.infoText}>GSTIN Holder Name: {filteredInvoiceData.gstinHolderName}</Text>
             )}
           </View>
 
@@ -297,28 +326,47 @@ const InvoiceDocument = ({ invoiceData, invoiceNumber, qrDataUrl, subtotal, disc
 
           {/* Items Table */}
           <View style={styles.table}>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={[styles.tableHeader, { width: '40%' }]}>Description</Text>
-              <Text style={[styles.tableHeader, { width: '20%' }]}>Price</Text>
-              <Text style={[styles.tableHeader, { width: '20%' }]}>Quantity</Text>
-              <Text style={[styles.tableHeader, { width: '20%' }]}>Total</Text>
+            <View style={{ flexDirection: 'row', borderBottom: '1px solid #eaeaea' }}>
+              <Text style={[styles.tableHeader, { width: '25%' }]}>Description</Text>
+              <Text style={[styles.tableHeader, { width: '15%', textAlign: 'center' }]}>Quantity</Text>
+              <Text style={[styles.tableHeader, { width: '15%', textAlign: 'right' }]}>Rate</Text>
+              <Text style={[styles.tableHeader, { width: '15%', textAlign: 'right' }]}>Discount</Text>
+              <Text style={[styles.tableHeader, { width: '15%', textAlign: 'right' }]}>Tax</Text>
+              <Text style={[styles.tableHeader, { width: '15%', textAlign: 'right' }]}>Total</Text>
             </View>
-            {filteredInvoiceData.items.map((item, index) => (
-              <View key={index} style={{ flexDirection: 'row' }}>
-                <Text style={[styles.tableCell, styles.tableCellBold, { width: '40%' }]}>
-                  {item.description}
-                </Text>
-                <Text style={[styles.tableCell, { width: '20%' }]}>
-                  {formatCurrency(item.rate)}
-                </Text>
-                <Text style={[styles.tableCell, { width: '20%' }]}>
+            
+            {filteredInvoiceData.items.map((item, index) => {
+              const itemAmount = item.quantity * item.rate; // Quantity x Rate
+              const itemDiscount = (itemAmount * item.discount) / 100; // Discount Amount
+              const itemAfterDiscount = itemAmount - itemDiscount; // Amount after Discount
+              const itemTax = (itemAfterDiscount * item.tax) / 100; // Tax Amount
+              const itemTotal = itemAfterDiscount + itemTax; // Final Total
+
+              return (
+                <View key={index} style={{ flexDirection: 'row', borderBottom: '1px solid #eaeaea' }}>
+                  <Text style={[styles.tableCell, { width: '25%' }]}>
+                    {item.description}
+                  </Text>
+                  <Text style={[styles.tableCell, { width: '15%', textAlign: 'center' }]}>
                   {item.quantity}
                 </Text>
-                <Text style={[styles.tableCell, styles.tableCellRight, { width: '20%' }]}>
-                  {formatCurrency(item.amount)}
+                <Text style={[styles.tableCell, { width: '15%', textAlign: 'right' }]}>
+                  {(item.rate)}
+                </Text>
+                <Text style={[styles.tableCell, { width: '15%', textAlign: 'right' }]}>
+                  {item.discount}
+                </Text>
+                <Text style={[styles.tableCell, { width: '15%', textAlign: 'right' }]}>
+                  {(item.tax)}
+                </Text>
+                <Text style={[styles.tableCell, { width: '15%', textAlign: 'right' }]}>
+                {itemTotal.toFixed(2)}
                 </Text>
               </View>
-            ))}
+            )}
+              
+              
+            )}
           </View>
 
           {/* Summary */}
@@ -344,13 +392,28 @@ const InvoiceDocument = ({ invoiceData, invoiceNumber, qrDataUrl, subtotal, disc
           </View>
         </View>
 
-        {/* Payment Method */}
-        {filteredInvoiceData.bankDetails && (
-          <View style={styles.paymentMethod}>
-            <Text style={styles.sectionTitle}>Payment Method</Text>
-            {filteredInvoiceData.bankDetails.split('\n').map((line, index) => (
-              <Text key={index} style={styles.infoText}>{line}</Text>
-            ))}
+        {/* Payment Details */}
+        <View style={styles.paymentMethod}>
+          <Text style={[styles.infoTextBold]}>Payment Details</Text>
+          {filteredInvoiceData.paymentMethod && (
+            <Text style={[styles.infoText, ]}>Method: {filteredInvoiceData.paymentMethod}</Text>
+          )}
+          {filteredInvoiceData.paymentTerms && (
+            <Text style={styles.infoText}>Terms: {filteredInvoiceData.paymentTerms}</Text>
+          )}
+          {filteredInvoiceData.bankDetails && (
+            <Text style={styles.infoText}>Bank/UPI Details: {filteredInvoiceData.bankDetails}</Text>
+          )}
+          {filteredInvoiceData.paymentInstructions && (
+            <Text style={[styles.infoText, { marginTop: 5 }]}>{filteredInvoiceData.paymentInstructions}</Text>
+          )}
+        </View>
+
+        {/* Notes */}
+        {filteredInvoiceData.notes && (
+          <View style={[styles.paymentMethod, { marginTop: 25, marginBottom: 10, padding: 10, backgroundColor: '#f9fafb', borderRadius: 4 }]}>
+            <Text style={[styles.sectionTitle, { color: '#4b5563' }]}>Additional Notes</Text>
+            <Text style={[styles.infoText, { lineHeight: 1.4 }]}>{filteredInvoiceData.notes}</Text>
           </View>
         )}
 
@@ -377,6 +440,12 @@ const InvoiceDocument = ({ invoiceData, invoiceNumber, qrDataUrl, subtotal, disc
         <Text style={styles.createdWith}>
           Created with <Text style={styles.createdWithSpan}>InvisiFeed</Text>
         </Text>
+
+        <View style={{ marginTop: 10, backgroundColor: '#fff1f2', padding: 8, borderRadius: 4, border: '1px solid #fecdd3' }}>
+          <Text style={{ color: '#881337', fontSize: 7, textAlign: 'center' }}>
+            Disclaimer: We are not involved in any fraudulent activity reported - Team InvisiFeed
+          </Text>
+        </View>
       </Page>
     </Document>
   );
