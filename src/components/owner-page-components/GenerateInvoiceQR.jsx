@@ -2,7 +2,16 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Upload, FileText, Download, Share2, FileUp, Plus, X } from "lucide-react";
+import {
+  Upload,
+  FileText,
+  Download,
+  Share2,
+  FileUp,
+  Plus,
+  X,
+  Trash,
+} from "lucide-react";
 import { toast } from "sonner";
 import ConfirmModal from "@/components/ConfirmModal";
 import CreateInvoiceForm from "./CreateInvoiceForm";
@@ -37,7 +46,8 @@ export default function Home() {
   const [dailyLimit, setDailyLimit] = useState(3);
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showCompleteProfileDialog, setShowCompleteProfileDialog] = useState(false);
+  const [showCompleteProfileDialog, setShowCompleteProfileDialog] =
+    useState(false);
 
   // Sample invoice data
   const sampleInvoices = [
@@ -103,7 +113,7 @@ export default function Home() {
   };
 
   const handleShowCreateInvoice = () => {
-    if(owner?.isProfileCompleted !== "completed") {
+    if (owner?.isProfileCompleted !== "completed") {
       setShowCompleteProfileDialog(true);
       return;
     }
@@ -345,6 +355,11 @@ export default function Home() {
 
   return (
     <>
+      {initialLoading && (
+        <div className="flex items-center justify-center h-screen bg-[#0A0A0A]">
+          <div className="w-8 h-8 border-2 border-yellow-400 border-t-transparent color-yellow-400 rounded-full animate-spin" />
+        </div>
+      )}
       {showConfirmModal && (
         <ConfirmModal
           message="Are you sure you want to reset all data? This will remove all invoices, feedbacks, and recommendations."
@@ -356,7 +371,7 @@ export default function Home() {
         />
       )}
 
-      <CompleteProfileDialog 
+      <CompleteProfileDialog
         open={showCompleteProfileDialog}
         onOpenChange={setShowCompleteProfileDialog}
       />
@@ -391,31 +406,43 @@ export default function Home() {
               ) : (
                 <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#0A0A0A]/50 rounded-full border border-yellow-400/20">
                   <p className="text-sm text-gray-300">
-                    Daily Uploads: <span className="font-medium text-yellow-400">{dailyUploads}</span>/<span className="font-medium text-yellow-400">{dailyLimit}</span>
-                  </p>
-                  {timeLeft && (
-                    <span className="text-xs text-yellow-400 bg-yellow-400/10 px-2 py-0.5 rounded-full">
-                      {timeLeft}h remaining
+                    Daily Uploads:{" "}
+                    <span className="font-medium text-yellow-400">
+                      {dailyUploads}
                     </span>
-                  )}
+                    /
+                    <span className="font-medium text-yellow-400">
+                      {dailyLimit}
+                    </span>
+                  </p>
                 </div>
               )}
             </div>
 
             {/* Action Buttons */}
-            <div className="flex justify-center space-x-4 mb-8">
-              {!showCreateInvoice ? (
+            <div className="flex justify-center space-x-4 mb-8 ">
+              {file ? null : dailyUploads >= 3 ? (
+                <div className="text-center">
+                  <p className="text-yellow-400 text-lg font-medium mb-2">
+                    Daily Limit Reached
+                  </p>
+                  <p className="text-gray-400 text-sm">
+                    You have reached your daily upload limit. Please try again
+                    in {timeLeft}h.
+                  </p>
+                </div>
+              ) : !showCreateInvoice ? (
                 <button
                   onClick={handleShowCreateInvoice}
-                className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105"
-              >
-                <Plus className="h-5 w-5" />
-                <span>Create New Invoice</span>
-              </button>
+                  className="flex items-center space-x-2 px-6 py-3 max-w-md w-full cursor-pointer bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105 justify-center"
+                >
+                  <Plus className="h-5 w-5" />
+                  <span >Create New Invoice</span>
+                </button>
               ) : (
                 <button
                   onClick={() => setShowCreateInvoice(false)}
-                  className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105"
+                  className="flex items-center cursor-pointer space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105"
                 >
                   <X className="h-5 w-5" />
                   <span>Cancel</span>
@@ -423,30 +450,37 @@ export default function Home() {
               )}
             </div>
 
-
             {/* File Input Section */}
-            {!showCreateInvoice && (
-
-
-
+            {!showCreateInvoice && dailyUploads < 3 && (
               <div className="mb-8 flex flex-col items-center w-full space-y-4">
+                {/* Display File Name */}
+                {file && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center max-w-md justify-between text-gray-300 mb-4 bg-[#0A0A0A]/50 p-3 rounded-lg border border-yellow-400/10"
+                  >
+                    {/* File Info */}
+                    <div className="flex items-center space-x-2">
+                      <FileText className="h-5 w-5 text-yellow-400" />
+                      <span className="text-sm">
+                        Selected:{" "}
+                        <span className="font-medium text-yellow-400">
+                          {file.name}
+                        </span>
+                      </span>
+                    </div>
 
-            {/* Display File Name */}
-            {file && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center max-w-md justify-center space-x-2 text-gray-300 mb-4 bg-[#0A0A0A]/50 p-3 rounded-lg border border-yellow-400/10"
-              >
-                <FileText className="h-5 w-5 text-yellow-400" />
-                <span className="text-sm">
-                  Selected:{" "}
-                  <span className="font-medium text-yellow-400">
-                    {file.name}
-                  </span>
-                </span>
-              </motion.div>
-            )}
+                    {/* Close Button */}
+                    <button
+                      onClick={() => setFile(null)}
+                      className="flex items-center justify-center w-6 h-6  text-white rounded-full transition-all duration-200"
+                      title="Remove File"
+                    >
+                      <Trash className="h-4 w-4 cursor-pointer " />
+                    </button>
+                  </motion.div>
+                )}
 
                 {/* Hidden File Input */}
                 <input
@@ -465,7 +499,7 @@ export default function Home() {
                   }`}
                 >
                   <Upload className="h-5 w-5" />
-                  <span>Choose PDF File</span>
+                  <span>Upload Invoice</span>
                 </label>
 
                 {/* Create Coupon Button */}
@@ -545,15 +579,8 @@ export default function Home() {
                           {initialLoading ? "Loading..." : "Processing..."}
                         </span>
                       </div>
-                    ) : dailyUploads >= 3 ? (
-                      <div className="flex items-center justify-center space-x-2">
-                        <span>Daily Limit Reached</span>
-                        {timeLeft && (
-                          <span className="text-sm">({timeLeft}h remaining)</span>
-                        )}
-                      </div>
                     ) : (
-                      "Upload & Extract"
+                      "Generate Smart Invoice"
                     )}
                   </motion.button>
                 </div>
@@ -810,7 +837,7 @@ export default function Home() {
         )}
 
         {/* Sample Invoices Modal */}
-        {showSampleInvoices && (
+        {showSampleInvoices && dailyUploads < 3 && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm p-4 overflow-">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -832,7 +859,8 @@ export default function Home() {
               {/* Caution Message */}
               <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
                 <p className="text-red-400 text-xs">
-                  <strong>Caution:</strong> Sample invoices are for testing purposes only.
+                  <strong>Caution:</strong> Sample invoices are for testing
+                  purposes only.
                 </p>
                 <a
                   href="#"
