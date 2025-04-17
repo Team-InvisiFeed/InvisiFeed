@@ -2,10 +2,11 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Upload, FileText, Download, Share2, FileUp, Plus } from "lucide-react";
+import { Upload, FileText, Download, Share2, FileUp, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import ConfirmModal from "@/components/ConfirmModal";
 import CreateInvoiceForm from "./CreateInvoiceForm";
+import CompleteProfileDialog from "./CompleteProfileDialog";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -36,6 +37,7 @@ export default function Home() {
   const [dailyLimit, setDailyLimit] = useState(3);
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showCompleteProfileDialog, setShowCompleteProfileDialog] = useState(false);
 
   // Sample invoice data
   const sampleInvoices = [
@@ -98,6 +100,14 @@ export default function Home() {
   const handleConfirm = (message, action) => {
     setConfirmAction(() => action);
     setShowConfirmModal(true);
+  };
+
+  const handleShowCreateInvoice = () => {
+    if(owner?.isProfileCompleted !== "completed") {
+      setShowCompleteProfileDialog(true);
+      return;
+    }
+    setShowCreateInvoice(true);
   };
 
   const handleFileChange = (e) => {
@@ -346,12 +356,17 @@ export default function Home() {
         />
       )}
 
+      <CompleteProfileDialog 
+        open={showCompleteProfileDialog}
+        onOpenChange={setShowCompleteProfileDialog}
+      />
+
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#0A0A0A] p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="flex flex-col items-center justify-center w-full max-w-3xl bg-gradient-to-br from-[#0A0A0A]/90 to-[#0A0A0A]/70 backdrop-blur-md text-white shadow-2xl rounded-2xl border border-yellow-400/20 p-8 group relative overflow-hidden"
+          className="flex flex-col items-center justify-center w-full bg-gradient-to-br from-[#0A0A0A]/90 to-[#0A0A0A]/70 backdrop-blur-md text-white max-w-7xl shadow-2xl rounded-2xl border border-yellow-400/20 p-8 group relative overflow-hidden"
         >
           <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-yellow-400/5 rounded-full blur-3xl" />
@@ -389,21 +404,39 @@ export default function Home() {
 
             {/* Action Buttons */}
             <div className="flex justify-center space-x-4 mb-8">
-              <button
-                onClick={() => setShowCreateInvoice(true)}
+              {!showCreateInvoice ? (
+                <button
+                  onClick={handleShowCreateInvoice}
                 className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105"
               >
                 <Plus className="h-5 w-5" />
                 <span>Create New Invoice</span>
               </button>
+              ) : (
+                <button
+                  onClick={() => setShowCreateInvoice(false)}
+                  className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105"
+                >
+                  <X className="h-5 w-5" />
+                  <span>Cancel</span>
+                </button>
+              )}
             </div>
+
+
+            {/* File Input Section */}
+            {!showCreateInvoice && (
+
+
+
+              <div className="mb-8 flex flex-col items-center w-full space-y-4">
 
             {/* Display File Name */}
             {file && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-center space-x-2 text-gray-300 mb-4 bg-[#0A0A0A]/50 p-3 rounded-lg border border-yellow-400/10"
+                className="flex items-center max-w-md justify-center space-x-2 text-gray-300 mb-4 bg-[#0A0A0A]/50 p-3 rounded-lg border border-yellow-400/10"
               >
                 <FileText className="h-5 w-5 text-yellow-400" />
                 <span className="text-sm">
@@ -415,9 +448,6 @@ export default function Home() {
               </motion.div>
             )}
 
-            {/* File Input Section */}
-            {!showCreateInvoice && (
-              <div className="mb-8 flex flex-col items-center w-full space-y-4">
                 {/* Hidden File Input */}
                 <input
                   type="file"
@@ -781,22 +811,28 @@ export default function Home() {
 
         {/* Sample Invoices Modal */}
         {showSampleInvoices && (
-          <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm p-4 overflow-">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-[#1A1A1A] p-8 rounded-2xl w-full max-w-md border border-yellow-400/20 shadow-2xl"
+              className="bg-[#1A1A1A] p-6 rounded-2xl w-full max-w-sm border border-yellow-400/20 shadow-2xl overflow-hidden"
             >
-              <h2 className="text-2xl font-bold mb-6 text-yellow-400">
-                Select Sample Invoice
-              </h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold text-yellow-400">
+                  Select Sample Invoice
+                </h2>
+                <button
+                  onClick={() => setShowSampleInvoices(false)}
+                  className="p-1 hover:bg-yellow-400/10 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-yellow-400" />
+                </button>
+              </div>
 
               {/* Caution Message */}
-              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
-                <p className="text-red-400 text-sm">
-                  <strong>Caution:</strong> Sample invoices are for testing
-                  purposes only. Not recommended for genuine business data
-                  analysis.
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+                <p className="text-red-400 text-xs">
+                  <strong>Caution:</strong> Sample invoices are for testing purposes only.
                 </p>
                 <a
                   href="#"
@@ -810,36 +846,28 @@ export default function Home() {
                       );
                     }, 100);
                   }}
-                  className="text-red-400 hover:text-red-300 text-sm mt-3 inline-block underline"
+                  className="text-red-400 hover:text-red-300 text-xs mt-1 inline-block underline"
                 >
                   Reset data for genuine data analysis
                 </a>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2 max-h-[300px]">
                 {sampleInvoices.map((invoice) => (
                   <button
                     key={invoice.id}
                     onClick={() => handleSampleInvoiceSelect(invoice)}
-                    className="w-full px-5 py-4 bg-[#0A0A0A] border border-yellow-400/20 rounded-xl text-white hover:bg-[#0A0A0A]/80 hover:border-yellow-400/40 transition-all duration-300 flex items-center justify-between cursor-pointer hover:scale-105"
+                    className="w-full px-4 py-3 bg-[#0A0A0A] border border-yellow-400/20 rounded-xl text-white hover:bg-[#0A0A0A]/80 hover:border-yellow-400/40 transition-all duration-300 flex items-center justify-between cursor-pointer hover:scale-105"
                     disabled={loading || dailyUploads >= 3}
                   >
-                    <span>{invoice.name}</span>
+                    <span className="text-sm">{invoice.name}</span>
                     {loading && file && file.name === `${invoice.name}.pdf` ? (
-                      <div className="w-5 h-5 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <FileUp className="h-5 w-5 text-yellow-400" />
+                      <FileUp className="h-4 w-4 text-yellow-400" />
                     )}
                   </button>
                 ))}
-              </div>
-              <div className="flex justify-end mt-8">
-                <button
-                  onClick={() => setShowSampleInvoices(false)}
-                  className="px-5 py-2.5 text-gray-300 hover:text-white transition-colors cursor-pointer"
-                >
-                  Cancel
-                </button>
               </div>
             </motion.div>
           </div>
