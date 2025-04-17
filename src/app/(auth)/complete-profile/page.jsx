@@ -368,34 +368,10 @@ function Page() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex min-h-screen bg-[#0A0A0A]">
       <Toaster position="top-center" richColors />
-      {/* Left Section with Gradient */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#000000] p-8 flex-col justify-center items-center text-white">
-        <div className="max-w-md space-y-4">
-          <h1 className="text-4xl font-extrabold tracking-tight">InvisiFeed</h1>
-          <p className="text-lg text-gray-200">
-            Complete your profile to get started
-          </p>
-          <div className="space-y-3 mt-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-              <p>Secure and anonymous feedback system</p>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-              <p>Real-time insights and analytics</p>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-              <p>Build a culture of trust and transparency</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Section with Form */}
-      <div className="w-full lg:w-1/2 flex flex-col items-center p-6 bg-[#0A0A0A]">
+      {/* Main Content Section */}
+      <div className="w-full flex flex-col items-center p-6 pb-12">
         <div className="w-full max-w-md">
           <div className="mb-8">
             <MobileLogo />
@@ -418,11 +394,19 @@ function Page() {
             <div className="flex justify-center mb-4">
               <Button
                 onClick={() => setIsGSTINDialogOpen(true)}
-                className="bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium"
+                className="bg-transparent hover:bg-yellow-400/10 text-yellow-400 border border-yellow-400/20 font-medium px-4 py-2 rounded-full transition-all duration-200"
               >
-                {session?.user?.gstinDetails?.gstinVerificationStatus
-                  ? "GSTIN Verified"
-                  : "Verify GSTIN"}
+                {session?.user?.gstinDetails?.gstinVerificationStatus ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    GSTIN Verified
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                    Verify GSTIN
+                  </div>
+                )}
               </Button>
             </div>
 
@@ -500,11 +484,7 @@ function Page() {
                       onClick={() => setIsCountryOpen(!isCountryOpen)}
                       className="w-full p-2 border rounded-md bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200 outline-none"
                     >
-                      <span
-                        className={
-                          selectedCountry ? "text-white" : "text-gray-400"
-                        }
-                      >
+                      <span className={selectedCountry ? "text-white" : "text-gray-400"}>
                         {selectedCountry || "Select Country"}
                       </span>
                       <svg
@@ -563,155 +543,144 @@ function Page() {
                     )}
                   </div>
 
-                  {/* State and City Grid */}
-                  <div className="grid grid-cols-2 gap-4">
-                    {/* State Dropdown */}
-                    <div className="relative" ref={stateRef}>
-                      <div
-                        onClick={() =>
-                          !selectedCountry || setIsStateOpen(!isStateOpen)
-                        }
-                        className={`w-full p-2 border rounded-md bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200 outline-none ${
-                          !selectedCountry
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
+                  {/* State Dropdown */}
+                  <div className="relative" ref={stateRef}>
+                    <div
+                      onClick={() =>
+                        !selectedCountry || setIsStateOpen(!isStateOpen)
+                      }
+                      className={`w-full p-2 border rounded-md bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200 outline-none ${
+                        !selectedCountry
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                    >
+                      <span className={selectedState ? "text-white" : "text-gray-400"}>
+                        {selectedState || "Select State"}
+                      </span>
+                      <svg
+                        className={`w-4 h-4 text-yellow-400/50 transition-transform duration-200 ${
+                          isStateOpen ? "rotate-180" : ""
                         }`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                       >
-                        <span
-                          className={
-                            selectedState ? "text-white" : "text-gray-400"
-                          }
-                        >
-                          {selectedState || "Select State"}
-                        </span>
-                        <svg
-                          className={`w-4 h-4 text-yellow-400/50 transition-transform duration-200 ${
-                            isStateOpen ? "rotate-180" : ""
-                          }`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
-                      </div>
-                      {showValidation && fieldErrors.state && (
-                        <p className="text-[11px] text-red-500 mt-1">
-                          State is required
-                        </p>
-                      )}
-                      {isStateOpen && states.length > 0 && (
-                        <div className="absolute z-50 w-full mt-1 bg-[#0A0A0A]/95 backdrop-blur-md border border-yellow-400/10 rounded-md shadow-lg shadow-black/20 max-h-60 overflow-hidden">
-                          <div className="sticky top-0 bg-[#0A0A0A]/95 p-2 border-b border-yellow-400/10">
-                            <input
-                              type="text"
-                              placeholder="Search state..."
-                              value={searchState}
-                              onChange={(e) => setSearchState(e.target.value)}
-                              className="w-full p-1.5 text-sm bg-[#0A0A0A]/50 border border-yellow-400/10 rounded text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400/30"
-                              autoFocus
-                            />
-                          </div>
-                          <div className="overflow-auto max-h-[200px] scrollbar-thin scrollbar-thumb-yellow-400/20 scrollbar-track-transparent">
-                            {filteredStates.map((state) => (
-                              <div
-                                key={state.isoCode}
-                                onClick={() => {
-                                  setSelectedState(state.name);
-                                  setIsStateOpen(false);
-                                  setSearchState("");
-                                }}
-                                className={`px-3 py-2 cursor-pointer text-white hover:bg-yellow-400/10 transition-all duration-150 border-b border-yellow-400/5 last:border-0 ${
-                                  selectedState === state.name
-                                    ? "bg-yellow-400/20"
-                                    : ""
-                                }`}
-                              >
-                                {state.name}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
                     </div>
+                    {showValidation && fieldErrors.state && (
+                      <p className="text-[11px] text-red-500 mt-1">
+                        State is required
+                      </p>
+                    )}
+                    {isStateOpen && states.length > 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-[#0A0A0A]/95 backdrop-blur-md border border-yellow-400/10 rounded-md shadow-lg shadow-black/20 max-h-60 overflow-hidden">
+                        <div className="sticky top-0 bg-[#0A0A0A]/95 p-2 border-b border-yellow-400/10">
+                          <input
+                            type="text"
+                            placeholder="Search state..."
+                            value={searchState}
+                            onChange={(e) => setSearchState(e.target.value)}
+                            className="w-full p-1.5 text-sm bg-[#0A0A0A]/50 border border-yellow-400/10 rounded text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400/30"
+                            autoFocus
+                          />
+                        </div>
+                        <div className="overflow-auto max-h-[200px] scrollbar-thin scrollbar-thumb-yellow-400/20 scrollbar-track-transparent">
+                          {filteredStates.map((state) => (
+                            <div
+                              key={state.isoCode}
+                              onClick={() => {
+                                setSelectedState(state.name);
+                                setIsStateOpen(false);
+                                setSearchState("");
+                              }}
+                              className={`px-3 py-2 cursor-pointer text-white hover:bg-yellow-400/10 transition-all duration-150 border-b border-yellow-400/5 last:border-0 ${
+                                selectedState === state.name
+                                  ? "bg-yellow-400/20"
+                                  : ""
+                              }`}
+                            >
+                              {state.name}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
-                    {/* City Dropdown */}
-                    <div className="relative" ref={cityRef}>
-                      <div
-                        onClick={() =>
-                          !selectedState || setIsCityOpen(!isCityOpen)
-                        }
-                        className={`w-full p-2 border rounded-md bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200 outline-none ${
-                          !selectedState ? "opacity-50 cursor-not-allowed" : ""
+                  {/* City Dropdown */}
+                  <div className="relative" ref={cityRef}>
+                    <div
+                      onClick={() =>
+                        !selectedState || setIsCityOpen(!isCityOpen)
+                      }
+                      className={`w-full p-2 border rounded-md bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200 outline-none ${
+                        !selectedState ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
+                    >
+                      <span className={selectedCity ? "text-white" : "text-gray-400"}>
+                        {selectedCity || "Select City"}
+                      </span>
+                      <svg
+                        className={`w-4 h-4 text-yellow-400/50 transition-transform duration-200 ${
+                          isCityOpen ? "rotate-180" : ""
                         }`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                       >
-                        <span
-                          className={
-                            selectedCity ? "text-white" : "text-gray-400"
-                          }
-                        >
-                          {selectedCity || "Select City"}
-                        </span>
-                        <svg
-                          className={`w-4 h-4 text-yellow-400/50 transition-transform duration-200 ${
-                            isCityOpen ? "rotate-180" : ""
-                          }`}
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
-                      </div>
-                      {showValidation && fieldErrors.city && (
-                        <p className="text-[11px] text-red-500 mt-1">
-                          City is required
-                        </p>
-                      )}
-                      {isCityOpen && cities.length > 0 && (
-                        <div className="absolute z-50 w-full mt-1 bg-[#0A0A0A]/95 backdrop-blur-md border border-yellow-400/10 rounded-md shadow-lg shadow-black/20 max-h-60 overflow-hidden">
-                          <div className="sticky top-0 bg-[#0A0A0A]/95 p-2 border-b border-yellow-400/10">
-                            <input
-                              type="text"
-                              placeholder="Search city..."
-                              value={searchCity}
-                              onChange={(e) => setSearchCity(e.target.value)}
-                              className="w-full p-1.5 text-sm bg-[#0A0A0A]/50 border border-yellow-400/10 rounded text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400/30"
-                              autoFocus
-                            />
-                          </div>
-                          <div className="overflow-auto max-h-[200px] scrollbar-thin scrollbar-thumb-yellow-400/20 scrollbar-track-transparent">
-                            {filteredCities.map((city) => (
-                              <div
-                                key={city.name}
-                                onClick={() => {
-                                  setSelectedCity(city.name);
-                                  setIsCityOpen(false);
-                                  setSearchCity("");
-                                }}
-                                className={`px-3 py-2 cursor-pointer text-white hover:bg-yellow-400/10 transition-all duration-150 border-b border-yellow-400/5 last:border-0 ${
-                                  selectedCity === city.name
-                                    ? "bg-yellow-400/20"
-                                    : ""
-                                }`}
-                              >
-                                {city.name}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
                     </div>
+                    {showValidation && fieldErrors.city && (
+                      <p className="text-[11px] text-red-500 mt-1">
+                        City is required
+                      </p>
+                    )}
+                    {isCityOpen && cities.length > 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-[#0A0A0A]/95 backdrop-blur-md border border-yellow-400/10 rounded-md shadow-lg shadow-black/20 max-h-60 overflow-hidden">
+                        <div className="sticky top-0 bg-[#0A0A0A]/95 p-2 border-b border-yellow-400/10">
+                          <input
+                            type="text"
+                            placeholder="Search city..."
+                            value={searchCity}
+                            onChange={(e) => setSearchCity(e.target.value)}
+                            className="w-full p-1.5 text-sm bg-[#0A0A0A]/50 border border-yellow-400/10 rounded text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400/30"
+                            autoFocus
+                          />
+                        </div>
+                        <div className="overflow-auto max-h-[200px] scrollbar-thin scrollbar-thumb-yellow-400/20 scrollbar-track-transparent">
+                          {filteredCities.map((city) => (
+                            <div
+                              key={city.name}
+                              onClick={() => {
+                                setSelectedCity(city.name);
+                                setIsCityOpen(false);
+                                setSearchCity("");
+                              }}
+                              className={`px-3 py-2 cursor-pointer text-white hover:bg-yellow-400/10 transition-all duration-150 border-b border-yellow-400/5 last:border-0 ${
+                                selectedCity === city.name
+                                  ? "bg-yellow-400/20"
+                                  : ""
+                              }`}
+                            >
+                              {city.name}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Local Address */}
