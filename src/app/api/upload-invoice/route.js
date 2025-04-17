@@ -3,10 +3,142 @@ import cloudinary from "cloudinary";
 import axios from "axios";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import QRCode from "qrcode";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  renderToStream,
+} from "@react-pdf/renderer";
+import { PDFDocument } from "pdf-lib";
 import OwnerModel from "@/model/Owner";
 import dbConnect from "@/lib/dbConnect";
 import crypto from "crypto";
+
+// Create styles
+const styles = StyleSheet.create({
+  page: {
+    backgroundColor: "#ffffff",
+    padding: 30,
+    fontSize: 10,
+  },
+  centerContent: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  companyInfo: {
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  companyName: {
+    fontSize: 36,
+    fontWeight: "bold",
+    color: "#4f46e5",
+  },
+  orgInfo: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  companyTagline: {
+    fontSize: 14,
+    color: "#6b7280",
+    alignSelf: "center",
+  },
+  invoiceDetails: {
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  invoiceNumber: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  invoiceDate: {
+    marginTop: 5,
+    fontSize: 12,
+    color: "#555",
+  },
+  body: {
+    marginVertical: 20,
+  },
+  textCenter: {
+    textAlign: "center",
+    marginVertical: 5,
+  },
+  infoText: {
+    fontSize: 12,
+    color: "#4b5563",
+  },
+  infoTextBold: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#1a1a1a",
+  },
+  link: {
+    color: "#1a56db",
+    textDecoration: "underline",
+    marginTop: 10,
+  },
+  qrCode: {
+    width: 100,
+    height: 100,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  feedbackSection: {
+    marginTop: 30,
+    padding: 20,
+    backgroundColor: "#f9fafb",
+    borderRadius: 8,
+    border: "1px solid #eaeaea",
+    textAlign: "center",
+  },
+  couponHeader: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#f59e0b",
+    marginBottom: 10,
+  },
+  feedbackText: {
+    fontSize: 12,
+    color: "#4b5563",
+    display: "flex",
+    gap: 4,
+  },
+  disclaimer: {
+    marginTop: 30,
+    padding: 10,
+    backgroundColor: "#fff1f2",
+    borderRadius: 4,
+    border: "1px solid #fecdd3",
+  },
+  disclaimerText: {
+    fontSize: 7,
+    color: "#881337",
+    textAlign: "center",
+    lineHeight: 1.5,
+  },
+  createdWith: {
+    textAlign: "center",
+    marginTop: 10,
+    fontSize: 10,
+    color: "#6b7280",
+    fontStyle: "italic",
+  },
+  createdWithSpan: {
+    color: "#4f46e5",
+    fontWeight: "semibold",
+  },
+  discFooter: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    left: 20,
+  },
+});
 
 // Cloudinary Config
 cloudinary.v2.config({
@@ -172,7 +304,8 @@ export async function POST(req) {
     const qrPdfBuffer = await generateQrPdf(
       invoiceNumber,
       username,
-      modifiedCouponCode
+      modifiedCouponCode,
+      owner
     );
     const mergedPdfBuffer = await mergePdfs(buffer, qrPdfBuffer);
 
@@ -261,146 +394,133 @@ async function extractInvoiceNumberFromPdf(file) {
 async function generateQrPdf(
   invoiceNumber,
   username,
-  modifiedCouponCode = null
+  modifiedCouponCode = null,
+  owner
 ) {
   try {
+    // Generate QR code data URL
     const encodedUsername = encodeURIComponent(username);
     const encodedInvoiceNumber = encodeURIComponent(invoiceNumber);
     let qrData = `${process.env.NEXT_PUBLIC_APP_URL}/feedback/${encodedUsername}?invoiceNo=${encodedInvoiceNumber}`;
-
-    if (modifiedCouponCode) {
+    const qrDataUrl = await QRCode.toDataURL(qrData, { width: 300 });
+    if(modifiedCouponCode){
       qrData += `&cpcd=${modifiedCouponCode}`;
     }
-
-    const qrBuffer = await QRCode.toBuffer(qrData, { width: 300 });
-
-    const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage([595.28, 841.89]); // A4
-
-    page.drawRectangle({
-      x: 0,
-      y: 0,
-      width: page.getWidth(),
-      height: page.getHeight(),
-      color: rgb(1, 1, 1), // White background
+    const currentDate = new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
 
-    const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const helveticaBoldFont = await pdfDoc.embedFont(
-      StandardFonts.HelveticaBold
+    // Create PDF document
+    const QrDocument = () => (
+      <Document>
+        <Page size="A4" style={styles.page}>
+          {/* Header */}
+          <View style={[styles.header, styles.centerContent]}>
+            <View style={styles.companyInfo}>
+              <Text style={styles.companyName}>InvisiFeed</Text>
+              <Text style={styles.companyTagline}>Your Feedback Matters</Text>
+            </View>
+          </View>
+          {/* Invoice Details */}
+          <View style={styles.orgInfo}>
+            <View style={styles.invoiceDetails}>
+              <Text style={styles.invoiceNumber}>
+                From: {owner?.organizationName}
+              </Text>
+
+              <Text style={styles.invoiceDate}>Email: {owner?.email}</Text>
+              {owner?.gstinDetails && (
+                <Text style={styles.invoiceDate}>
+                  GSTIN holder name: {owner?.gstinDetails?.gstinHolderName}
+                </Text>
+              )}
+            </View>
+            <View style={styles.invoiceDetails}>
+              <Text style={styles.invoiceNumber}>Invoice: {invoiceNumber}</Text>
+              <Text style={styles.invoiceDate}>Invoice Date: {currentDate}</Text>
+            </View>
+          </View>
+
+          {/* Instructions */}
+          <View style={[styles.body, styles.centerContent]}>
+            <Text style={[styles.infoTextBold, styles.textCenter]}>
+              Scan this QR code to share your valuable feedback
+            </Text>
+            <Text style={[styles.infoText, styles.textCenter]}>
+              Your insights help us deliver exceptional service
+            </Text>
+            <Text style={[styles.infoText, styles.textCenter]}>
+              Thank you for choosing InvisiFeed!
+            </Text>
+            {/* QR Code */}
+            <Image src={qrDataUrl} style={styles.qrCode} />
+            <Text style={[styles.infoText, styles.link]}>{qrData}</Text>
+          </View>
+
+          {/* Coupon Section */}
+          {modifiedCouponCode && (
+            <View style={styles.feedbackSection}>
+              <Text style={styles.couponHeader}>WIN EXCLUSIVE COUPONS!</Text>
+              <View style={styles.feedbackText}>
+                <Text>
+                  Complete the feedback form to claim amazing discounts and
+                  special offers.
+                </Text>
+                <Text>Your voice helps us serve you better!</Text>
+              </View>
+            </View>
+          )}
+
+          {/*Disclaimer + Footer*/}
+
+          <View style={styles.discFooter}>
+            {/* Disclaimer */}
+            <View style={styles.disclaimer}>
+              <Text style={styles.disclaimerText}>
+                Disclaimer: This tool is meant strictly for generating valid
+                business invoices. Any misuse, such as fake invoicing or GST
+                fraud, is punishable under the GST Act, 2017 and Bharatiya Nyaya
+                Sanhita (BNS), 2023 (Sections 316 & 333). The user is solely
+                responsible for the accuracy of GSTIN or any missing
+                information; as per Rule 46 of the CGST Rules, furnishing
+                correct invoice details is the supplier’s responsibility. We are
+                not liable for any incorrect, fake, or missing GSTIN entered by
+                users.{" "}
+              </Text>
+            </View>
+
+            {/* Created with */}
+            <Text style={styles.createdWith}>
+              Created with{" "}
+              <Text style={styles.createdWithSpan}>InvisiFeed</Text>
+            </Text>
+          </View>
+        </Page>
+      </Document>
     );
 
-    const centerText = (text, y, size, font, color = rgb(0.2, 0.2, 0.2)) => {
-      const textWidth = font.widthOfTextAtSize(text, size);
-      const x = (page.getWidth() - textWidth) / 2;
-      page.drawText(text, {
-        x,
-        y,
-        size,
-        font,
-        color,
-      });
-    };
+    // Render to stream
+    const stream = await renderToStream(<QrDocument />);
 
-    // Header
-    centerText("InvisiFeed", 750, 36, helveticaBoldFont, rgb(1, 0.843, 0)); // golden yellow
-    centerText("Your Feedback Matters", 700, 20, helveticaFont);
-    centerText(`Invoice: ${invoiceNumber}`, 650, 16, helveticaFont);
-
-    const instructions = [
-      "Scan this QR code to share your valuable feedback",
-      "Your insights help us deliver exceptional service",
-      "Thank you for choosing InvisiFeed!",
-    ];
-
-    instructions.forEach((text, index) => {
-      centerText(text, 600 - index * 25, 14, helveticaFont);
-    });
-
-    // QR Code
-    const qrImage = await pdfDoc.embedPng(qrBuffer);
-    const { width, height } = qrImage.scale(0.5);
-    const centerX = (page.getWidth() - width) / 2;
-    const qrY = 375;
-
-    page.drawImage(qrImage, {
-      x: centerX,
-      y: qrY,
-      width,
-      height,
-    });
-
-    // Link
-    const linkText = qrData;
-    const linkFontSize = 10;
-    const linkY = qrY - 40;
-    const linkWidth = helveticaFont.widthOfTextAtSize(linkText, linkFontSize);
-    const linkX = (page.getWidth() - linkWidth) / 2;
-
-    centerText("Or click the link below:", linkY + 20, 12, helveticaFont);
-    page.drawText(linkText, {
-      x: linkX,
-      y: linkY,
-      size: linkFontSize,
-      font: helveticaFont,
-      color: rgb(0, 0, 0.8),
-    });
-
-    // Coupon Section
-    if (modifiedCouponCode) {
-      const couponBoxY = linkY - 100;
-
-      page.drawRectangle({
-        x: 50,
-        y: couponBoxY,
-        width: page.getWidth() - 100,
-        height: 60,
-        color: rgb(0.95, 0.95, 0.95),
-        borderColor: rgb(1, 0.843, 0), // golden yellow border
-        borderWidth: 1,
-      });
-
-      centerText(
-        "WIN EXCLUSIVE COUPONS!",
-        couponBoxY + 40,
-        16,
-        helveticaBoldFont,
-        rgb(1, 0.843, 0)
-      ); // golden yellow text
-      centerText(
-        "Complete the feedback form for a chance to win special discounts",
-        couponBoxY + 20,
-        12,
-        helveticaFont
-      );
+    // Convert stream to buffer
+    const chunks = [];
+    for await (const chunk of stream) {
+      chunks.push(chunk);
     }
-
-    // Footer
-    page.drawRectangle({
-      x: 0,
-      y: 0,
-      width: page.getWidth(),
-      height: 40,
-      color: rgb(0.95, 0.95, 0.95),
-    });
-
-    centerText(
-      "© 2024 InvisiFeed. All rights reserved.",
-      25,
-      10,
-      helveticaFont,
-      rgb(0.5, 0.5, 0.5)
-    );
-
-    return await pdfDoc.save();
+    return Buffer.concat(chunks);
   } catch (error) {
     console.error("Error generating QR PDF:", error);
     throw error;
   }
 }
-
 async function mergePdfs(invoicePdfBuffer, qrPdfBuffer) {
   try {
+    // Unfortunately, react-pdf doesn't provide direct PDF merging capabilities
+    // We'll continue using pdf-lib for merging as it's more suitable for this task
+    const PDFDocument = require("pdf-lib").PDFDocument;
+
     const invoicePdf = await PDFDocument.load(invoicePdfBuffer);
     const qrPdf = await PDFDocument.load(qrPdfBuffer);
 
