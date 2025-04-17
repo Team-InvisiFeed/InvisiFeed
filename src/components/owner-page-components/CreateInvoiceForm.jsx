@@ -38,6 +38,7 @@ const formSchema = z.object({
   businessPhone: z.string().optional(),
   businessAddress: z.string().min(1, "Business address is required"),
   gstin: z.string().optional(),
+  gstinHolderName: z.string().optional(),
 
   // Customer Details
   customerName: z.string().min(1, "Customer name is required"),
@@ -146,6 +147,8 @@ export default function CreateInvoiceForm({ onSave, onCancel }) {
     name: "items",
   });
 
+  console.log("form data:", form.getValues());
+
   const [subtotal, setSubtotal] = useState(0);
   const [taxTotal, setTaxTotal] = useState(0);
   const [discountTotal, setDiscountTotal] = useState(0);
@@ -178,6 +181,7 @@ export default function CreateInvoiceForm({ onSave, onCancel }) {
       toast.error("Please fill in all required fields");
       return;
     }
+    console.log(data)
     onSave(data);
   };
 
