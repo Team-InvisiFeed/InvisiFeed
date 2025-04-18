@@ -404,7 +404,7 @@ async function generateQrPdf(
     let qrData = `${process.env.NEXT_PUBLIC_APP_URL}/feedback/${encodedUsername}?invoiceNo=${encodedInvoiceNumber}`;
     const qrDataUrl = await QRCode.toDataURL(qrData, { width: 300 });
     if(modifiedCouponCode){
-      qrData += `&cpcd=${modifiedCouponCode}`;
+      qrData += `&cpcd=${modifiedCouponCode.trim()}`;
     }
     const currentDate = new Date().toLocaleDateString("en-US", {
       year: "numeric",
