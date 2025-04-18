@@ -125,6 +125,7 @@ function FeedbackFormContent() {
       if (response.status == 201) {
         const result = await axios.post("/api/set-recommended-actions", {
           username,
+          invoiceNumber,
         });
       }
     } catch (error) {
