@@ -123,6 +123,10 @@ const InvoiceSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  updatedRecommendedActions: {
+    type: Boolean,
+    default: false,
+  },
   couponAttached: {
     type: CouponSchema,
     default: null,
