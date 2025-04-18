@@ -28,11 +28,7 @@ export async function POST(req) {
       throw new ApiError(404, "Invoice not found");
     }
 
-    if (invoice.isFeedbackSubmitted) {
-      throw new ApiError(400, "Feedback already submitted");
-    }
-
-    if (invoice.updatedRecommendedActions === true) {
+    if (invoice.isFeedbackSubmitted && invoice.updatedRecommendedActions) {
       throw new ApiError(400, "Recommended actions already updated");
     }
 
