@@ -214,13 +214,13 @@ export default function CreateInvoiceForm({
          initial={{ opacity: 0, y: 20 }}
          animate={{ opacity: 1, y: 0 }}
          exit={{ opacity: 0, y: 20 }}
-         className="fixed custom-popup inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-2 pt-8 md:mt-0"
+         className="fixed custom-popup inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:mt-0"
        >
          <motion.div
            initial={{ scale: 0.9, opacity: 0 }}
            animate={{ scale: 1, opacity: 1 }}
            exit={{ scale: 0.9, opacity: 0 }}
-           className="bg-[#0A0A0A] rounded-sm sm:max-w-2xl w-full max-h-[95vh] overflow-y-auto relative max-w-3xl mx-auto sm:mx-4 border border-yellow-400/20"
+           className="bg-[#0A0A0A] rounded-sm sm:max-w-2xl w-full max-h-[80vh] overflow-y-auto relative max-w-3xl mx-auto sm:mx-4 border border-yellow-400/20 mb-20 md:mb-0 "
          >
               <button
                 onClick={onCancel}
@@ -231,7 +231,7 @@ export default function CreateInvoiceForm({
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
-                  className="md:mb-3 mb-30 "
+                  className="mb-3 "
                 >
                   {/* Business Details */}
                   <Card className="bg-[#0A0A0A]  border-none w-full">
