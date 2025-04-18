@@ -9,21 +9,37 @@ import {
   Mail,
   Phone,
   MapPin,
+  Github,
 } from "lucide-react";
-import LinkedInPopup from "./LinkedInPopup";
+import SocialMediaPopup from "./SocialMediaPopup";
 
 function Footer() {
-  const [isLinkedInPopupOpen, setIsLinkedInPopupOpen] = useState(false);
-
+  const [isSocialMediaPopupOpen, setIsSocialMediaPopupOpen] = useState(false);
+  const [selectedSocialMedia, setSelectedSocialMedia] = useState(null);
   const socialLinks = [
-    { name: "facebook", icon: Facebook, href: "#" },
-    { name: "twitter", icon: Twitter, href: "#" },
-    { name: "instagram", icon: Instagram, href: "#" },
+    {
+      name: "github",
+      icon: Github,
+      onClick: () => {
+        setSelectedSocialMedia("github");
+        setIsSocialMediaPopupOpen(true);
+      },
+    },
+    {
+      name: "twitter",
+      icon: Twitter,
+      onClick: () => {
+        setSelectedSocialMedia("twitter");
+        setIsSocialMediaPopupOpen(true);
+      },
+    },
     {
       name: "linkedin",
       icon: Linkedin,
-      href: "#",
-      onClick: () => setIsLinkedInPopupOpen(true),
+      onClick: () => {
+        setSelectedSocialMedia("linkedin");
+        setIsSocialMediaPopupOpen(true);
+      },
     },
   ];
 
@@ -116,7 +132,6 @@ function Footer() {
               {socialLinks.map((social) => (
                 <a
                   key={social.name}
-                  href={social.href}
                   onClick={social.onClick}
                   className="p-2 bg-[#0A0A0A]/50 backdrop-blur-sm rounded-lg text-gray-400 hover:text-yellow-400 hover:bg-[#0A0A0A]/70 transition-all duration-200 border border-yellow-400/10"
                 >
@@ -154,9 +169,10 @@ function Footer() {
       </div>
 
       {/* LinkedIn Popup */}
-      <LinkedInPopup
-        isOpen={isLinkedInPopupOpen}
-        onClose={() => setIsLinkedInPopupOpen(false)}
+      <SocialMediaPopup
+        isOpen={isSocialMediaPopupOpen}
+        onClose={() => setIsSocialMediaPopupOpen(false)}
+        initialSocialMedia={selectedSocialMedia}
       />
     </footer>
   );
