@@ -69,7 +69,7 @@ export async function POST(req) {
 
     // Generate QR code
     const encodedUsername = encodeURIComponent(username);
-    const encodedInvoiceNumber = encodeURIComponent(invoiceNumber);
+    const encodedInvoiceNumber = encodeURIComponent(invoiceNumber.trim());
     let qrData = `${process.env.NEXT_PUBLIC_APP_URL}/feedback/${encodedUsername}?invoiceNo=${encodedInvoiceNumber}`;
 
     // Add coupon data if provided
@@ -84,8 +84,8 @@ export async function POST(req) {
       ).join("");
 
       // Modify coupon code by adding random chars at start and invoice count
-      dbCouponCode = `${invoiceData.coupon.code}${owner.invoices.length + 1}`;
-      modifiedCouponCode = `${randomChars}${invoiceData.coupon.code}${owner.invoices.length + 1}`;
+      dbCouponCode = `${invoiceData.coupon.code.trim()}${owner.invoices.length + 1}`;
+      modifiedCouponCode = `${randomChars}${invoiceData.coupon.code.trim()}${owner.invoices.length + 1}`;
       expiryDate.setDate(expiryDate.getDate() + Number(invoiceData.coupon.expiryDays));
 
       qrData += `&cpcd=${modifiedCouponCode}`;
@@ -169,13 +169,13 @@ export async function POST(req) {
 
     // Save invoice to database
     owner.invoices.push({
-      invoiceId: invoiceNumber,
+      invoiceId: invoiceNumber.trim(),
       mergedPdfUrl: uploadResponse.secure_url,
       AIuseCount: 0,
       couponAttached: invoiceData.addCoupon
         ? {
-            couponCode: dbCouponCode,
-            couponDescription: invoiceData.coupon.description,
+            couponCode: dbCouponCode.trim(),
+            couponDescription: invoiceData.coupon.description.trim(),
             couponExpiryDate: expiryDate,
             isCouponUsed: false,
           }
@@ -192,7 +192,7 @@ export async function POST(req) {
     return NextResponse.json({
       success: true,
       url: uploadResponse.secure_url,
-      invoiceNumber,
+      invoiceNumber: invoiceNumber.trim(),
     });
   } catch (error) {
     console.error("Error creating invoice:", error);
