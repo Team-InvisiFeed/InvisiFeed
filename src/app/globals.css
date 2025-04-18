@@ -17,6 +17,43 @@ textarea:-webkit-autofill:active {
   transition: background-color 5000s ease-in-out 0s;
 }
 
+/* Hide scrollbar buttons (up/down arrows) for Webkit browsers */
+.custom-popup::-webkit-scrollbar-button {
+  display: none; /* Completely hide the scrollbar arrows */
+}
+
+/* General styling for the scrollbar */
+.custom-popup::-webkit-scrollbar {
+  margin-right:5px;
+  width: 5px; /* Scrollbar width */
+ 
+}
+
+.custom-popup::-webkit-scrollbar-thumb {
+  background: #ffc107; /* Yellow thumb color */
+  border-radius: 12px; /* Rounded scrollbar handle */
+}
+
+.custom-popup::-webkit-scrollbar-track {
+  background: #0a0a0a; /* Dark background for scrollbar track */
+  border-radius: 12px;
+}
+
+/* Firefox specific scrollbar styles */
+.custom-popup {
+  scrollbar-width: thin; /* Thin scrollbar */
+  scrollbar-color: #ffc107 #0a0a0a; /* Thumb and track colors */
+
+}
+
+/* Optional: Extra fallback for Firefox arrows */
+.custom-popup::-moz-scrollbar-button {
+  display: none; /* Hide arrows in Firefox */
+}
+
+
+
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
