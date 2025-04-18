@@ -360,6 +360,15 @@ export default function Home() {
           <div className="w-8 h-8 border-2 border-yellow-400 border-t-transparent color-yellow-400 rounded-full animate-spin" />
         </div>
       )}
+       {/* Create Invoice Form */}
+       {showCreateInvoice && (
+              <CreateInvoiceForm
+                onSave={handleCreateInvoice}
+                onCancel={() => setShowCreateInvoice(false)}
+                open={showCreateInvoice}
+                onOpenChange={setShowCreateInvoice}
+              />
+            )}
       {showConfirmModal && (
         <ConfirmModal
           message="Are you sure you want to reset all data? This will remove all invoices, feedbacks, and recommendations."
@@ -605,14 +614,7 @@ export default function Home() {
               </div>
             )}
 
-            {/* Create Invoice Form */}
-            {showCreateInvoice && (
-              <CreateInvoiceForm
-                onSave={handleCreateInvoice}
-                onCancel={() => setShowCreateInvoice(false)}
-              />
-            )}
-
+           
             {invoiceNumber && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
