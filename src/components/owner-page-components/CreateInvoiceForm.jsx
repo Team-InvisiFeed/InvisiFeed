@@ -220,7 +220,7 @@ export default function CreateInvoiceForm({
            initial={{ scale: 0.9, opacity: 0 }}
            animate={{ scale: 1, opacity: 1 }}
            exit={{ scale: 0.9, opacity: 0 }}
-           className="bg-[#0A0A0A] rounded-sm sm:max-w-2xl w-full max-h-[80vh] overflow-y-auto relative max-w-3xl mx-auto sm:mx-4 border border-yellow-400/20 mb-20 md:mb-0 "
+           className="bg-[#0A0A0A] absolute bottom-24 top-12  rounded-sm sm:max-w-2xl md:w-full w-[95vw] max-h-[80vh] overflow-y-auto max-w-xl mx-auto sm:mx-4 border border-yellow-400/20 md:mb-0"
          >
               <button
                 onClick={onCancel}
@@ -299,7 +299,9 @@ export default function CreateInvoiceForm({
                             </FormItem>
                           )}
                         />
-                        <FormField
+
+                        {owner?.gstinDetails?.gstinVerificationStatus===true ? (
+                          <FormField
                           control={form.control}
                           name="gstin"
                           render={({ field }) => (
@@ -314,18 +316,14 @@ export default function CreateInvoiceForm({
                                   className="bg-[#0A0A0A] text-white border-yellow-400/20"
                                 />
                               </FormControl>
-                              <p
-                                onClick={() => setShowVerifyGstinDialog(true)}
-                                className="text-gray-300 text-sm"
-                              >
-                                {owner?.gstinDetails
-                                  ?.gstinVerificationStatus === false &&
-                                  "Verify GSTIN"}
-                              </p>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
+                        ) : (<Button type="button"
+                          onClick={() => setShowVerifyGstinDialog(true)}
+                          className="bg-transparent text-gray-300 justify-start border border-yellow-400/20 hover:bg-yellow-400/10">Verify GSTIN</Button>)}
+                        
                         {owner?.gstinDetails?.gstinVerificationStatus ===
                           true && (
                           <FormField
