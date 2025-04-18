@@ -8,9 +8,10 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 export async function POST(req) {
   await dbConnect();
 
-  const { username } = await req.json();
+  const { username, invoiceNumber } = await req.json();
 
   const decodedUsername = decodeURIComponent(username);
+  const decodedInvoiceNumber = decodeURIComponent(invoiceNumber);
 
   try {
     const owner = await OwnerModel.findOne({ username: decodedUsername });
@@ -18,6 +19,23 @@ export async function POST(req) {
     if (!owner) {
       throw new ApiError(404, "Organisation not found");
     }
+
+    const invoice = owner.invoices.find(
+      (inv) => inv.invoiceId === decodedInvoiceNumber
+    );
+
+    if (!invoice) {
+      throw new ApiError(404, "Invoice not found");
+    }
+
+    if (invoice.isFeedbackSubmitted) {
+      throw new ApiError(400, "Feedback already submitted");
+    }
+
+    if (invoice.updatedRecommendedActions === true) {
+      throw new ApiError(400, "Recommended actions already updated");
+    }
+
     const feedbacks = owner.feedbacks || [];
     const totalFeedbacks = feedbacks.length;
 
@@ -75,6 +93,10 @@ export async function POST(req) {
 
     owner.currentRecommendedActions.improvements = improvements;
     owner.currentRecommendedActions.strengths = strengths;
+
+    if (invoice.updatedRecommendedActions === false) {
+      invoice.updatedRecommendedActions = true;
+    }
     await owner.save();
 
     // khatam
