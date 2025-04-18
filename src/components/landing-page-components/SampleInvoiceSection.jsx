@@ -3,8 +3,9 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { FileText, ArrowRight, QrCode } from "lucide-react";
-
+import { useRouter } from "next/navigation";
 const SampleInvoiceSection = () => {
+  const router = useRouter();
   return (
     <section className="py-24 bg-[#0A0A0A] relative">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#0A0A0A] via-[#0A0A0A] to-[#000000] opacity-50" />
@@ -26,7 +27,8 @@ const SampleInvoiceSection = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="group flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30"
+              onClick={()=>router.push("/sign-in")}
+              className="group flex items-center cursor-pointer space-x-3 px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30"
             >
               <span className="text-lg">Try Sample Invoice</span>
               <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
