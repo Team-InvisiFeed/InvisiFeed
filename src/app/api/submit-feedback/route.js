@@ -35,7 +35,9 @@ export async function POST(req) {
     // Add the new feedback to the owner's feedbacks array
     owner.feedbacks.push({
       ...formData,
-      createdAt: new Date(),
+      feedbackContent: formData.feedbackContent.trim(),
+      suggestionContent: formData.suggestionContent.trim(),
+      createdAt: new Date()
     });
 
     // Set the feedback submitted flag on the specific invoice
