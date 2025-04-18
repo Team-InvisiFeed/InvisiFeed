@@ -255,23 +255,23 @@ const InvoiceDocument = ({
   // Filter out empty fields
   const filteredInvoiceData = {
     ...invoiceData,
-    businessName: invoiceData.businessName || undefined,
-    businessAddress: invoiceData.businessAddress || undefined,
-    businessPhone: invoiceData.businessPhone || undefined,
-    businessEmail: invoiceData.businessEmail || undefined,
-    gstin: invoiceData.gstin || undefined,
-    gstinHolderName: invoiceData.gstinHolderName || undefined,
-    customerName: invoiceData.customerName || undefined,
-    customerAddress: invoiceData.customerAddress || undefined,
-    customerPhone: invoiceData.customerPhone || undefined,
-    customerEmail: invoiceData.customerEmail || undefined,
-    invoiceDate: invoiceData.invoiceDate || undefined,
+    businessName: invoiceData.businessName.trim() || undefined,
+    businessAddress: invoiceData.businessAddress.trim() || undefined,
+    businessPhone: invoiceData.businessPhone.trim() || undefined,
+    businessEmail: invoiceData.businessEmail.trim() || undefined,
+    gstin: invoiceData.gstin.trim() || undefined,
+    gstinHolderName: invoiceData.gstinHolderName.trim() || undefined,
+    customerName: invoiceData.customerName.trim() || undefined,
+    customerAddress: invoiceData.customerAddress.trim() || undefined,
+    customerPhone: invoiceData.customerPhone.trim() || undefined,
+    customerEmail: invoiceData.customerEmail.trim() || undefined,
+    invoiceDate: invoiceData.invoiceDate.trim() || undefined,
     dueDate: invoiceData.dueDate ? formatDate(invoiceData.dueDate) : undefined,
-    paymentTerms: invoiceData.paymentTerms || undefined,
-    bankDetails: invoiceData.bankDetails || undefined,
-    paymentMethod: invoiceData.paymentMethod || undefined,
-    paymentInstructions: invoiceData.paymentInstructions || undefined,
-    notes: invoiceData.notes || undefined,
+    paymentTerms: invoiceData.paymentTerms.trim() || undefined,
+    bankDetails: invoiceData.bankDetails.trim() || undefined,
+    paymentMethod: invoiceData.paymentMethod.trim() || undefined,
+    paymentInstructions: invoiceData.paymentInstructions.trim() || undefined,
+    notes: invoiceData.notes.trim() || undefined,
     addCoupon: invoiceData.addCoupon || false,
     coupon: invoiceData.coupon || undefined,
   };
@@ -303,7 +303,7 @@ const InvoiceDocument = ({
           </View>
           <View style={styles.invoiceTitle}>
             <Text style={styles.invoiceHeading}>INVOICE</Text>
-            <Text style={styles.invoiceNumber}>#{invoiceNumber}</Text>
+            <Text style={styles.invoiceNumber}>#{invoiceNumber.trim()}</Text>
             <Text style={styles.invoiceDate}>Issued on: {currentDate}</Text>
             <Text style={styles.invoiceDate}>
               Due Date: {filteredInvoiceData.dueDate}
@@ -437,7 +437,7 @@ const InvoiceDocument = ({
                   }}
                 >
                   <Text style={[styles.tableCell, { width: "25%" }]}>
-                    {item.description}
+                    {item.description.trim()}
                   </Text>
                   <Text
                     style={[
