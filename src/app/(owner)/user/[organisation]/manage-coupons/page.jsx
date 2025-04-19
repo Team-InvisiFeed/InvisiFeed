@@ -95,18 +95,18 @@ export default function ManageCoupons() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] p-6 pt-24">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-[#0A0A0A] pt-16 sm:pt-20 md:pt-24 px-3 sm:px-4 md:px-6">
+      <div className="w-full max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
             Manage Coupons
           </h1>
-          <p className="text-gray-400 mt-2">
+          <p className="text-sm sm:text-base text-gray-400 mt-1.5 sm:mt-2">
             View and manage all your active coupons
           </p>
         </motion.div>
@@ -117,7 +117,7 @@ export default function ManageCoupons() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-yellow-400">Coupon List</CardTitle>
-                <div className="relative w-64">
+                <div className="relative w-40 sm:w-48 md:w-64">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
                     type="text"
@@ -139,7 +139,7 @@ export default function ManageCoupons() {
                 </div>
               ) : (
                 <>
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 gap-3 sm:gap-4">
                     {paginatedCoupons.map((coupon) => (
                       <div
                         key={coupon.invoiceId}
@@ -156,10 +156,10 @@ export default function ManageCoupons() {
                           }
                         >
                           <div className="flex items-center space-x-4">
-                            <div className="bg-yellow-400/10 text-yellow-400 px-3 py-1 rounded-full text-sm font-medium border border-yellow-400/20">
+                            <div className="bg-yellow-400/10 text-yellow-400 px-3 py-1 rounded-full text-xs font-medium border border-yellow-400/20 md:text-sm">
                               {coupon.couponCode}
                             </div>
-                            <span className="text-gray-300">
+                            <span className="text-gray-300 text-xs md:text-lg">
                               Invoice: {coupon.invoiceId}
                             </span>
                           </div>
@@ -197,7 +197,7 @@ export default function ManageCoupons() {
                               transition={{ duration: 0.2 }}
                               className="border-t border-yellow-400/10"
                             >
-                              <div className="p-4 space-y-3">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                                 <div>
                                   <h3 className="text-sm font-medium text-gray-400">
                                     Description
@@ -268,7 +268,7 @@ export default function ManageCoupons() {
       {/* Delete Confirmation Dialog */}
       {showDeleteDialog && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-[#0A0A0A] border border-yellow-400/20 rounded-lg p-6 max-w-md w-full mx-4">
+          <div className="bg-[#0A0A0A]/80 border border-yellow-400/10 rounded-lg p-3 sm:p-4 relative group">
             <h2 className="text-xl font-bold text-yellow-400 mb-4">
               Confirm Delete
             </h2>
