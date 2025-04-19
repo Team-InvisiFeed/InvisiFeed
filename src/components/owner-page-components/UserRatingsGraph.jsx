@@ -81,7 +81,7 @@ export default function UserRatingsGraph() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] py-4 sm:py-12 px-2 sm:px-4">
-      <Card className="w-full max-w-4xl mx-auto bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
+      <Card className="w-full max-w-6xl mx-auto bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
         <div className="relative">
           <CardHeader className="border-b border-yellow-400/20 px-3 sm:px-6">
