@@ -33,7 +33,7 @@ export default function ManageCoupons() {
 
   const fetchCoupons = async () => {
     try {
-      const response = await axios.post("/api/get-coupons");
+      const response = await axios.get("/api/get-coupons");
       if (response?.data?.success) {
         setCoupons(response.data.coupons);
         return;
