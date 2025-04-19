@@ -3,17 +3,24 @@ import OwnerModel from "@/models/Owner";
 import InvoiceModel from "@/models/Invoice";
 import { NextResponse } from "next/server";
 
-export async function POST(req) {
+export async function GET(req) {
   await dbConnect();
 
-  const { username, invoiceNumber } = await req.json();
-
-  const decodedUsername = decodeURIComponent(username);
-
-  const decodedInvoiceNumber = decodeURIComponent(invoiceNumber);
-
   try {
-    const owner = await OwnerModel.findOne({ username: decodedUsername });
+    const URLParams = req.nextUrl.searchParams;
+
+    const username = URLParams.get("username");
+    const invoiceNumber = URLParams.get("invoiceNumber");
+    const couponCode = URLParams.get("couponCode");
+
+    if (!username || !invoiceNumber) {
+      return NextResponse.json(
+        { success: false, message: "Missing required parameters" },
+        { status: 400 }
+      );
+    }
+
+    const owner = await OwnerModel.findOne({ username });
 
     if (!owner) {
       return NextResponse.json(
@@ -22,21 +29,27 @@ export async function POST(req) {
       );
     }
 
-    // Find or create invoice entry
-    let invoice = await InvoiceModel.findOne({
-      invoiceId: decodedInvoiceNumber,
+    // Find invoice entry
+    const query = {
+      invoiceId: invoiceNumber,
       owner: owner._id,
-    });
+    };
+
+    // Add coupon code to query if provided
+    if (couponCode) {
+      query["couponAttached.couponCode"] = couponCode;
+    }
+
+    let invoice = await InvoiceModel.findOne(query);
 
     if (!invoice) {
-      invoice = await InvoiceModel.create({
-        invoiceId: decodedInvoiceNumber,
-        AIuseCount: 0,
-      });
+      return NextResponse.json(
+        { success: false, message: "Invoice not found" },
+        { status: 404 }
+      );
+    }
 
-      await invoice.save();
-
-    } else if (invoice && invoice.isFeedbackSubmitted) {
+    if (invoice && invoice.isFeedbackSubmitted) {
       return NextResponse.json(
         { success: false, message: "Feedback already submitted" },
         { status: 404 }
@@ -47,13 +60,15 @@ export async function POST(req) {
       {
         success: true,
         message: "Invoice Number and Username verified",
-        data: { owner, invoice },
+        owner,
+        invoice,
       },
-      { status: 201 }
+      { status: 200 }
     );
   } catch (error) {
+    console.error("Error in check-invoice route:", error);
     return NextResponse.json(
-      { success: false, message: error.message },
+      { success: false, message: error.message || "Internal server error" },
       { status: 500 }
     );
   }

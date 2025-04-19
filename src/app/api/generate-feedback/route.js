@@ -9,16 +9,13 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 export async function POST(req) {
   try {
     const body = await req.json();
-
-    // Decode the encoded parameters
-    const decodedUsername = decodeURIComponent(body.username);
-    const decodedInvoiceNumber = decodeURIComponent(body.invoiceNumber);
+    const { username, invoiceNumber } = body;
 
     // Connect to database
     await dbConnect();
 
     const owner = await OwnerModel.findOne({
-      username: decodedUsername,
+      username: username,
     });
 
     if (!owner) {
@@ -29,7 +26,7 @@ export async function POST(req) {
     }
 
     const invoice = await InvoiceModel.findOne({
-      invoiceId: decodedInvoiceNumber,
+      invoiceId: invoiceNumber,
       owner: owner._id,
     });
 
