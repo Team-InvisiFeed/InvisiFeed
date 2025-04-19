@@ -89,6 +89,7 @@ const OwnerSchema = new Schema({
     type: String,
     required: false,
     default: "",
+    trim:true
   },
 
   address: {

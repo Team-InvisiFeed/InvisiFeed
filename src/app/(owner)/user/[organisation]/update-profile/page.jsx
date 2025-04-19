@@ -43,6 +43,7 @@ const formSchema = z.object({
 function UpdateProfilePage() {
   const { data: session, update } = useSession();
   const owner = session?.user;
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editingField, setEditingField] = useState(null);
@@ -74,17 +75,12 @@ function UpdateProfilePage() {
         const fetchedCountries = Country.getAllCountries();
         setCountries(fetchedCountries);
 
-        // Fetch user data
-        const response = await axios.post("/api/get-owner-info", {
-          username: owner?.username,
-        });
-        const userData = response.data.data;
-        form.reset(userData);
+        form.reset(owner);
 
         // If user has country selected, fetch states
-        if (userData?.address?.country) {
+        if (owner?.address?.country) {
           const countryCode = fetchedCountries.find(
-            (c) => c.name === userData.address.country
+            (c) => c.name === owner.address.country
           )?.isoCode;
 
           if (countryCode) {
@@ -92,9 +88,9 @@ function UpdateProfilePage() {
             setStates(fetchedStates);
 
             // If user has state selected, fetch cities
-            if (userData?.address?.state) {
+            if (owner?.address?.state) {
               const stateCode = fetchedStates.find(
-                (s) => s.name === userData.address.state
+                (s) => s.name === owner.address.state
               )?.isoCode;
 
               if (stateCode) {
@@ -103,12 +99,19 @@ function UpdateProfilePage() {
                   stateCode
                 );
                 setCities(fetchedCities);
+
               }
+            }
+            if(owner?.address?.city){ 
+              const cityCode = fetchedCities.find(
+                (s) => s.name === owner.address.city
+              )?.isoCode;
+              form.setValue("address.city", cityCode);
             }
           }
         }
       } catch (error) {
-        toast.error("Failed to fetch profile information");
+        
       } finally {
         setLoading(false);
       }
@@ -173,28 +176,27 @@ function UpdateProfilePage() {
     }
     const payload = {
       data,
-      username: session?.user?.username,
     };
 
     try {
       setSaving(true);
 
-      const response = await axios.post("/api/update-profile", payload);
+      const {data} = await axios.patch("/api/update-profile", payload);
 
-      if (response.status === 200) {
+    if(data.success){
         // Update session with new data
         await update({
           user: {
             ...session.user,
             organizationName:
-              data.organizationName || session.user.organizationName,
-            phoneNumber: data.phoneNumber || session.user.phoneNumber,
-            address: data.address || session.user.address,
-            isProfileCompleted: response.data.user.isProfileCompleted,
+            data.user.organizationName || session.user.organizationName,
+            phoneNumber: data.user.phoneNumber || session.user.phoneNumber,
+            address: data.user.address || session.user.address,
+            isProfileCompleted: data.user.isProfileCompleted,
           },
         });
 
-        toast.success(response.data.message);
+        toast.success(data.message);
         setEditingField(null);
         router.refresh();
       }
@@ -260,6 +262,7 @@ function UpdateProfilePage() {
                         <Input
                           {...field}
                           placeholder="Enter Organisation Name"
+                          
                           className="bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20"
                           disabled={editingField !== "all"}
                         />

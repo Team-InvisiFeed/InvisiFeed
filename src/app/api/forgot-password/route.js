@@ -11,7 +11,6 @@ export async function POST(request) {
 
     // Find user by email
     const user = await OwnerModel.findOne({ email });
-
     if (!user) {
       return NextResponse.json(
         { success: false, message: "User not found" },
