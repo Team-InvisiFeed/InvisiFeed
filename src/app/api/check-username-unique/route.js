@@ -2,6 +2,7 @@ import dbConnect from "@/lib/dbConnect";
 import OwnerModel from "@/models/Owner";
 import { z } from "zod";
 import { usernameValidation } from "@/schemas/registerSchema";
+import { NextResponse } from "next/server";
 
 const UsernameQuerySchema = z.object({
   username: usernameValidation,
@@ -22,7 +23,7 @@ export async function GET(request) {
 
     if (!result.success) {
       const usernameErrors = result.error.format().username?._errors || [];
-      return Response.json(
+      return NextResponse.json(
         {
           success: false,
           message:
@@ -42,19 +43,19 @@ export async function GET(request) {
     });
 
     if (existingVerifiedUser) {
-      return Response.json(
+      return NextResponse.json(
         { success: false, message: "Username already taken" },
         { status: 400 }
       );
     }
 
-    return Response.json(
+    return NextResponse.json(
       { success: true, message: "Username is available" },
       { status: 200 }
     );
   } catch (error) {
     console.error("Error checking username", error);
-    return Response.json(
+    return NextResponse.json(
       { success: false, message: "Error checking username" },
       { status: 500 }
     );
