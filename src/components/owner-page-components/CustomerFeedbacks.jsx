@@ -51,11 +51,13 @@ const CustomerFeedbacks = () => {
   const fetchFeedbacks = async (page) => {
     try {
       setLoading(true);
-      const response = await axios.post("/api/get-feedbacks", {
-        username: organisation,
-        page,
-        limit: 5,
-        sortBy,
+      const response = await axios.get("/api/get-feedbacks", {
+        params: {
+          username: organisation,
+          page,
+          limit: 5,
+          sortBy,
+        },
       });
 
       const { data } = response.data;

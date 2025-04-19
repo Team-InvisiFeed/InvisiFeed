@@ -2,16 +2,26 @@ import dbConnect from "@/lib/dbConnect";
 import FeedbackModel from "@/models/Feedback";
 import OwnerModel from "@/models/Owner";
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/options";
 
-export async function POST(req) {
+
+export async function GET(req) {
   await dbConnect();
 
-  const { username } = await req.json();
-
-  const decodedUsername = decodeURIComponent(username);
-
   try {
-    const owner = await OwnerModel.findOne({ username: decodedUsername });
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const username = session?.user?.username;
+
+    const owner = await OwnerModel.findOne({ username });
 
     if (!owner) {
       return NextResponse.json(

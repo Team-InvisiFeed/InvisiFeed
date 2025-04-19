@@ -2,7 +2,9 @@ import dbConnect from "@/lib/dbConnect";
 import FeedbackModel from "@/models/Feedback";
 import InvoiceModel from "@/models/Invoice";
 import OwnerModel from "@/models/Owner";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
+import { authOptions } from "../auth/[...nextauth]/options";
 
 // Constants
 const METRICS = {
@@ -248,24 +250,27 @@ function groupByMonth(feedbacks) {
     .sort((a, b) => monthOrder.indexOf(a.date) - monthOrder.indexOf(b.date));
 }
 
-export async function POST(req) {
+export async function GET(req) {
+  await dbConnect();
   try {
-    await dbConnect();
+    const session = await getServerSession(authOptions);
 
-    // Input validation
-    const body = await req.json();
-    if (!body?.username) {
+    if (!session) {
       return NextResponse.json(
-        { success: false, message: "Username is required" },
-        { status: 400 }
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
       );
     }
 
-    const decodedUsername = decodeURIComponent(body.username);
-    const { year, viewType = "currentYear" } = body;
+    const username = session?.user?.username;
+
+    // Input validation
+    const URLParams = req.nextUrl.searchParams;
+    const year = URLParams.get("year");
+    const viewType = URLParams.get("viewType");
 
     // Optimize database query
-    const owner = await OwnerModel.findOne({ username: decodedUsername });
+    const owner = await OwnerModel.findOne({ username });
 
     if (!owner) {
       return NextResponse.json(
@@ -371,10 +376,7 @@ export async function POST(req) {
   } catch (error) {
     console.error("Error getting dashboard metrics:", error);
     return NextResponse.json(
-      {
-        message: error.message || "Internal server error",
-        success: false,
-      },
+      { success: false, message: "Internal server error" },
       { status: 500 }
     );
   }
