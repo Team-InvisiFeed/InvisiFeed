@@ -1,5 +1,6 @@
 import dbConnect from "@/lib/dbConnect";
 import OwnerModel from "@/models/Owner";
+import { NextResponse } from "next/server";
 
 export async function POST(request) {
   await dbConnect();
@@ -26,38 +27,38 @@ export async function POST(request) {
     if (isCodeValid && isCodeNotExpired) {
       owner.isVerified = true;
       await owner.save();
-      return new Response(
-        JSON.stringify({
+      return NextResponse.json(
+        {
           success: true,
           message: "Account verified successfully",
-        }),
+        },
         { status: 200 }
       );
     } else if (!isCodeNotExpired) {
-      return new Response(
-        JSON.stringify({
+      return NextResponse.json(
+        {
           success: false,
           message:
             "Verification code has expired, please sign up again to get a new code",
-        }),
+        },
         { status: 400 }
       );
     } else {
-      return new Response(
-        JSON.stringify({
+      return NextResponse.json(
+        {
           success: false,
           message: "Incorrect Verification code",
-        }),
+        },
         { status: 400 }
       );
     }
   } catch (error) {
     console.error("Error verifying owner:", error);
-    return new Response(
-      JSON.stringify({
+    return NextResponse.json(
+      {
         success: false,
         message: "Error verifying owner",
-      }),
+      },
       { status: 500 }
     );
   }

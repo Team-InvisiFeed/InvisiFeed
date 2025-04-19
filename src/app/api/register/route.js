@@ -2,6 +2,7 @@ import sendVerificationEmail from "@/utils/sendVerificationEmail";
 import dbConnect from "@/lib/dbConnect";
 import OwnerModel from "@/models/Owner";
 import bcrypt from "bcryptjs";
+import { NextResponse } from "next/server";
 
 export async function POST(req) {
   await dbConnect();
@@ -21,7 +22,7 @@ export async function POST(req) {
 
     // Agar username already kisi verified user ke paas hai toh error return kar do
     if (existingUserVerifiedByUsername) {
-      return Response.json(
+      return NextResponse.json(
         {
           success: false,
           message: "Username already exists.",
@@ -39,11 +40,11 @@ export async function POST(req) {
 
     if (existingUserByEmail) {
       if (existingUserByEmail.isVerified) {
-        return new Response(
-          JSON.stringify({
+        return NextResponse.json(
+          {
             success: false,
             message: "Email already exists",
-          }),
+          },
           { status: 400 }
         );
       } else {
@@ -86,30 +87,30 @@ export async function POST(req) {
     const emailResponse = await sendVerificationEmail(email, verifyCode);
 
     if (!emailResponse.success) {
-      return new Response(
-        JSON.stringify({
+      return NextResponse.json(
+        {
           success: false,
           message: emailResponse.message,
-        }),
+        },
         { status: 500 }
       );
     }
 
-    return new Response(
-      JSON.stringify({
+    return NextResponse.json(
+      {
         success: true,
         message: "User registered successfully. Please verify your email.",
-      }),
+      },
       { status: 201 }
     );
   } catch (error) {
     console.error("Error registering user:", error);
 
-    return new Response(
-      JSON.stringify({
+    return NextResponse.json(
+      {
         success: false,
         message: "Error registering user",
-      }),
+      },
       { status: 500 }
     );
   }
