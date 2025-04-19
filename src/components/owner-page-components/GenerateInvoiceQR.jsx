@@ -334,15 +334,18 @@ export default function Home() {
     }
   };
 
+  if (initialLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-[#0A0A0A]">
+        <div className="w-8 h-8 border-2 border-yellow-400 border-t-transparent color-yellow-400 rounded-full animate-spin" />
+      </div>
+    );
+  }
   return (
     <>
-      {initialLoading && (
-        <div className="flex items-center justify-center h-screen bg-[#0A0A0A]">
-          <div className="w-8 h-8 border-2 border-yellow-400 border-t-transparent color-yellow-400 rounded-full animate-spin" />
-        </div>
-      )}
+      
       {/* Create Invoice Form */}
-      {showCreateInvoice && (
+      {showCreateInvoice &&  (
         <CreateInvoiceForm
           onSave={handleCreateInvoice}
           onCancel={() => setShowCreateInvoice(false)}
