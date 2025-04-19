@@ -13,6 +13,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import axios from "axios";
+import Link from "next/link";
 
 export default function GSTINVerificationDialog({ open, onOpenChange }) {
   const [gstinNumber, setGstinNumber] = useState("");
@@ -93,7 +94,7 @@ export default function GSTINVerificationDialog({ open, onOpenChange }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px] bg-[#0A0A0A] border border-yellow-400/10">
+      <DialogContent className="max-w-[425px] bg-[#0A0A0A] border border-yellow-400/10">
         <DialogHeader>
           <DialogTitle className="text-white">Verify GSTIN</DialogTitle>
         </DialogHeader>
@@ -105,6 +106,29 @@ export default function GSTINVerificationDialog({ open, onOpenChange }) {
               onChange={(e) => setGstinNumber(e.target.value)}
               className="bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400"
             />
+          </div>
+          <div className="p-3 rounded-md bg-red-500/10 text-red-400 text-xs">
+            <p>
+              Disclaimer: Please ensure you are entering the correct GSTIN.
+              Providing false information is at your own risk and may be
+              illegal. Read our{" "}
+              <Link
+                href="/terms-of-service"
+                className="underline text-red-300 hover:text-red-400"
+                target="_blank"
+              >
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link
+                href="/privacy-policy"
+                className="underline text-red-300s hover:text-red-400"
+                target="_blank"
+              >
+                Privacy Policy
+              </Link>
+              .
+            </p>
           </div>
 
           {verificationResult && (
