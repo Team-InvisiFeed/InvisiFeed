@@ -19,6 +19,7 @@ import { Loader2, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import MobileLogo from "@/components/MobileLogo";
+import axios from "axios";
 
 // Validation schemas for each step
 const emailSchema = z.object({
@@ -78,24 +79,16 @@ function ForgotPasswordContent() {
   const onEmailSubmit = async (data) => {
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/forgot-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: data.email }),
+      const response = await axios.post("/api/forgot-password", {
+        email: data.email,
       });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Something went wrong");
+      console.log(response)
+      if (response?.data?.success) {
+        setStep(2);
+        toast.success("Reset link sent to your email");
       }
-
-      setStep(2);
-      toast.success("Reset link sent to your email");
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error?.response?.data?.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -106,27 +99,16 @@ function ForgotPasswordContent() {
     setIsSubmitting(true);
     try {
       const token = searchParams.get("token");
-      const response = await fetch("/api/reset-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          token,
-          password: data.password,
-        }),
+      const response = await axios.post("/api/reset-password", {
+        token,
+        password: data.password,
       });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Something went wrong");
+      if (response?.data?.success) {
+        toast.success("Password reset successfully");
+        router.push("/sign-in");
       }
-
-      toast.success("Password reset successfully");
-      router.push("/sign-in");
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error?.response?.data?.message);
     } finally {
       setIsSubmitting(false);
     }
