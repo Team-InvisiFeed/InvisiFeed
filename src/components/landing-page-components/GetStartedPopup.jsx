@@ -6,6 +6,7 @@ import { X, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useRouter, usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 const GetStartedPopup = () => {
   const [showPopup, setShowPopup] = useState(false);
@@ -14,6 +15,9 @@ const GetStartedPopup = () => {
   const [isSignInLoading, setIsSignInLoading] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const owner = session?.user;
+
 
   // Reset hasShown when user returns to home page
   useEffect(() => {
@@ -28,7 +32,7 @@ const GetStartedPopup = () => {
   useEffect(() => {
     let timeoutId;
 
-    if (pathname === "/" && !hasShown) {
+    if (pathname === "/" && !hasShown && !owner) {
       timeoutId = setTimeout(() => {
         setShowPopup(true);
         setHasShown(true);
@@ -40,7 +44,7 @@ const GetStartedPopup = () => {
         clearTimeout(timeoutId);
       }
     };
-  }, [pathname, hasShown]);
+  }, [pathname, hasShown, owner]);
 
   const handleRegister = () => {
     setIsRegisterLoading(true);
@@ -52,8 +56,8 @@ const GetStartedPopup = () => {
     router.push("/sign-in");
   };
 
-  // Don't render the popup if not on home page
-  if (pathname !== "/") {
+  // Don't render the popup if not on home page or if user is logged in
+  if (pathname !== "/" || owner) {
     return null;
   }
 
