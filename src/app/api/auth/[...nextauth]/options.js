@@ -61,8 +61,8 @@ export const authOptions = {
             throw new Error("Incorrect password");
           }
 
-          // Delete old invoice PDFs (older than 1 hour)
-          // await deleteOldInvoicePdfs(user.username);
+          // Delete old invoice PDFs (older than 15 minutes)
+          await deleteOldInvoicePdfs(user.username);
 
           // Generate tokens
           const accessToken = generateAccessToken(user);
@@ -109,8 +109,8 @@ export const authOptions = {
               return `/sign-in?error=DIFFERENT_SIGNIN_METHOD`;
             }
 
-            // Delete old invoice PDFs (older than 1 hour)
-            // await deleteOldInvoicePdfs(existingUser.username);
+            // Delete old invoice PDFs (older than 15 minutes)
+            await deleteOldInvoicePdfs(existingUser.username);
 
             // ✅ Allow sign-in if it's a valid Google user
             user.id = existingUser._id.toString();

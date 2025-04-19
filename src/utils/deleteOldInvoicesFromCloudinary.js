@@ -1,5 +1,6 @@
 import cloudinary from "cloudinary";
 import OwnerModel from "@/models/Owner";
+import InvoiceModel from "@/models/Invoice";
 
 // Cloudinary Config
 cloudinary.v2.config({
@@ -13,24 +14,27 @@ export async function deleteOldInvoicePdfs(username) {
   try {
     // Find the owner
     const owner = await OwnerModel.findOne({ username });
-    if (!owner || !owner.invoices || owner.invoices.length === 0) {
+    const invoices = await InvoiceModel.find({
+      owner: owner._id
+    })
+    if (!invoices || !invoices.length === 0) {
       return { deleted: 0, errors: 0 };
     }
 
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    const fifteenMinuteAgo = new Date(Date.now() - 15 * 60 * 1000);
     let deletedCount = 0;
     let errorCount = 0;
 
     // Check each invoice for PDFs older than 1 hour
-    for (const invoice of owner.invoices) {
+    for (const invoice of invoices) {
       const invoiceCreatedAt = new Date(invoice.createdAt);
 
-      // Skip if invoice is less than 1 hour old
-      if (invoiceCreatedAt > oneHourAgo) {
+      // Skip if invoice is less than 15 minutes old
+      if (invoiceCreatedAt > fifteenMinuteAgo) {
         continue;
       }
 
-      // Delete mergedPdfUrl if it exists and is older than 1 hour
+      // Delete mergedPdfUrl if it exists and is older than 15 minutes
       if (invoice.mergedPdfUrl) {
         try {
           // Extract public_id from URL
@@ -53,7 +57,8 @@ export async function deleteOldInvoicePdfs(username) {
         }
       }
     }
-    await owner.save();
+   
+    await invoices.save()
 
 
     return { deleted: deletedCount, errors: errorCount };
