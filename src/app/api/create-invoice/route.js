@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import cloudinary from "cloudinary";
-import OwnerModel from "@/model/Owner";
+import OwnerModel from "@/models/Owner";
 import dbConnect from "@/lib/dbConnect";
 import crypto from "crypto";
 import { generateInvoicePdf } from "@/utils/pdfGenerator";
+import InvoiceModel from "@/models/Invoice";
 
 // Cloudinary Config
 cloudinary.v2.config({
@@ -17,15 +18,11 @@ export async function POST(req) {
     await dbConnect();
     const data = await req.json();
     const { username, ...invoiceData } = data;
-    console.log("recieved invoiceData:", invoiceData);
 
     // Find owner
     const owner = await OwnerModel.findOne({ username });
     if (!owner) {
-      return NextResponse.json(
-        { error: "Owner not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Owner not found" }, { status: 404 });
     }
 
     // Check daily upload limit
@@ -53,12 +50,13 @@ export async function POST(req) {
     }
 
     // Generate invoice number if not provided
-    const invoiceNumber = invoiceData.invoiceNumber || `INV-${Date.now()}`;
+    const invoiceNumber = invoiceData.invoiceNumber.trim() || `INV-${Date.now()}`;
 
     // Check if invoice number already exists
-    const existedInvoice = owner.invoices.some(
-      (invoice) => invoice.invoiceId === invoiceNumber
-    );
+    const existedInvoice = await InvoiceModel.findOne({
+      invoiceId: invoiceNumber,
+      owner: owner._id,
+    });
 
     if (existedInvoice) {
       return NextResponse.json(
@@ -69,11 +67,11 @@ export async function POST(req) {
 
     // Generate QR code
     const encodedUsername = encodeURIComponent(username);
-    const encodedInvoiceNumber = encodeURIComponent(invoiceNumber.trim());
+    const encodedInvoiceNumber = encodeURIComponent(invoiceNumber);
     let qrData = `${process.env.NEXT_PUBLIC_APP_URL}/feedback/${encodedUsername}?invoiceNo=${encodedInvoiceNumber}`;
 
     // Add coupon data if provided
-    let modifiedCouponCode = null;
+    let modifiedCouponCodeforURL = null;
     let dbCouponCode = null;
     const expiryDate = new Date();
     if (invoiceData.addCoupon && invoiceData.coupon) {
@@ -84,15 +82,21 @@ export async function POST(req) {
       ).join("");
 
       // Modify coupon code by adding random chars at start and invoice count
-      dbCouponCode = `${invoiceData.coupon.code.trim()}${owner.invoices.length + 1}`;
-      modifiedCouponCode = `${randomChars}${invoiceData.coupon.code.trim()}${owner.invoices.length + 1}`;
-      expiryDate.setDate(expiryDate.getDate() + Number(invoiceData.coupon.expiryDays));
+      dbCouponCode = `${invoiceData.coupon.code.trim()}${
+        (await InvoiceModel.countDocuments({})) + 1
+      }`;
+      modifiedCouponCodeforURL = `${randomChars}${invoiceData.coupon.code.trim()}${
+        (await InvoiceModel.countDocuments({})) + 1
+      }`;
+      expiryDate.setDate(
+        expiryDate.getDate() + Number(invoiceData.coupon.expiryDays)
+      );
 
-      qrData += `&cpcd=${modifiedCouponCode}`;
+      qrData += `&cpcd=${modifiedCouponCodeforURL}`;
     }
 
     // Calculate totals
-   
+
     // const subtotal = invoiceData.items.reduce((sum, item) => sum + item.amount, 0);
     // const discountTotal = invoiceData.items.reduce((sum, item) => {
     //   const itemDiscount = (item.amount * item.discount) / 100;
@@ -118,13 +122,7 @@ export async function POST(req) {
     const discountTotal = discount;
     const grandTotal = sub - discount + tax;
     const taxTotal = tax;
-    console.log("invoiceData:", invoiceData);
-    console.log("invoiceNumber:", invoiceNumber);
-    console.log("qrData:", qrData);
-    console.log("subtotal:", subtotal);
-    console.log("discountTotal:", discountTotal);
-    console.log("taxTotal:", taxTotal);
-    console.log("grandTotal:", grandTotal);
+
 
     // Generate PDF using react-pdf/renderer
     const pdfBuffer = await generateInvoicePdf(
@@ -135,12 +133,10 @@ export async function POST(req) {
       discountTotal,
       taxTotal,
       grandTotal
-      
     );
 
     // Upload to Cloudinary
     const uploadResponse = await new Promise((resolve, reject) => {
-
       const sanitiseString = (str) => {
         return str.replace(/[^a-zA-Z0-9-_\.]/g, "_");
       };
@@ -168,19 +164,22 @@ export async function POST(req) {
     });
 
     // Save invoice to database
-    owner.invoices.push({
-      invoiceId: invoiceNumber.trim(),
+    const newInvoice = new InvoiceModel({
+      invoiceId: invoiceNumber,
+      owner: owner._id,
       mergedPdfUrl: uploadResponse.secure_url,
       AIuseCount: 0,
       couponAttached: invoiceData.addCoupon
         ? {
-            couponCode: dbCouponCode.trim(),
+            couponCode: dbCouponCode,
             couponDescription: invoiceData.coupon.description.trim(),
             couponExpiryDate: expiryDate,
             isCouponUsed: false,
           }
         : null,
     });
+
+    await newInvoice.save();
 
     // Update upload counts
     owner.uploadedInvoiceCount.count += 1;
@@ -192,7 +191,7 @@ export async function POST(req) {
     return NextResponse.json({
       success: true,
       url: uploadResponse.secure_url,
-      invoiceNumber: invoiceNumber.trim(),
+      invoiceNumber: invoiceNumber,
     });
   } catch (error) {
     console.error("Error creating invoice:", error);
@@ -201,4 +200,4 @@ export async function POST(req) {
       { status: 500 }
     );
   }
-} 
+}

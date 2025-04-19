@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import OwnerModel from "@/model/Owner";
+import OwnerModel from "@/models/Owner";
+import InvoiceModel from "@/models/Invoice";
 import dbConnect from "@/lib/dbConnect";
 
 export async function POST(req) {
@@ -9,34 +10,43 @@ export async function POST(req) {
 
     if (!username || !invoiceId) {
       return NextResponse.json(
-        { error: "Username and invoiceId are required" },
+        { success: false, message: "Username and invoiceId are required" },
         { status: 400 }
       );
     }
 
     const owner = await OwnerModel.findOne({ username });
     if (!owner) {
-      return NextResponse.json({ error: "Owner not found" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, message: "Owner not found" },
+        { status: 404 }
+      );
     }
 
     // Find the invoice and update its coupon status
-    const invoice = owner.invoices.find((inv) => inv.invoiceId === invoiceId);
+    const invoice = await InvoiceModel.findOne({
+      invoiceId: invoiceId,
+      owner: owner._id,
+    });
     if (!invoice || !invoice.couponAttached) {
       return NextResponse.json(
-        { error: "Invoice or coupon not found" },
+        { success: false, message: "Invoice or coupon not found" },
         { status: 404 }
       );
     }
 
     invoice.couponAttached.isCouponUsed = true;
-    await owner.save();
+    await invoice.save();
 
     return NextResponse.json(
-      { message: "Coupon marked as used successfully" },
+      { success: true, message: "Coupon marked as used successfully" },
       { status: 200 }
     );
   } catch (error) {
     console.error("Error updating coupon status:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: error.message },
+      { status: 500 }
+    );
   }
 }

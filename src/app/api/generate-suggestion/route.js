@@ -1,6 +1,8 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import OwnerModel from "@/model/Owner";
+import OwnerModel from "@/models/Owner";
+import InvoiceModel from "@/models/Invoice";
 import dbConnect from "@/lib/dbConnect";
+import { NextResponse } from "next/server";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -18,23 +20,30 @@ export async function POST(req) {
     // Find the owner and check AI usage count
     const owner = await OwnerModel.findOne({
       username: decodedUsername,
-      "invoices.invoiceId": decodedInvoiceNumber,
     });
 
     if (!owner) {
-      return Response.json(
-        { message: "Owner or invoice not found" },
+      return NextResponse.json(
+        { success: false, message: "Business not found" },
         { status: 404 }
       );
     }
 
-    const invoice = owner.invoices.find(
-      (inv) => inv.invoiceId === decodedInvoiceNumber
-    );
+    const invoice = await InvoiceModel.findOne({
+      invoiceId: decodedInvoiceNumber,
+      owner: owner._id
+    })
+
+    if (!invoice) {
+      return NextResponse.json(
+        { success: false, message: "Invoice not found" },
+        { status: 404 }
+      );
+    }
 
     if (invoice.AIuseCount >= 3) {
-      return Response.json(
-        { message: "AI usage limit reached for this invoice" },
+      return NextResponse.json(
+        { success: false, message: "AI usage limit reached for this feedback" },
         { status: 429 }
       );
     }
@@ -89,13 +98,13 @@ export async function POST(req) {
 
     // Update AI usage count
     invoice.AIuseCount += 1;
-    await owner.save();
+    await invoice.save();
 
-    return Response.json({ data: { suggestion } });
+    return NextResponse.json({ success: true, message: "Suggestion generated successfully", data: { suggestion } }, { status: 201 });
   } catch (error) {
     console.error("Error generating suggestion:", error);
-    return Response.json(
-      { message: "Failed to generate suggestion" },
+    return NextResponse.json(
+      { success: false, message: "Failed to generate suggestion" },
       { status: 500 }
     );
   }

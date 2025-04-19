@@ -1,6 +1,6 @@
 import sendVerificationEmail from "@/utils/sendVerificationEmail";
 import dbConnect from "@/lib/dbConnect";
-import OwnerModel from "@/model/Owner";
+import OwnerModel from "@/models/Owner";
 import bcrypt from "bcryptjs";
 
 export async function POST(req) {
@@ -76,7 +76,6 @@ export async function POST(req) {
           pincode: "",
         },
         feedbacks: [],
-        invoices: [],
         isProfileCompleted: "pending",
       });
 

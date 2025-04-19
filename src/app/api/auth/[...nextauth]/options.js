@@ -2,7 +2,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/dbConnect";
-import OwnerModel from "@/model/Owner";
+import OwnerModel from "@/models/Owner";
 import jwt from "jsonwebtoken";
 import { deleteOldInvoicePdfs } from "@/utils/deleteOldInvoicesFromCloudinary";
 import sendVerificationEmail from "@/utils/sendVerificationEmail";
@@ -62,7 +62,7 @@ export const authOptions = {
           }
 
           // Delete old invoice PDFs (older than 1 hour)
-          await deleteOldInvoicePdfs(user.username);
+          // await deleteOldInvoicePdfs(user.username);
 
           // Generate tokens
           const accessToken = generateAccessToken(user);
@@ -110,7 +110,7 @@ export const authOptions = {
             }
 
             // Delete old invoice PDFs (older than 1 hour)
-            await deleteOldInvoicePdfs(existingUser.username);
+            // await deleteOldInvoicePdfs(existingUser.username);
 
             // ✅ Allow sign-in if it's a valid Google user
             user.id = existingUser._id.toString();

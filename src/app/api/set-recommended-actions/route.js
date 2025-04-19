@@ -1,7 +1,9 @@
 import dbConnect from "@/lib/dbConnect";
-import OwnerModel from "@/model/Owner";
-import { ApiError } from "@/utils/ApiError";
+import FeedbackModel from "@/models/Feedback";
+import InvoiceModel from "@/models/Invoice";
+import OwnerModel from "@/models/Owner";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { NextResponse } from "next/server";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -17,23 +19,33 @@ export async function POST(req) {
     const owner = await OwnerModel.findOne({ username: decodedUsername });
 
     if (!owner) {
-      throw new ApiError(404, "Organisation not found");
+      return NextResponse.json(
+        { success: false, message: "Business not found" },
+        { status: 404 }
+      );
     }
 
-    const invoice = owner.invoices.find(
-      (inv) => inv.invoiceId === decodedInvoiceNumber
-    );
+    const invoice = await InvoiceModel.findOne({
+      invoiceId: decodedInvoiceNumber,
+      owner: owner._id,
+    });
 
     if (!invoice) {
-      throw new ApiError(404, "Invoice not found");
+      return NextResponse.json(
+        { success: false, message: "Invoice not found" },
+        { status: 404 }
+      );
     }
 
     if (invoice.isFeedbackSubmitted && invoice.updatedRecommendedActions) {
-      throw new ApiError(400, "Recommended actions already updated");
+      return NextResponse.json(
+        { success: false, message: "Recommended actions already updated" },
+        { status: 400 }
+      );
     }
 
-    const feedbacks = owner.feedbacks || [];
-    const totalFeedbacks = feedbacks.length;
+    const feedbacks = await FeedbackModel.find({ givenTo: owner._id });
+    const totalNumberOfFeedbacks = feedbacks.length;
 
     const metrics = {
       satisfactionRating: "Satisfaction",
@@ -47,12 +59,11 @@ export async function POST(req) {
     const averageRatings = {};
     Object.keys(metrics).forEach((key) => {
       averageRatings[key] =
-        totalFeedbacks > 0
+        totalNumberOfFeedbacks > 0
           ? feedbacks.reduce((sum, feedback) => sum + feedback[key], 0) /
-            totalFeedbacks
+            totalNumberOfFeedbacks
           : 0;
     });
-    // yaha se dekhna hai
 
     const model = genAI.getGenerativeModel({
       model: "gemini-2.0-flash",
@@ -93,15 +104,19 @@ export async function POST(req) {
     if (invoice.updatedRecommendedActions === false) {
       invoice.updatedRecommendedActions = true;
     }
+    await invoice.save();
     await owner.save();
 
     // khatam
-    return Response.json(
-      { message: "Recommended actions set successfully" },
+    return NextResponse.json(
+      { success: true, message: "Recommended actions set successfully" },
       { status: 201 }
     );
   } catch (error) {
     console.error("Error setting recommended actions:", error);
-    return Response.json({ message: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: error.message },
+      { status: 500 }
+    );
   }
 }

@@ -1,5 +1,5 @@
 import dbConnect from "@/lib/dbConnect";
-import OwnerModel from "@/model/Owner";
+import OwnerModel from "@/models/Owner";
 import { z } from "zod";
 import { usernameValidation } from "@/schemas/registerSchema";
 

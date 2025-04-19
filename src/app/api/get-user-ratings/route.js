@@ -1,6 +1,7 @@
 import dbConnect from "@/lib/dbConnect";
-import OwnerModel from "@/model/Owner";
-import { ApiError } from "@/utils/ApiError";
+import FeedbackModel from "@/models/Feedback";
+import OwnerModel from "@/models/Owner";
+import { NextResponse } from "next/server";
 
 export async function POST(req) {
   await dbConnect();
@@ -13,17 +14,21 @@ export async function POST(req) {
     const owner = await OwnerModel.findOne({ username: decodedUsername });
 
     if (!owner) {
-      throw new ApiError(404, "Organisation not found");
+      return NextResponse.json(
+        { success: false, message: "Business not found" },
+        { status: 404 }
+      );
     }
 
     // Calculate average ratings from all feedbacks
-    const feedbacks = owner.feedbacks || [];
+    const feedbacks = await FeedbackModel.find({ givenTo: owner._id });
     const totalFeedbacks = feedbacks.length;
 
     if (totalFeedbacks === 0) {
-      return Response.json(
+      return NextResponse.json(
         {
-          message: "No feedbacks found for this organisation",
+          success: true,
+          message: "No feedbacks found for this business",
           data: {
             averageRatings: {
               satisfactionRating: 0,
@@ -66,8 +71,9 @@ export async function POST(req) {
       );
     });
 
-    return Response.json(
+    return NextResponse.json(
       {
+        success: true,
         message: "Owner ratings retrieved successfully",
         data: {
           averageRatings,
@@ -77,6 +83,9 @@ export async function POST(req) {
       { status: 200 }
     );
   } catch (error) {
-    return Response.json({ message: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: error.message },
+      { status: 500 }
+    );
   }
 }

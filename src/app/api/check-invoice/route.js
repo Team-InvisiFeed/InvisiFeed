@@ -1,6 +1,7 @@
 import dbConnect from "@/lib/dbConnect";
-import OwnerModel from "@/model/Owner";
-import { ApiError } from "@/utils/ApiError";
+import OwnerModel from "@/models/Owner";
+import InvoiceModel from "@/models/Invoice";
+import { NextResponse } from "next/server";
 
 export async function POST(req) {
   await dbConnect();
@@ -15,44 +16,45 @@ export async function POST(req) {
     const owner = await OwnerModel.findOne({ username: decodedUsername });
 
     if (!owner) {
-      return Response.json(
-        { message: "Invoice Provider not found" },
+      return NextResponse.json(
+        { success: false, message: "Invoice Provider not found" },
         { status: 404 }
       );
-    }
-
-    // Initialize invoices array if it doesn't exist
-    if (!owner.invoices) {
-      owner.invoices = [];
     }
 
     // Find or create invoice entry
-    let invoice = owner.invoices.find(
-      (inv) => inv.invoiceId === decodedInvoiceNumber
-    );
+    let invoice = await InvoiceModel.findOne({
+      invoiceId: decodedInvoiceNumber,
+      owner: owner._id,
+    });
 
     if (!invoice) {
-      invoice = {
+      invoice = await InvoiceModel.create({
         invoiceId: decodedInvoiceNumber,
         AIuseCount: 0,
-      };
-      owner.invoices.push(invoice);
-      await owner.save();
+      });
+
+      await invoice.save();
+
     } else if (invoice && invoice.isFeedbackSubmitted) {
-      return Response.json(
-        { message: "Feedback already submitted" },
+      return NextResponse.json(
+        { success: false, message: "Feedback already submitted" },
         { status: 404 }
       );
     }
 
-    return Response.json(
+    return NextResponse.json(
       {
+        success: true,
         message: "Invoice Number and Username verified",
-        owner: owner,
+        data: { owner, invoice },
       },
       { status: 201 }
     );
   } catch (error) {
-    return Response.json({ message: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: error.message },
+      { status: 500 }
+    );
   }
 }

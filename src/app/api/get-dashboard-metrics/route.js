@@ -1,6 +1,8 @@
 import dbConnect from "@/lib/dbConnect";
-import OwnerModel from "@/model/Owner";
-import { ApiError } from "@/utils/ApiError";
+import FeedbackModel from "@/models/Feedback";
+import InvoiceModel from "@/models/Invoice";
+import OwnerModel from "@/models/Owner";
+import { NextResponse } from "next/server";
 
 // Constants
 const METRICS = {
@@ -253,23 +255,27 @@ export async function POST(req) {
     // Input validation
     const body = await req.json();
     if (!body?.username) {
-      throw new ApiError(400, "Username is required");
+      return NextResponse.json(
+        { success: false, message: "Username is required" },
+        { status: 400 }
+      );
     }
 
     const decodedUsername = decodeURIComponent(body.username);
     const { year, viewType = "currentYear" } = body;
 
     // Optimize database query
-    const owner = await OwnerModel.findOne({ username: decodedUsername })
-      .select("feedbacks invoices currentRecommendedActions")
-      .lean();
+    const owner = await OwnerModel.findOne({ username: decodedUsername });
 
     if (!owner) {
-      throw new ApiError(404, "Organisation not found");
+      return NextResponse.json(
+        { success: false, message: "Business not found" },
+        { status: 404 }
+      );
     }
 
-    const feedbacks = owner.feedbacks || [];
-    const invoices = owner.invoices || [];
+    const feedbacks = await FeedbackModel.find({ givenTo: owner._id });
+    const invoices = await InvoiceModel.find({ owner: owner._id });
     const totalFeedbacks = feedbacks.length;
     const totalInvoices = invoices.length;
 
@@ -337,8 +343,9 @@ export async function POST(req) {
       ),
     ].sort((a, b) => b - a);
 
-    return Response.json(
+    return NextResponse.json(
       {
+        success: true,
         message: "Dashboard metrics retrieved successfully",
         data: {
           feedbackRatio,
@@ -363,13 +370,12 @@ export async function POST(req) {
     );
   } catch (error) {
     console.error("Error getting dashboard metrics:", error);
-    const status = error instanceof ApiError ? error.statusCode : 500;
-    return Response.json(
+    return NextResponse.json(
       {
         message: error.message || "Internal server error",
         success: false,
       },
-      { status }
+      { status: 500 }
     );
   }
 }

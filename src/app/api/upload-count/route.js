@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import OwnerModel from "@/model/Owner";
+import OwnerModel from "@/models/Owner";
 import dbConnect from "@/lib/dbConnect";
 
 export async function GET(req) {

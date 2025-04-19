@@ -1,6 +1,8 @@
 import dbConnect from "@/lib/dbConnect";
-import OwnerModel from "@/model/Owner";
-import { ApiError } from "@/utils/ApiError";
+import InvoiceModel from "@/models/Invoice";
+import OwnerModel from "@/models/Owner";
+import { NextResponse } from "next/server";
+import FeedbackModel from "@/models/Feedback";
 
 export async function POST(req) {
   await dbConnect();
@@ -15,41 +17,50 @@ export async function POST(req) {
     const owner = await OwnerModel.findOne({ username: decodedUsername });
 
     if (!owner) {
-      throw new ApiError(404, "Organisation not found");
+      return NextResponse.json(
+        { success: false, message: "Business not found" },
+        { status: 404 }
+      );
     }
 
     // Find the invoice index
-    const invoice = owner.invoices.find(
-      (inv) => inv.invoiceId === decodedInvoiceNumber
-    );
+    const invoice = await InvoiceModel.findOne({
+      invoiceId: decodedInvoiceNumber,
+      owner: owner._id,
+    });
 
     if (!invoice) {
-      throw new ApiError(404, "Invoice not found");
-    }
-
-    // Initialize feedbacks array if it doesn't exist
-    if (!owner.feedbacks) {
-      owner.feedbacks = [];
+      return NextResponse.json(
+        { success: false, message: "Invoice not found" },
+        { status: 404 }
+      );
     }
 
     // Add the new feedback to the owner's feedbacks array
-    owner.feedbacks.push({
+
+    const feedback = await FeedbackModel.create({
       ...formData,
-      feedbackContent: formData.feedbackContent.trim(),
-      suggestionContent: formData.suggestionContent.trim(),
-      createdAt: new Date()
+      givenTo: owner._id,
     });
+
+    await feedback.save();
 
     // Set the feedback submitted flag on the specific invoice
     invoice.isFeedbackSubmitted = true;
+    await invoice.save(); 
+
+    owner.feedbacks.push(feedback._id);
     await owner.save();
 
-    return Response.json(
-      { message: "Feedback added successfully" },
+    return NextResponse.json(
+      { success: true, message: "Feedback submitted successfully" },
       { status: 201 }
     );
   } catch (error) {
     console.error("Error submitting feedback:", error);
-    return Response.json({ message: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: error.message },
+      { status: 500 }
+    );
   }
 }

@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
 import cloudinary from "cloudinary";
-import axios from "axios";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import OwnerModel from "@/model/Owner";
+import OwnerModel from "@/models/Owner";
 import dbConnect from "@/lib/dbConnect";
 import crypto from "crypto";
 import { extractInvoiceNumberFromPdf } from "@/utils/upload-invoice-utils/extractInvoiceNumber";
 import { generateQrPdf } from "@/utils/upload-invoice-utils/generateQRpdf";
 import { mergePdfs } from "@/utils/upload-invoice-utils/mergePdfs";
+import InvoiceModel from "@/models/Invoice";
 
 // Cloudinary Config
 cloudinary.v2.config({
@@ -15,7 +14,6 @@ cloudinary.v2.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
 
 // Validate coupon data against schema
 function validateCouponData(couponData) {
@@ -113,11 +111,6 @@ export async function POST(req) {
       );
     }
 
-    // Check if invoice already exists
-    if (!owner.invoices) {
-      owner.invoices = [];
-    }
-
     const invoiceNumber = await extractInvoiceNumberFromPdf(file);
     if (
       !invoiceNumber ||
@@ -130,9 +123,10 @@ export async function POST(req) {
       );
     }
 
-    const existedInvoice = owner.invoices.some(
-      (invoice) => invoice.invoiceId === invoiceNumber
-    );
+    const existedInvoice = await InvoiceModel.findOne({
+      invoiceId: invoiceNumber,
+      owner: owner._id,
+    });
 
     if (existedInvoice) {
       return NextResponse.json(
@@ -146,7 +140,7 @@ export async function POST(req) {
     const buffer = Buffer.from(bytes);
 
     // Handle coupon data if provided
-    let modifiedCouponCode = null;
+    let modifiedCouponCodeforURL = null;
     const expiryDate = new Date();
     let dbCouponCode = null;
 
@@ -157,10 +151,14 @@ export async function POST(req) {
         () => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[crypto.randomInt(0, 36)]
       ).join("");
 
+      console.log("INVOICE COUNT", await InvoiceModel.countDocuments({}));
+
       // Modify coupon code by adding random chars at start and invoice count
-      dbCouponCode = `${couponData.couponCode}${owner.invoices.length + 1}`;
-      modifiedCouponCode = `${randomChars}${couponData.couponCode}${
-        owner.invoices.length + 1
+      dbCouponCode = `${couponData.couponCode}${
+        await InvoiceModel.countDocuments({}) + 1
+      }`;
+      modifiedCouponCodeforURL = `${randomChars}${couponData.couponCode}${
+        await InvoiceModel.countDocuments({}) + 1
       }`;
 
       // Calculate expiry date
@@ -171,7 +169,7 @@ export async function POST(req) {
     const qrPdfBuffer = await generateQrPdf(
       invoiceNumber,
       username,
-      modifiedCouponCode,
+      modifiedCouponCodeforURL,
       owner
     );
     const mergedPdfBuffer = await mergePdfs(buffer, qrPdfBuffer);
@@ -200,8 +198,10 @@ export async function POST(req) {
     const finalPdfUrl = finalUpload.secure_url;
 
     // Add new invoice with initial AIuseCount, coupon if provided, and PDF URLs
-    owner.invoices.push({
+    console.log("DB COUPON CODE", dbCouponCode);
+    const newInvoice = new InvoiceModel({
       invoiceId: invoiceNumber,
+      owner: owner._id,
       mergedPdfUrl: finalPdfUrl,
       AIuseCount: 0,
       couponAttached: couponData
@@ -213,6 +213,8 @@ export async function POST(req) {
           }
         : null,
     });
+
+    await newInvoice.save();
 
     // Update upload counts
     owner.uploadedInvoiceCount.count += 1;
@@ -230,8 +232,3 @@ export async function POST(req) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-
-
-
-
-

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import dbConnect from "@/lib/dbConnect";
-import OwnerModel from "@/model/Owner";
+import OwnerModel from "@/models/Owner";
 
 export async function POST(req) {
   try {

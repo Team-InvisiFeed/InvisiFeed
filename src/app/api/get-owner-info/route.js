@@ -1,5 +1,5 @@
 import dbConnect from "@/lib/dbConnect";
-import OwnerModel from "@/model/Owner";
+import OwnerModel from "@/models/Owner";
 import { ApiError } from "@/utils/ApiError";
 
 export async function POST(req) {
