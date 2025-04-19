@@ -18,9 +18,7 @@ export default function UserRatingsGraph() {
   useEffect(() => {
     const fetchRatings = async () => {
       try {
-        const response = await axios.post(`/api/get-user-ratings`, {
-          username: owner.username,
-        });
+        const response = await axios.get(`/api/get-user-ratings`);
         setRatings(response.data.data);
       } catch (error) {
         setError("Failed to fetch ratings");

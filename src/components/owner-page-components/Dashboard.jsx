@@ -158,11 +158,12 @@ const Dashboard = () => {
 
   const fetchMetrics = useCallback(async () => {
     try {
-      const response = await axios.post("/api/get-dashboard-metrics", {
-        username: owner.username,
-        year: selectedYear,
-        viewType,
-      });
+
+      const params = new URLSearchParams();
+      params.append('year', selectedYear);
+      params.append('viewType', viewType);
+
+      const response = await axios.get(`/api/get-dashboard-metrics?${params.toString()}`);
       setMetrics(response.data.data);
     } catch (error) {
       setError("Failed to fetch dashboard metrics");
