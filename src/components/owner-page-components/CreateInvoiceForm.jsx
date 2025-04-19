@@ -220,7 +220,7 @@ export default function CreateInvoiceForm({
            initial={{ scale: 0.9, opacity: 0 }}
            animate={{ scale: 1, opacity: 1 }}
            exit={{ scale: 0.9, opacity: 0 }}
-           className="bg-[#0A0A0A] absolute bottom-24 top-12  rounded-sm sm:max-w-2xl md:w-full w-[95vw] max-h-[80vh] overflow-y-auto max-w-xl mx-auto sm:mx-4 border border-yellow-400/20 md:mb-0"
+           className="bg-[#0A0A0A] absolute bottom-24 md:bottom-12 top-12  rounded-sm sm:max-w-2xl md:w-full w-[95vw] max-h-[80vh]  overflow-y-auto max-w-xl md:max-w-4xl mx-auto sm:mx-4 border border-yellow-400/20 md:mb-0"
          >
               <button
                 onClick={onCancel}
@@ -320,9 +320,16 @@ export default function CreateInvoiceForm({
                             </FormItem>
                           )}
                         />
-                        ) : (<Button type="button"
+                        ) : (
+                        <div className="flex gap-1   flex-col">
+                        <span className="text-gray-300 text-sm font-semibold "> 
+                          GSTIN / Tax ID 
+                        </span>
+                        <Button type="button"
                           onClick={() => setShowVerifyGstinDialog(true)}
-                          className="bg-transparent text-gray-300 justify-start border border-yellow-400/20 hover:bg-yellow-400/10">Verify GSTIN</Button>)}
+                          className="bg-transparent text-gray-300 justify-start border border-yellow-400/20 hover:bg-yellow-400/10 ">Verify GSTIN</Button>
+                        </div>
+                        )}
                         
                         {owner?.gstinDetails?.gstinVerificationStatus ===
                           true && (
