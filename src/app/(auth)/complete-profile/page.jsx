@@ -38,9 +38,10 @@ const completeProfileSchema = z.object({
 
 function Page() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isNavigatingToUserPage, setIsNavigatingToUserPage] = useState(false);
+
   const router = useRouter();
   const { data: session, status, update } = useSession();
-  const username = session?.user?.username;
 
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
@@ -81,7 +82,7 @@ function Page() {
       session.user.isProfileCompleted === "completed" ||
       session.user.isProfileCompleted === "skipped"
     ) {
-      router.push(`/user/${session.user.username}`);
+      router.push(`/user/${session?.user?.username}`);
     }
   }, [session, status, router]);
 
@@ -227,7 +228,7 @@ function Page() {
   ]);
 
   // Form Submit
-  const onSubmit = async (data) => {
+  const onSubmit = async (formData) => {
     setShowValidation(true);
 
     // Move validation check after setting showValidation
@@ -249,14 +250,13 @@ function Page() {
       };
 
       // Submit the profile data
-      const response = await axios.post("/api/complete-profile", {
-        organizationName: data.organizationName,
-        phoneNumber: data.phoneNumber,
+      const { data } = await axios.patch("/api/complete-profile", {
+        organizationName: formData.organizationName,
+        phoneNumber: formData.phoneNumber,
         address: formattedAddress,
-        username: username,
       });
 
-      if (response.data.success) {
+      if (data.success) {
         toast.success("Profile completed successfully!");
 
         // Update the session to reflect the new profile status
@@ -264,17 +264,18 @@ function Page() {
           ...session,
           user: {
             ...session.user,
-            organizationName: data.organizationName,
-            phoneNumber: data.phoneNumber,
-            address: formattedAddress,
-            isProfileCompleted: response.data.profileStatus,
+            organizationName: data.updatedUser.organizationName,
+            phoneNumber: data.updatedUser.phoneNumber,
+            address: data.updatedUser.address,
+            isProfileCompleted: data.profileStatus,
           },
         });
 
         // Redirect to user page
-        router.push(`/user/${session.user.username}`);
+        setIsNavigatingToUserPage(true);
+        router.push(`/user/${session?.user?.username}`);
       } else {
-        toast.error(response.data.message || "Failed to complete profile");
+        toast.error(data.message || "Failed to complete profile");
       }
     } catch (error) {
       console.error("Error completing profile:", error);
@@ -313,7 +314,7 @@ function Page() {
       setIsSubmitting(true);
 
       // Submit empty data with skipProfile flag
-      const response = await axios.post("/api/complete-profile", {
+      const { data } = await axios.patch("/api/complete-profile", {
         organizationName: session.user.organizationName || "",
         phoneNumber: "",
         address: {
@@ -324,29 +325,32 @@ function Page() {
           pincode: "",
         },
         skipProfile: true, // Flag to indicate this is a skip request
-        username: username,
       });
 
-      if (response.data.success) {
-        toast.success(response.data.message);
+      if (data.success) {
+        toast.success(data.message);
 
         // Update the session to reflect the new profile status
         await update({
           ...session,
           user: {
             ...session.user,
-            isProfileCompleted: response.data.profileStatus,
+            isProfileCompleted: data.profileStatus,
           },
         });
 
         // Redirect to user page
-        router.push(`/user/${session.user.username}`);
+        setIsNavigatingToUserPage(true);
+        router.push(`/user/${session?.user?.username}`);
       } else {
-        toast.error("Failed to skip profile completion");
+        toast.error(data.message || "Failed to skip profile completion");
       }
     } catch (error) {
       console.error("Error skipping profile:", error);
-      toast.error("An error occurred while skipping profile completion");
+      toast.error(
+        error.response?.data?.message ||
+          "An error occurred while skipping profile completion"
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -359,7 +363,7 @@ function Page() {
     }
   }, [session, form]);
 
-  if (status === "loading" || !session) {
+  if (status === "loading" || !session || isNavigatingToUserPage) {
     return (
       <div className="flex h-screen items-center justify-center bg-[#0A0A0A]">
         <Loader2 className="h-8 w-8 animate-spin text-yellow-400" />
@@ -484,7 +488,11 @@ function Page() {
                       onClick={() => setIsCountryOpen(!isCountryOpen)}
                       className="w-full p-2 border rounded-md bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200 outline-none"
                     >
-                      <span className={selectedCountry ? "text-white" : "text-gray-400"}>
+                      <span
+                        className={
+                          selectedCountry ? "text-white" : "text-gray-400"
+                        }
+                      >
                         {selectedCountry || "Select Country"}
                       </span>
                       <svg
@@ -550,12 +558,14 @@ function Page() {
                         !selectedCountry || setIsStateOpen(!isStateOpen)
                       }
                       className={`w-full p-2 border rounded-md bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 cursor-pointer h-9 flex items-center justify-between hover:border-yellow-400/30 transition-all duration-200 outline-none ${
-                        !selectedCountry
-                          ? "opacity-50 cursor-not-allowed"
-                          : ""
+                        !selectedCountry ? "opacity-50 cursor-not-allowed" : ""
                       }`}
                     >
-                      <span className={selectedState ? "text-white" : "text-gray-400"}>
+                      <span
+                        className={
+                          selectedState ? "text-white" : "text-gray-400"
+                        }
+                      >
                         {selectedState || "Select State"}
                       </span>
                       <svg
@@ -624,7 +634,11 @@ function Page() {
                         !selectedState ? "opacity-50 cursor-not-allowed" : ""
                       }`}
                     >
-                      <span className={selectedCity ? "text-white" : "text-gray-400"}>
+                      <span
+                        className={
+                          selectedCity ? "text-white" : "text-gray-400"
+                        }
+                      >
                         {selectedCity || "Select City"}
                       </span>
                       <svg
