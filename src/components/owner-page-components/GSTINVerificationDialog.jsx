@@ -30,9 +30,10 @@ export default function GSTINVerificationDialog({ open, onOpenChange }) {
     try {
       // Using our new API endpoint
       const response = await axios.get(
-        `/api/verify-gstin-external?gstinNumber=${gstinNumber}`
+        `/api/get-gstin-details?gstinNumber=${gstinNumber}`
       );
-      const data = response.data;
+      console.log(response);
+      const data = response.data.data;
 
       if (data.taxpayerInfo === null) {
         setVerificationResult({ valid: false, message: "Invalid GSTIN" });
@@ -61,7 +62,7 @@ export default function GSTINVerificationDialog({ open, onOpenChange }) {
 
     setIsLoading(true);
     try {
-      const response = await axios.post("/api/verify-gstin", {
+      const response = await axios.post("/api/save-gstin", {
         gstinNumber,
       });
 

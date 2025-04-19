@@ -3,9 +3,11 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import OwnerModel from "@/models/Owner";
 import dbConnect from "@/lib/dbConnect";
+
 export async function POST(req) {
+  await dbConnect();
   try {
-    await dbConnect();
+   
     const session = await getServerSession(authOptions);
     if (!session) {
       return NextResponse.json(
