@@ -12,6 +12,7 @@ import {
   Github,
 } from "lucide-react";
 import SocialMediaPopup from "./SocialMediaPopup";
+import Link from "next/link";
 
 function Footer() {
   const [isSocialMediaPopupOpen, setIsSocialMediaPopupOpen] = useState(false);
@@ -78,19 +79,23 @@ function Footer() {
               Quick Links
             </h4>
             <ul className="space-y-3">
-              {["Home", "About Us", "Contact Us", "Privacy Policy"].map(
-                (link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
-                      className="text-gray-400 hover:text-yellow-400 transition-colors duration-200 flex items-center space-x-2 group"
-                    >
-                      <span className="w-1 h-1 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                      <span>{link}</span>
-                    </a>
-                  </li>
-                )
-              )}
+              {["Home", "About Us", "Privacy Policy"].map((link) => (
+                <li key={link}>
+                  <Link
+                    href={
+                      link === "Home"
+                        ? "/"
+                        : link === "About Us"
+                        ? "/about-us"
+                        : "/privacy-policy"
+                    }
+                    className="text-gray-400 hover:text-yellow-400 transition-colors duration-200 flex items-center space-x-2 group"
+                  >
+                    <span className="w-1 h-1 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    <span>{link}</span>
+                  </Link>
+                </li>
+              ))}
             </ul>
           </motion.div>
 
@@ -107,15 +112,13 @@ function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center space-x-3 text-gray-400 hover:text-yellow-400 transition-colors">
                 <Mail className="h-4 w-4" />
-                <span>support@invisifeed.com</span>
-              </li>
-              <li className="flex items-center space-x-3 text-gray-400 hover:text-yellow-400 transition-colors">
-                <Phone className="h-4 w-4" />
-                <span>+1 (555) 123-4567</span>
+                <a href="mailto:invisifeed@gmail.com">
+                  <span>invisifeed@gmail.com</span>
+                </a>
               </li>
               <li className="flex items-center space-x-3 text-gray-400 hover:text-yellow-400 transition-colors">
                 <MapPin className="h-4 w-4" />
-                <span>123 Business Ave, Suite 100</span>
+                <span>India</span>
               </li>
             </ul>
           </motion.div>
@@ -151,18 +154,18 @@ function Footer() {
               © 2025 InvisiFeed. All rights reserved.
             </p>
             <div className="flex space-x-6">
-              <a
-                href="#"
+              <Link
+                href="/terms-of-service"
                 className="text-sm text-gray-500 hover:text-yellow-400 transition-colors"
               >
                 Terms of Service
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/privacy-policy"
                 className="text-sm text-gray-500 hover:text-yellow-400 transition-colors"
               >
                 Privacy Policy
-              </a>
+              </Link>
             </div>
           </div>
         </div>
