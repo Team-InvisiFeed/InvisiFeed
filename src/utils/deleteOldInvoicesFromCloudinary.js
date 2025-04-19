@@ -45,6 +45,7 @@ export async function deleteOldInvoicePdfs(username) {
             });
             if (result.result === "ok" || result.result === "not found") {
               invoice.mergedPdfUrl = null;
+              await invoice.save()
               deletedCount++;
             }
           }
@@ -58,7 +59,6 @@ export async function deleteOldInvoicePdfs(username) {
       }
     }
    
-    await invoices.save()
 
 
     return { deleted: deletedCount, errors: errorCount };
