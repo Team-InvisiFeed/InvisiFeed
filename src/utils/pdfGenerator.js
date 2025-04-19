@@ -578,7 +578,7 @@ const InvoiceDocument = ({
                   Complete the feedback form for a chance to win a special
                   discount coupon for your next service.
                 </Text>
-                <Link src={feedbackUrl}>{feedbackUrl}</Link>
+                <Link src={feedbackUrl}>Click Here</Link>
               </View>
             </View>
             <Image src={qrImage} style={styles.qrCode} />
