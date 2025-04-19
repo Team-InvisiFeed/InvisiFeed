@@ -7,16 +7,13 @@ import { NextResponse } from "next/server";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-export async function POST(req) {
+export async function PUT(req) {
   await dbConnect();
 
   const { username, invoiceNumber } = await req.json();
 
-  const decodedUsername = decodeURIComponent(username);
-  const decodedInvoiceNumber = decodeURIComponent(invoiceNumber);
-
   try {
-    const owner = await OwnerModel.findOne({ username: decodedUsername });
+    const owner = await OwnerModel.findOne({ username: username });
 
     if (!owner) {
       return NextResponse.json(
@@ -26,7 +23,7 @@ export async function POST(req) {
     }
 
     const invoice = await InvoiceModel.findOne({
-      invoiceId: decodedInvoiceNumber,
+      invoiceId: invoiceNumber,
       owner: owner._id,
     });
 
@@ -98,8 +95,10 @@ export async function POST(req) {
       .map((point) => point.replace(/[*#\-•]/g, "").trim())
       .slice(0, 3);
 
-    owner.currentRecommendedActions.improvements = improvements;
-    owner.currentRecommendedActions.strengths = strengths;
+    owner.currentRecommendedActions = {
+      improvements,
+      strengths,
+    };
 
     if (invoice.updatedRecommendedActions === false) {
       invoice.updatedRecommendedActions = true;

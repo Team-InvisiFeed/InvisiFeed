@@ -33,7 +33,9 @@ function FeedbackFormContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const username = params.username;
+  const decodedUsername = decodeURIComponent(username);
   const invoiceNumber = searchParams.get("invoiceNo");
+  const decodedInvoiceNumber = decodeURIComponent(invoiceNumber);
   const queryCouponCode = searchParams.get("cpcd");
   const couponCode = queryCouponCode ? queryCouponCode.slice(4) : "";
 
@@ -67,20 +69,26 @@ function FeedbackFormContent() {
 
   const checkInvoiceAndUser = async () => {
     try {
-      const response = await axios.post("/api/check-invoice", {
-        username,
-        invoiceNumber,
-      });
+      // Properly encode parameters
+      const params = new URLSearchParams();
+      params.append('username', username);
+      params.append('invoiceNumber', invoiceNumber);
+      if (couponCode) {
+        params.append('couponCode', couponCode);
+      }
 
-      const decodedInvoiceNumber = decodeURIComponent(invoiceNumber);
+      console.log(params.toString());
+
+      const { data } = await axios.get(`/api/check-invoice?${params.toString()}`);
+
       setInvalidInvoice(false);
       setFeedbackAlreadySubmitted(false);
 
-      const owner = response.data.data.owner;
+      const owner = data.owner;
       if (owner) {
         setOrganizationName(owner.organizationName);
       }
-      const invoice = response.data.data.invoice;
+      const invoice = data.invoice;
       if (!invoice) {
         setAiUsageCount(0);
         setAiLimitReached(false);
@@ -94,6 +102,7 @@ function FeedbackFormContent() {
         }
       }
     } catch (error) {
+      console.error('Invoice check error:', error.response?.data.message || error);
       if (error.response && error.response.status === 404) {
         if (error.response.data.message === "Feedback already submitted") {
           setFeedbackAlreadySubmitted(true);
@@ -102,7 +111,7 @@ function FeedbackFormContent() {
         }
       } else {
         console.error("An unexpected error occurred:", error.message);
-        toast(error.message);
+        toast.error(error.response?.data?.message || "Failed to verify invoice");
       }
     }
   };
@@ -116,14 +125,14 @@ function FeedbackFormContent() {
       e.preventDefault();
       const response = await axios.post("/api/submit-feedback", {
         formData,
-        username: username.trim(),
-        invoiceNumber: invoiceNumber.trim(),
+        username: decodedUsername,
+        invoiceNumber: decodedInvoiceNumber,
       });
 
       if (response.status == 201) {
-        const result = await axios.post("/api/set-recommended-actions", {
-          username: username.trim(),
-          invoiceNumber: invoiceNumber.trim(),
+        const result = await axios.put("/api/set-recommended-actions", {
+          username: decodedUsername,
+          invoiceNumber: decodedInvoiceNumber,
         });
         if (result.status == 201) {
           toast.success("Feedback submitted successfully");
@@ -145,28 +154,20 @@ function FeedbackFormContent() {
       }
 
       setLoadingFeedback(true);
-      const response = await fetch("/api/generate-feedback", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          satisfactionRating: formData.satisfactionRating,
-          communicationRating: formData.communicationRating,
-          qualityOfServiceRating: formData.qualityOfServiceRating,
-          valueForMoneyRating: formData.valueForMoneyRating,
-          recommendRating: formData.recommendRating,
-          overAllRating: formData.overAllRating,
-          feedbackContent: formData.feedbackContent,
-          username,
-          invoiceNumber,
-        }),
+      const response = await axios.post("/api/generate-feedback", {
+        satisfactionRating: formData.satisfactionRating,
+        communicationRating: formData.communicationRating,
+        qualityOfServiceRating: formData.qualityOfServiceRating,
+        valueForMoneyRating: formData.valueForMoneyRating,
+        recommendRating: formData.recommendRating,
+        overAllRating: formData.overAllRating,
+        feedbackContent: formData.feedbackContent,
+        username: decodedUsername,
+        invoiceNumber: decodedInvoiceNumber,
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        handleChange("feedbackContent", data.feedback);
+      if (response.status == 201) {
+        handleChange("feedbackContent", response.data.feedback);
         setAiUsageCount((prev) => prev + 1);
         if (aiUsageCount + 1 >= 3) {
           setAiLimitReached(true);
@@ -177,11 +178,14 @@ function FeedbackFormContent() {
           setAiLimitReached(true);
           toast.error("AI usage limit reached for this invoice");
         } else {
-          toast.error(data.message || "Failed to generate feedback");
+          toast.error(response.data.message || "Failed to generate feedback");
         }
       }
     } catch (error) {
-      console.error("Error generating feedback:", error);
+      console.error(
+        "Error generating feedback:",
+        error?.response?.data?.message
+      );
       toast.error("Something went wrong!");
     } finally {
       setLoadingFeedback(false);
@@ -205,8 +209,8 @@ function FeedbackFormContent() {
         overAllRating: formData.overAllRating,
         feedbackContent: formData.feedbackContent,
         suggestionContent: formData.suggestionContent,
-        username,
-        invoiceNumber,
+        username: decodedUsername,
+        invoiceNumber: decodedInvoiceNumber,
       });
 
       if (

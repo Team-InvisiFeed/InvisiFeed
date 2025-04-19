@@ -9,12 +9,8 @@ export async function POST(req) {
 
   const { formData, username, invoiceNumber } = await req.json();
 
-  const decodedUsername = decodeURIComponent(username);
-
-  const decodedInvoiceNumber = decodeURIComponent(invoiceNumber);
-
   try {
-    const owner = await OwnerModel.findOne({ username: decodedUsername });
+    const owner = await OwnerModel.findOne({ username: username });
 
     if (!owner) {
       return NextResponse.json(
@@ -25,7 +21,7 @@ export async function POST(req) {
 
     // Find the invoice index
     const invoice = await InvoiceModel.findOne({
-      invoiceId: decodedInvoiceNumber,
+      invoiceId: invoiceNumber,
       owner: owner._id,
     });
 

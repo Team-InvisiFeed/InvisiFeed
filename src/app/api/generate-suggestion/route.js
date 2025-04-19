@@ -9,17 +9,14 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 export async function POST(req) {
   try {
     const body = await req.json();
-
-    // Decode the encoded parameters
-    const decodedUsername = decodeURIComponent(body.username);
-    const decodedInvoiceNumber = decodeURIComponent(body.invoiceNumber);
+    const { username, invoiceNumber } = body;
 
     // Connect to database
     await dbConnect();
 
     // Find the owner and check AI usage count
     const owner = await OwnerModel.findOne({
-      username: decodedUsername,
+      username: username,
     });
 
     if (!owner) {
@@ -30,7 +27,7 @@ export async function POST(req) {
     }
 
     const invoice = await InvoiceModel.findOne({
-      invoiceId: decodedInvoiceNumber,
+      invoiceId: invoiceNumber,
       owner: owner._id
     })
 
@@ -100,7 +97,14 @@ export async function POST(req) {
     invoice.AIuseCount += 1;
     await invoice.save();
 
-    return NextResponse.json({ success: true, message: "Suggestion generated successfully", data: { suggestion } }, { status: 201 });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Suggestion generated successfully",
+        data: { suggestion },
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Error generating suggestion:", error);
     return NextResponse.json(
