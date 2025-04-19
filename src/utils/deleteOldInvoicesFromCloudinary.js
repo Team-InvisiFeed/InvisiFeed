@@ -1,5 +1,5 @@
 import cloudinary from "cloudinary";
-import OwnerModel from "@/model/Owner";
+import OwnerModel from "@/models/Owner";
 
 // Cloudinary Config
 cloudinary.v2.config({
