@@ -2,17 +2,24 @@ import { NextResponse } from "next/server";
 
 import dbConnect from "@/lib/dbConnect";
 import OwnerModel from "@/models/Owner";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
-export async function POST(req) {
+export async function PATCH(req) {
   try {
     await dbConnect();
+    const session = await getServerSession(authOptions);
+    const username = session?.user?.username;
     const body = await req.json();
 
     // Find the user
-    const user = await OwnerModel.findOne({ username: body.username });
+    const user = await OwnerModel.findOne({ username });
 
     if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, message: "User not found" },
+        { status: 404 }
+      );
     }
 
     // Update user fields
@@ -27,14 +34,21 @@ export async function POST(req) {
     }
 
     // Check if all required fields are filled
-    const hasOrganizationName = user.organizationName && user.organizationName.trim() !== "";
+    const hasOrganizationName =
+      user.organizationName && user.organizationName.trim() !== "";
     const hasPhoneNumber = user.phoneNumber && user.phoneNumber.trim() !== "";
-    const hasAddress = user.address && 
-      user.address.localAddress && user.address.localAddress.trim() !== "" &&
-      user.address.city && user.address.city.trim() !== "" &&
-      user.address.state && user.address.state.trim() !== "" &&
-      user.address.country && user.address.country.trim() !== "" &&
-      user.address.pincode && user.address.pincode.trim() !== "";
+    const hasAddress =
+      user.address &&
+      user.address.localAddress &&
+      user.address.localAddress.trim() !== "" &&
+      user.address.city &&
+      user.address.city.trim() !== "" &&
+      user.address.state &&
+      user.address.state.trim() !== "" &&
+      user.address.country &&
+      user.address.country.trim() !== "" &&
+      user.address.pincode &&
+      user.address.pincode.trim() !== "";
 
     // Update profile completion status
     if (hasOrganizationName && hasPhoneNumber && hasAddress) {
@@ -49,6 +63,7 @@ export async function POST(req) {
     // Return success response
     return NextResponse.json(
       {
+        success: true,
         message: "Profile updated successfully",
         user: {
           id: user._id,
@@ -65,7 +80,7 @@ export async function POST(req) {
   } catch (error) {
     console.error("Error updating profile:", error);
     return NextResponse.json(
-      { message: "Error updating profile" },
+      { success: false, message: "Error updating profile" },
       { status: 500 }
     );
   }
