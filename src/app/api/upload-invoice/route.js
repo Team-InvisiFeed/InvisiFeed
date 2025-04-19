@@ -7,6 +7,8 @@ import { extractInvoiceNumberFromPdf } from "@/utils/upload-invoice-utils/extrac
 import { generateQrPdf } from "@/utils/upload-invoice-utils/generateQRpdf";
 import { mergePdfs } from "@/utils/upload-invoice-utils/mergePdfs";
 import InvoiceModel from "@/models/Invoice";
+import { authOptions } from "../auth/[...nextauth]/options";
+import { getServerSession } from "next-auth";
 
 // Cloudinary Config
 cloudinary.v2.config({
@@ -57,10 +59,20 @@ function validateCouponData(couponData) {
 
 export async function POST(req) {
   await dbConnect();
+
   try {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
     const formData = await req.formData();
     const file = formData.get("file");
-    const username = formData.get("username");
+    const username = session?.user?.username;
     const couponDataStr = formData.get("couponData");
 
     let couponData = null;
@@ -71,20 +83,26 @@ export async function POST(req) {
         validateCouponData(couponData);
       } catch (error) {
         return NextResponse.json(
-          { error: `Invalid coupon data: ${error.message}` },
+          { success: false, message: `Invalid coupon data: ${error.message}` },
           { status: 400 }
         );
       }
     }
 
     if (!file) {
-      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "No file uploaded" },
+        { status: 400 }
+      );
     }
 
     // Check owner exists or not
     const owner = await OwnerModel.findOne({ username });
     if (!owner) {
-      return NextResponse.json({ error: "Owner not found" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, message: "Owner not found" },
+        { status: 404 }
+      );
     }
 
     // Check daily upload limit
@@ -104,7 +122,8 @@ export async function POST(req) {
       const hoursLeft = Math.ceil(timeLeft);
       return NextResponse.json(
         {
-          error: `Daily upload limit reached. Please try again after ${hoursLeft} hours.`,
+          success: false,
+          message: `Daily upload limit reached. Please try again after ${hoursLeft} hours.`,
           timeLeft: hoursLeft,
         },
         { status: 429 }
@@ -118,7 +137,7 @@ export async function POST(req) {
       invoiceNumber === "Extraction Failed"
     ) {
       return NextResponse.json(
-        { error: "Invoice number not found" },
+        { success: false, message: "Invoice number not found" },
         { status: 400 }
       );
     }
@@ -130,7 +149,7 @@ export async function POST(req) {
 
     if (existedInvoice) {
       return NextResponse.json(
-        { error: "Invoice already exists" },
+        { success: false, message: "Invoice already exists" },
         { status: 400 }
       );
     }
@@ -155,10 +174,10 @@ export async function POST(req) {
 
       // Modify coupon code by adding random chars at start and invoice count
       dbCouponCode = `${couponData.couponCode}${
-        await InvoiceModel.countDocuments({}) + 1
+        (await InvoiceModel.countDocuments({})) + 1
       }`;
       modifiedCouponCodeforURL = `${randomChars}${couponData.couponCode}${
-        await InvoiceModel.countDocuments({}) + 1
+        (await InvoiceModel.countDocuments({})) + 1
       }`;
 
       // Calculate expiry date
@@ -224,11 +243,19 @@ export async function POST(req) {
     await owner.save();
 
     return NextResponse.json(
-      { url: finalPdfUrl, invoiceNumber },
+      {
+        success: true,
+        message: "Invoice uploaded successfully",
+        url: finalPdfUrl,
+        invoiceNumber,
+      },
       { status: 200 }
     );
   } catch (error) {
     console.error("Error processing request:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

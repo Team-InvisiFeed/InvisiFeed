@@ -5,6 +5,8 @@ import dbConnect from "@/lib/dbConnect";
 import crypto from "crypto";
 import { generateInvoicePdf } from "@/utils/pdfGenerator";
 import InvoiceModel from "@/models/Invoice";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/options";
 
 // Cloudinary Config
 cloudinary.v2.config({
@@ -17,12 +19,18 @@ export async function POST(req) {
   try {
     await dbConnect();
     const data = await req.json();
-    const { username, ...invoiceData } = data;
+    const { ...invoiceData } = data;
+
+    const session = await getServerSession(authOptions);
+    const username = session?.user?.username;
 
     // Find owner
     const owner = await OwnerModel.findOne({ username });
     if (!owner) {
-      return NextResponse.json({ error: "Owner not found" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, message: "Business not found" },
+        { status: 404 }
+      );
     }
 
     // Check daily upload limit
@@ -42,7 +50,8 @@ export async function POST(req) {
       const hoursLeft = Math.ceil(timeLeft);
       return NextResponse.json(
         {
-          error: `Daily upload limit reached. Please try again after ${hoursLeft} hours.`,
+          success: false,
+          message: `Daily upload limit reached. Please try again after ${hoursLeft} hours.`,
           timeLeft: hoursLeft,
         },
         { status: 429 }
@@ -50,7 +59,8 @@ export async function POST(req) {
     }
 
     // Generate invoice number if not provided
-    const invoiceNumber = invoiceData.invoiceNumber.trim() || `INV-${Date.now()}`;
+    const invoiceNumber =
+      invoiceData.invoiceNumber.trim() || `INV-${Date.now()}`;
 
     // Check if invoice number already exists
     const existedInvoice = await InvoiceModel.findOne({
@@ -60,7 +70,7 @@ export async function POST(req) {
 
     if (existedInvoice) {
       return NextResponse.json(
-        { error: "Invoice number already exists" },
+        { success: false, message: "Invoice number already exists" },
         { status: 400 }
       );
     }
@@ -122,7 +132,6 @@ export async function POST(req) {
     const discountTotal = discount;
     const grandTotal = sub - discount + tax;
     const taxTotal = tax;
-
 
     // Generate PDF using react-pdf/renderer
     const pdfBuffer = await generateInvoicePdf(
@@ -188,15 +197,19 @@ export async function POST(req) {
 
     await owner.save();
 
-    return NextResponse.json({
-      success: true,
-      url: uploadResponse.secure_url,
-      invoiceNumber: invoiceNumber,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Invoice created successfully",
+        url: uploadResponse.secure_url,
+        invoiceNumber: invoiceNumber,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error creating invoice:", error);
     return NextResponse.json(
-      { error: "Failed to create invoice" },
+      { success: false, message: "Failed to create invoice" },
       { status: 500 }
     );
   }

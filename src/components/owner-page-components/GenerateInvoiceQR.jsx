@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import ConfirmModal from "@/components/ConfirmModal";
 import CreateInvoiceForm from "./CreateInvoiceForm";
 import CompleteProfileDialog from "./CompleteProfileDialog";
+import axios from "axios";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -84,9 +85,7 @@ export default function Home() {
       if (!owner?.username) return;
 
       try {
-        const res = await fetch(`/api/upload-count?username=${owner.username}`);
-        const data = await res.json();
-
+        const { data } = await axios.get(`/api/upload-count`);
         if (data.success) {
           setDailyUploads(data.dailyUploads);
           if (data.timeLeft) {
@@ -98,7 +97,9 @@ export default function Home() {
           }
         }
       } catch (error) {
-        console.error("Error fetching upload count:", error);
+        toast.error(
+          error.response?.data?.message || "Failed to fetch upload count"
+        );
       } finally {
         setInitialLoading(false);
       }
@@ -196,7 +197,6 @@ export default function Home() {
     setLoading(true);
     const formData = new FormData();
     formData.append("file", fileToUpload);
-    formData.append("username", owner.username);
     if (couponSaved) {
       formData.append("couponData", JSON.stringify(couponData));
     }
@@ -207,41 +207,37 @@ export default function Home() {
     formData.append("isSampleInvoice", isSampleInvoice);
 
     try {
-      const res = await fetch("/api/upload-invoice", {
-        method: "POST",
-        body: formData,
+      const { data } = await axios.post("/api/upload-invoice", formData);
+
+      setPdfUrl(data.url);
+      setInvoiceNumber(data.invoiceNumber);
+      setDailyUploads((prev) => prev + 1);
+      setUploadCount((prev) => prev + 1);
+      setEmailSent(false);
+      setCustomerEmail("");
+      setCouponSaved(false);
+      setCouponData({
+        couponCode: "",
+        description: "",
+        expiryDays: 30,
       });
-
-      const data = await res.json();
-      if (data.error) {
-        if (res.status === 429) {
-          setTimeLeft(data.timeLeft);
-          toast.error(
-            `Daily upload limit reached. Please try again after ${data.timeLeft} hours.`
-          );
-        } else {
-          toast.error(`Error: ${data.error}`);
-        }
-      } else {
-        setPdfUrl(data.url);
-        setInvoiceNumber(data.invoiceNumber);
-        setDailyUploads((prev) => prev + 1);
-        setUploadCount((prev) => prev + 1);
-        setEmailSent(false);
-        setCustomerEmail("");
-        setCouponSaved(false);
-        setCouponData({
-          couponCode: "",
-          description: "",
-          expiryDays: 30,
-        });
-        toast.success("Invoice uploaded successfully");
-      }
+      toast.success("Invoice uploaded successfully");
     } catch (error) {
-      toast.error("Something went wrong! Please try again.");
+      console.log(error);
+      if (error.response?.status === 429) {
+        setTimeLeft(error.response.data.timeLeft);
+        toast.error(
+          `Daily upload limit reached. Please try again after ${error.response.data.timeLeft} hours.`
+        );
+      } else {
+        toast.error(
+          error.response?.data?.message ||
+            "Something went wrong! Please try again."
+        );
+      }
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const handleUpload = async () => {
@@ -256,20 +252,12 @@ export default function Home() {
 
     setSendingEmail(true);
     try {
-      const response = await fetch("/api/send-invoice-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          customerEmail,
-          invoiceNumber,
-          pdfUrl,
-          companyName: owner?.organizationName || "Your Company",
-        }),
+      const { data } = await axios.post("/api/send-invoice-email", {
+        customerEmail,
+        invoiceNumber,
+        pdfUrl,
+        companyName: owner?.organizationName || "Your Company",
       });
-
-      const data = await response.json();
 
       if (data.success) {
         setEmailSent(true);
@@ -280,7 +268,8 @@ export default function Home() {
       }
     } catch (error) {
       toast.error(
-        "Something went wrong while sending the email. Please try again."
+        error.response?.data?.error ||
+          "Something went wrong while sending the email. Please try again."
       );
     } finally {
       setSendingEmail(false);
@@ -289,14 +278,8 @@ export default function Home() {
 
   const handleResetData = async () => {
     try {
-      const res = await fetch("/api/reset-data", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username: owner.username }),
-      });
-      const data = await res.json();
+      const { data } = await axios.delete("/api/reset-data");
+
       if (data.success) {
         toast.success("Data reset successfully");
         setFile(null);
@@ -310,7 +293,10 @@ export default function Home() {
       }
     } catch (error) {
       console.error("Error resetting data:", error);
-      toast.error("Failed to reset data. Please try again.");
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to reset data. Please try again."
+      );
     }
   };
 
@@ -322,18 +308,10 @@ export default function Home() {
 
     setLoading(true);
     try {
-      const response = await fetch("/api/create-invoice", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...invoiceData,
-          username: owner.username,
-        }),
+      const { data } = await axios.post("/api/create-invoice", {
+        ...invoiceData,
       });
 
-      const data = await response.json();
       if (data.success) {
         setPdfUrl(data.url);
         setInvoiceNumber(data.invoiceNumber);
@@ -342,12 +320,15 @@ export default function Home() {
         toast.success("Invoice created successfully");
       } else {
         toast.error(
-          data.error || "Failed to create invoice. Please try again."
+          data.message || "Failed to create invoice. Please try again."
         );
       }
     } catch (error) {
       console.error("Error creating invoice:", error);
-      toast.error("Failed to create invoice. Please try again.");
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to create invoice. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -360,15 +341,15 @@ export default function Home() {
           <div className="w-8 h-8 border-2 border-yellow-400 border-t-transparent color-yellow-400 rounded-full animate-spin" />
         </div>
       )}
-       {/* Create Invoice Form */}
-       {showCreateInvoice && (
-              <CreateInvoiceForm
-                onSave={handleCreateInvoice}
-                onCancel={() => setShowCreateInvoice(false)}
-                open={showCreateInvoice}
-                onOpenChange={setShowCreateInvoice}
-              />
-            )}
+      {/* Create Invoice Form */}
+      {showCreateInvoice && (
+        <CreateInvoiceForm
+          onSave={handleCreateInvoice}
+          onCancel={() => setShowCreateInvoice(false)}
+          open={showCreateInvoice}
+          onOpenChange={setShowCreateInvoice}
+        />
+      )}
       {showConfirmModal && (
         <ConfirmModal
           message="Are you sure you want to reset all data? This will remove all invoices, feedbacks, and recommendations."
@@ -446,7 +427,7 @@ export default function Home() {
                   className="flex items-center space-x-2 px-6 py-3 max-w-md w-full cursor-pointer bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105 justify-center"
                 >
                   <Plus className="h-5 w-5" />
-                  <span >Create New Invoice</span>
+                  <span>Create New Invoice</span>
                 </button>
               ) : (
                 <button
@@ -614,7 +595,6 @@ export default function Home() {
               </div>
             )}
 
-           
             {invoiceNumber && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
