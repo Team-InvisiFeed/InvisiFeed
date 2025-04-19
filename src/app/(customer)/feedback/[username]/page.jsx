@@ -76,17 +76,15 @@ function FeedbackFormContent() {
       setInvalidInvoice(false);
       setFeedbackAlreadySubmitted(false);
 
-      const owner = response.data.owner;
+      const owner = response.data.data.owner;
       if (owner) {
         setOrganizationName(owner.organizationName);
       }
-      if (!owner.invoices) {
+      const invoice = response.data.data.invoice;
+      if (!invoice) {
         setAiUsageCount(0);
         setAiLimitReached(false);
       } else {
-        const invoice = owner.invoices.find(
-          (inv) => inv.invoiceId === decodedInvoiceNumber
-        );
         setAiUsageCount(invoice?.AIuseCount || 0);
         setAiLimitReached((invoice?.AIuseCount || 0) >= 3);
 
@@ -121,12 +119,18 @@ function FeedbackFormContent() {
         username: username.trim(),
         invoiceNumber: invoiceNumber.trim(),
       });
-      setFeedbackSubmittedSuccess(true);
+
       if (response.status == 201) {
         const result = await axios.post("/api/set-recommended-actions", {
           username: username.trim(),
           invoiceNumber: invoiceNumber.trim(),
         });
+        if (result.status == 201) {
+          toast.success("Feedback submitted successfully");
+          setFeedbackSubmittedSuccess(true);
+        } else {
+          toast.error("Failed to submit feedback. Please try again.");
+        }
       }
     } catch (error) {
       toast.error("Failed to submit feedback. Please try again.");
