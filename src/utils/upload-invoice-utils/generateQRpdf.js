@@ -1,4 +1,4 @@
-import { Document, Page, View, Text, Image, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, View, Text, Image, StyleSheet, Link } from "@react-pdf/renderer";
 import { renderToStream } from "@react-pdf/renderer";
 import QRCode from "qrcode";
 
@@ -191,7 +191,7 @@ export async function generateQrPdf(
               </Text>
               {/* QR Code */}
               <Image src={qrDataUrl} style={styles.qrCode} />
-              <Text style={[styles.infoText, styles.link]}>{qrData}</Text>
+              <Link src={qrData} style={[styles.infoText, styles.link]}>Click Here</Link>
             </View>
   
             {/* Coupon Section */}

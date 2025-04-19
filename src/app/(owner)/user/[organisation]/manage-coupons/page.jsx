@@ -33,17 +33,15 @@ export default function ManageCoupons() {
 
   const fetchCoupons = async () => {
     try {
-      const response = await axios.post("/api/get-coupons", {
-        username: owner.username,
-      });
-      if (response.data.error) {
-        toast(response.data.error);
+      const response = await axios.get("/api/get-coupons");
+      if (response?.data?.success) {
+        setCoupons(response.data.coupons);
         return;
       }
-      setCoupons(response.data.coupons);
     } catch (error) {
       toast("Failed to fetch coupons");
       console.error("Error fetching coupons:", error);
+      toast(error?.response?.data?.message);
     } finally {
       setLoading(false);
     }
@@ -51,21 +49,16 @@ export default function ManageCoupons() {
 
   const handleDeleteCoupon = async (coupon) => {
     try {
-      const response = await axios.post("/api/delete-coupon", {
-        username: owner.username,
-        invoiceId: coupon.invoiceId,
+      const response = await axios.delete("/api/delete-coupon", {
+        data: { invoiceId: coupon.invoiceId }, 
       });
-
-      if (response.data.error) {
-        toast(response.data.error);
-        return;
+      if (response?.data?.success) {
+        toast("Coupon marked as used successfully");
+        setCoupons(coupons.filter((c) => c.invoiceId !== coupon.invoiceId));
+        setShowDeleteDialog(false);
       }
-
-      toast("Coupon marked as used successfully");
-      setCoupons(coupons.filter((c) => c.invoiceId !== coupon.invoiceId));
-      setShowDeleteDialog(false);
     } catch (error) {
-      toast("Failed to delete coupon");
+      toast(error?.response?.data?.message);
       console.error("Error deleting coupon:", error);
     }
   };

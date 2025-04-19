@@ -2,11 +2,15 @@ import { NextResponse } from "next/server";
 import OwnerModel from "@/models/Owner";
 import InvoiceModel from "@/models/Invoice";
 import dbConnect from "@/lib/dbConnect";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/options";
 
-export async function POST(req) {
+export async function DELETE(req) {
   await dbConnect();
   try {
-    const { username, invoiceId } = await req.json();
+    const session = await getServerSession(authOptions);
+    const username = session?.user?.username;
+    const { invoiceId } = await req.json();
 
     if (!username || !invoiceId) {
       return NextResponse.json(
@@ -45,7 +49,7 @@ export async function POST(req) {
   } catch (error) {
     console.error("Error updating coupon status:", error);
     return NextResponse.json(
-      { success: false, message: error.message },
+      { success: false, message: "Internal Server Error" },
       { status: 500 }
     );
   }
