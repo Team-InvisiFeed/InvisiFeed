@@ -52,7 +52,9 @@ export async function POST(req) {
       success: true,
       message: "GSTIN verified successfully",
       gstinDetails: owner.gstinDetails,
-    });
+    },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error verifying GSTIN:", error);
     return NextResponse.json(

@@ -1,6 +1,6 @@
 import dbConnect from "@/lib/dbConnect";
 import OwnerModel from "@/models/Owner";
-import { ApiError } from "@/utils/ApiError";
+import { NextResponse } from "next/server";
 
 export async function POST(req) {
   await dbConnect();
@@ -13,14 +13,24 @@ export async function POST(req) {
     const owner = await OwnerModel.findOne({ username: decodedUsername });
 
     if (!owner) {
-      throw new ApiError(404, "Organisation not found");
+      return NextResponse.json(
+        { success: false, message: "Organisation not found" },
+        { status: 404 }
+      );
     }
 
-    return Response.json(
-      { message: "Owner information retrieved successfully", data: owner },
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Owner information retrieved successfully",
+        data: owner,
+      },
       { status: 201 }
     );
   } catch (error) {
-    return Response.json({ message: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: error.message },
+      { status: 500 }
+    );
   }
 }
