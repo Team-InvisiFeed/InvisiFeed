@@ -24,6 +24,7 @@ export default function Home() {
 
   const [file, setFile] = useState(null);
   const [pdfUrl, setPdfUrl] = useState("");
+  const [feedbackUrl, setFeedbackUrl] = useState("");
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [dailyUploads, setDailyUploads] = useState(0);
@@ -210,6 +211,7 @@ export default function Home() {
       const { data } = await axios.post("/api/upload-invoice", formData);
 
       setPdfUrl(data.url);
+      setFeedbackUrl(data.feedbackUrl);
       setInvoiceNumber(data.invoiceNumber);
       setDailyUploads((prev) => prev + 1);
       setUploadCount((prev) => prev + 1);
@@ -256,6 +258,7 @@ export default function Home() {
         customerEmail,
         invoiceNumber,
         pdfUrl,
+        feedbackUrl,
         companyName: owner?.organizationName || "Your Company",
       });
 
@@ -314,6 +317,7 @@ export default function Home() {
 
       if (data.success) {
         setPdfUrl(data.url);
+        setFeedbackUrl(data.feedbackUrl);
         setInvoiceNumber(data.invoiceNumber);
         setUploadCount((prev) => prev + 1);
         setShowCreateInvoice(false);
@@ -343,9 +347,8 @@ export default function Home() {
   }
   return (
     <>
-      
       {/* Create Invoice Form */}
-      {showCreateInvoice &&  (
+      {showCreateInvoice && (
         <CreateInvoiceForm
           onSave={handleCreateInvoice}
           onCancel={() => setShowCreateInvoice(false)}
@@ -550,9 +553,9 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Upload Button */}
-                {
-                  pdfUrl && (<div className="w-full max-w-md mx-auto">
+                {/* Generate Invoice Button */}
+                {file && (
+                  <div className="w-full max-w-md mx-auto">
                     <motion.button
                       onClick={handleUpload}
                       disabled={
@@ -577,9 +580,9 @@ export default function Home() {
                         "Generate Smart Invoice"
                       )}
                     </motion.button>
-                  </div>)
-                }
-                
+                  </div>
+                )}
+
                 <p
                   onClick={() => setShowSampleInvoices(true)}
                   className="text-gray-100 text-sm mt-4 text-center cursor-pointer hover:text-yellow-400 transition-colors"
