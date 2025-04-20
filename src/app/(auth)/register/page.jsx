@@ -44,6 +44,7 @@ function Page() {
   // ✅ Form Setup
   const form = useForm({
     resolver: zodResolver(registerSchema),
+    mode: "onTouched",
     defaultValues: {
       organizationName: "",
       email: "",
@@ -98,6 +99,7 @@ function Page() {
         `/api/check-username-unique?username=${encodeURIComponent(username)}`
       );
 
+
       setUsernameStatus({
         isChecking: false,
         isAvailable: response.data.success,
@@ -151,6 +153,12 @@ function Page() {
       {/* Left Section with Gradient */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#000000] p-8 flex-col justify-center items-center text-white">
         <div className="max-w-md space-y-4">
+          <h1
+            className="text-4xl font-extrabold tracking-tight cursor-pointer"
+            onClick={() => router.push("/")}
+          >
+            InvisiFeed
+          </h1>
           <h1
             className="text-4xl font-extrabold tracking-tight cursor-pointer"
             onClick={() => router.push("/")}
@@ -232,7 +240,7 @@ function Page() {
           </div>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 min-h-[350px]">
               <AnimatePresence mode="wait">
                 {step === 1 && (
                   <motion.div
