@@ -158,12 +158,13 @@ const Dashboard = () => {
 
   const fetchMetrics = useCallback(async () => {
     try {
-
       const params = new URLSearchParams();
-      params.append('year', selectedYear);
-      params.append('viewType', viewType);
+      params.append("year", selectedYear);
+      params.append("viewType", viewType);
 
-      const response = await axios.get(`/api/get-dashboard-metrics?${params.toString()}`);
+      const response = await axios.get(
+        `/api/get-dashboard-metrics?${params.toString()}`
+      );
       setMetrics(response.data.data);
     } catch (error) {
       setError("Failed to fetch dashboard metrics");
@@ -250,7 +251,7 @@ const Dashboard = () => {
   if (error) return <ErrorState error={error} />;
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] p-2 sm:p-6">
+    <div className="min-h-screen bg-[#0A0A0A] p-2 sm:p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <motion.div {...ANIMATION_CONFIG} className="mb-4 sm:mb-8">
@@ -483,10 +484,10 @@ const Dashboard = () => {
         </div>
 
         {/* Bar Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6 mb-4 sm:mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6 mb-4 sm:mb-8 custom-popup-2">
           {/* Service Ratings */}
           <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity custom-popup-2" />
             <div className="relative">
               <CardHeader className="items-center pb-2">
                 <CardTitle className="text-yellow-400 text-sm sm:text-base">
@@ -497,8 +498,8 @@ const Dashboard = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-1 pb-2">
-                <div className="h-[200px] sm:h-[300px] w-full overflow-x-auto">
-                  <div className="min-w-[300px] sm:min-w-full h-full">
+                <div className="h-[200px] sm:h-[300px] w-full overflow-x-auto custom-popup-2">
+                  <div className="h-full w-full">
                     <ChartContainer config={CHART_CONFIG} className="h-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart
@@ -506,8 +507,8 @@ const Dashboard = () => {
                           layout="vertical"
                           margin={{
                             top: 10,
-                            right: 50,
-                            left: isMobile ? 10 : 100,
+                            right: isMobile ? 50 : 0,
+                            left: isMobile ? 10 : 0,
                             bottom: 10,
                           }}
                         >
@@ -518,12 +519,8 @@ const Dashboard = () => {
                             tickLine={false}
                             tickMargin={10}
                             axisLine={false}
-                            width={isMobile ? 0 : 100}
-                            tick={{
-                              fontSize: 10,
-                              fill: "#9CA3AF",
-                              display: isMobile ? "none" : "block",
-                            }}
+                            width={isMobile ? 0 : 10}
+                            tick={{ display: "none" }}
                           />
                           <XAxis type="number" domain={[0, 5]} hide />
                           <ChartTooltip
@@ -540,7 +537,7 @@ const Dashboard = () => {
                               dataKey="name"
                               position="insideLeft"
                               offset={8}
-                              className={`fill-[#000] font-medium ${
+                              className={`fill-[#515151] font-medium ${
                                 isMobile ? "block" : "hidden sm:block"
                               }`}
                               fontSize={10}
@@ -551,7 +548,7 @@ const Dashboard = () => {
                               offset={8}
                               className="fill-yellow-400 font-bold"
                               fontSize={12}
-                              formatter={(value) => `${value.toFixed(1)}`}
+                              formatter={(value) => value === 0 ? null : `${value.toFixed(1)}`}
                             />
                           </Bar>
                         </BarChart>
@@ -564,134 +561,131 @@ const Dashboard = () => {
           </Card>
 
           {/* Rating Trend Chart */}
-          <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="relative">
-              <CardHeader className="items-start pb-2">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-2">
-                  <div className="flex flex-col items-start">
-                    <CardTitle className="text-yellow-400 text-sm sm:text-base">
-                      Rating Trend
-                    </CardTitle>
-                    <CardDescription className="text-xs">
-                      Overall rating over time
-                    </CardDescription>
-                  </div>
-                  <div className="flex flex-row items-center gap-2">
-                    <Select
-                      value={viewType}
-                      onValueChange={(value) => {
-                        setViewType(value);
-                        setSelectedYear(""); // Clear year selection when changing view type
-                      }}
-                    >
-                      <SelectTrigger className="w-[120px] sm:w-[140px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400">
-                        <SelectValue placeholder="Select Time" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
-                        <SelectItem
-                          value="currentMonth"
-                          className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
-                        >
-                          Current Month
-                        </SelectItem>
-                        <SelectItem
-                          value="currentWeek"
-                          className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
-                        >
-                          Current Week
-                        </SelectItem>
-                        <SelectItem
-                          value="currentYear"
-                          className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
-                        >
-                          Current Year
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Select
-                      value={selectedYear}
-                      onValueChange={(value) => {
-                        setSelectedYear(value);
-                        setViewType(""); // Clear view type when selecting a year
-                      }}
-                    >
-                      <SelectTrigger className="w-[100px] sm:w-[120px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400">
-                        <SelectValue placeholder="Year" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
-                        {metrics?.availableYears?.map((year) => (
-                          <SelectItem
-                            key={year}
-                            value={year.toString()}
-                            className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
-                          >
-                            {year}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="flex-1 pb-2">
-                <div className="h-[200px] sm:h-[300px] w-full overflow-x-auto">
-                  <div className="min-w-[300px] sm:min-w-full h-full">
-                    <ChartContainer config={CHART_CONFIG} className="h-full">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart
-                          data={historicalData}
-                          margin={{
-                            top: 20,
-                            right: 20,
-                            left: isMobile ? 10 : 20,
-                            bottom: 60,
-                          }}
-                        >
-                          <CartesianGrid vertical={false} stroke="#374151" />
-                          <XAxis
-                            dataKey="date"
-                            stroke="#9CA3AF"
-                            tickLine={false}
-                            tickMargin={10}
-                            axisLine={false}
-                            interval={0}
-                            angle={-45}
-                            textAnchor="end"
-                            height={60}
-                            tick={{ fill: "#9CA3AF", fontSize: 8 }}
-                          />
-                          <YAxis
-                            stroke="#9CA3AF"
-                            domain={[0, 5]}
-                            tickLine={false}
-                            axisLine={false}
-                            tick={{
-                              fill: "#9CA3AF",
-                              fontSize: 10,
-                              display: isMobile ? "none" : "block",
-                            }}
-                            width={isMobile ? 0 : 30}
-                          />
-                          <ChartTooltip
-                            cursor={false}
-                            content={<ChartTooltipContent hideLabel />}
-                          />
-                          <Line
-                            type="monotone"
-                            dataKey="rating"
-                            stroke="#FACC15"
-                            strokeWidth={2}
-                            dot={{ fill: "#FACC15", r: 3 }}
-                          ></Line>
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </ChartContainer>
-                  </div>
-                </div>
-              </CardContent>
-            </div>
-          </Card>
+          <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden custom-popup-2">
+  <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+  <div className="relative">
+    <CardHeader className="items-start pb-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-2">
+        <div className="flex flex-col items-start">
+          <CardTitle className="text-yellow-400 text-sm sm:text-base">Rating Trend</CardTitle>
+          <CardDescription className="text-xs">Overall rating over time</CardDescription>
+        </div>
+        <div className="flex flex-row items-center gap-2">
+          <Select
+            value={viewType}
+            onValueChange={(value) => {
+              setViewType(value);
+              setSelectedYear(""); // Clear year selection when changing view type
+            }}
+          >
+            <SelectTrigger className="w-[120px] sm:w-[140px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400">
+              <SelectValue placeholder="Select Time" />
+            </SelectTrigger>
+            <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
+              <SelectItem
+                value="currentMonth"
+                className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
+              >
+                Current Month
+              </SelectItem>
+              <SelectItem
+                value="currentWeek"
+                className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
+              >
+                Current Week
+              </SelectItem>
+              <SelectItem
+                value="currentYear"
+                className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
+              >
+                Current Year
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          <Select
+            value={selectedYear}
+            onValueChange={(value) => {
+              setSelectedYear(value);
+              setViewType(""); // Clear view type when selecting a year
+            }}
+          >
+            <SelectTrigger className="w-[100px] sm:w-[120px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400">
+              <SelectValue placeholder="Year" />
+            </SelectTrigger>
+            <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
+              {metrics?.availableYears?.map((year) => (
+                <SelectItem
+                  key={year}
+                  value={year.toString()}
+                  className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
+                >
+                  {year}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    </CardHeader>
+    <CardContent className="flex-1 scrollbar-hidden-container overflow-y-hidden"> {/* Y-axis hidden */}
+      <div className="h-[200px] sm:h-[300px] w-full overflow-x-auto custom-popup-2">
+        <div className="min-w-[300px] sm:min-w-[400px] h-full">
+          <ChartContainer config={CHART_CONFIG} className="h-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={historicalData}
+                margin={{
+                  top: 20,
+                  right: 20,
+                  left: isMobile ? 10 : 20,
+                  bottom: 60,
+                }}
+              >
+                <CartesianGrid vertical={false} stroke="#374151" />
+                <XAxis
+                  dataKey="date"
+                  stroke="#9CA3AF"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  interval={0}
+                  angle={-45}
+                  textAnchor="end"
+                  height={2}
+                  tick={{ fill: "#9CA3AF", fontSize: 8 }}
+                />
+                <YAxis
+                  stroke="#9CA3AF"
+                  domain={[0, 5]}
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{
+                    fill: "#9CA3AF",
+                    fontSize: 10,
+                    display: isMobile ? "none" : "block",
+                  }}
+                  width={isMobile ? 0 : 30}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="rating"
+                  stroke="#FACC15"
+                  strokeWidth={2}
+                  dot={{ fill: "#FACC15", r: 3 }}
+                ></Line>
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </div>
+      </div>
+    </CardContent>
+  </div>
+</Card>
+
         </div>
 
         {/* Performance Metrics */}

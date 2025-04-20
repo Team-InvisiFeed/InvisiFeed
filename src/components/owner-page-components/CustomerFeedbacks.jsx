@@ -119,7 +119,7 @@ const CustomerFeedbacks = () => {
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {feedbacks.length === 0 ? (
           <div className="flex justify-center items-center min-h-[50vh]">
             <p className="text-gray-400 text-lg">No feedbacks available yet.</p>

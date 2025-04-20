@@ -51,6 +51,44 @@ textarea:-webkit-autofill:active {
   display: none; /* Hide arrows in Firefox */
 }
 
+/* Default hidden scrollbars */
+/* Hide scrollbar buttons (up/down arrows) for Webkit browsers */
+.custom-popup-2::-webkit-scrollbar-button {
+  display: none; /* Completely hide the scrollbar arrows */
+}
+
+/* General styling for the scrollbar for dashboard*/
+.custom-popup-2 {
+  overflow-y: hidden; /* Hide vertical scrollbar */
+  overflow-x: auto; /* Enable horizontal scrolling if needed */
+}
+.custom-popup-2::-webkit-scrollbar {
+  margin-right:5px;
+  width: 5px; /* Scrollbar width */
+ 
+}
+
+.custom-popup-2::-webkit-scrollbar-thumb {
+  background: #ffc107; /* Yellow thumb color */
+  border-radius: 12px; /* Rounded scrollbar handle */
+}
+
+.custom-popup::-webkit-scrollbar-track {
+  background: #0a0a0a; /* Dark background for scrollbar track */
+  border-radius: 12px;
+}
+
+/* Firefox specific scrollbar styles */
+.custom-popup-2 {
+  scrollbar-width: thin; /* Thin scrollbar */
+  scrollbar-color: #ffc107 #0a0a0a; /* Thumb and track colors */
+
+}
+
+/* Optional: Extra fallback for Firefox arrows */
+.custom-popup-2::-moz-scrollbar-button {
+  display: none; /* Hide arrows in Firefox */
+}
 
 
 
