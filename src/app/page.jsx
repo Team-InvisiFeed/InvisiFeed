@@ -15,7 +15,7 @@ import FAQSection from "@/components/landing-page-components/FAQSection";
 import CTASection from "@/components/landing-page-components/CTASection";
 import GetStartedPopup from "@/components/landing-page-components/GetStartedPopup";
 import ScrollToTop from "@/components/ScrollToTop";
-
+import PricingSection from "@/components/landing-page-components/PricingSection";
 export default function Home() {
   return (
     <main className="min-h-screen bg-[#0A0A0A] text-white overflow-x-hidden">
@@ -33,6 +33,7 @@ export default function Home() {
           <SampleInvoiceSection />
           <TestimonialsSection />
           <SecuritySection />
+          <PricingSection />
           <FAQSection />
           <CTASection />
         </div>
