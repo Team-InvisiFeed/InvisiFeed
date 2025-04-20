@@ -44,9 +44,9 @@ const ReviewInvisifeed = () => {
 
   return (
     <section className="py-10 bg-[#0A0A0A] relative ">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#0A0A0A] via-[#0A0A0A] to-[#000000] opacity-50 border-yellow-400/20 rounded-xl border max-w-[90vw] mx-auto hover:border-yellow-400/40  transition-colors" />
+      <div className="absolute inset-0   bg-gradient-to-br   hover:from-yellow-400/20 transition-all duration-300 opacity-50 border-yellow-400/20 rounded-xl border max-w-[90vw] mx-auto hover:border-yellow-400/40   " />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative ">
         <div className="text-center mb-16">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
