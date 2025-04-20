@@ -430,7 +430,7 @@ export default function Home() {
                   className="flex items-center space-x-2 px-6 py-3 max-w-md w-full cursor-pointer bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105 justify-center"
                 >
                   <Plus className="h-5 w-5" />
-                  <span>Create New Invoice</span>
+                  <span>Create Invoice</span>
                 </button>
               ) : (
                 <button
@@ -551,32 +551,35 @@ export default function Home() {
                 )}
 
                 {/* Upload Button */}
-                <div className="w-full max-w-md mx-auto">
-                  <motion.button
-                    onClick={handleUpload}
-                    disabled={
-                      loading || !file || dailyUploads >= 3 || initialLoading
-                    }
-                    className="w-full px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none cursor-pointer"
-                    whileHover={{
-                      scale: dailyUploads < 3 && !initialLoading ? 1.02 : 1,
-                    }}
-                    whileTap={{
-                      scale: dailyUploads < 3 && !initialLoading ? 0.98 : 1,
-                    }}
-                  >
-                    {loading || initialLoading ? (
-                      <div className="flex items-center justify-center space-x-2 ">
-                        <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
-                        <span>
-                          {initialLoading ? "Loading..." : "Processing..."}
-                        </span>
-                      </div>
-                    ) : (
-                      "Generate Smart Invoice"
-                    )}
-                  </motion.button>
-                </div>
+                {
+                  pdfUrl && (<div className="w-full max-w-md mx-auto">
+                    <motion.button
+                      onClick={handleUpload}
+                      disabled={
+                        loading || !file || dailyUploads >= 3 || initialLoading
+                      }
+                      className="w-full px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none cursor-pointer"
+                      whileHover={{
+                        scale: dailyUploads < 3 && !initialLoading ? 1.02 : 1,
+                      }}
+                      whileTap={{
+                        scale: dailyUploads < 3 && !initialLoading ? 0.98 : 1,
+                      }}
+                    >
+                      {loading || initialLoading ? (
+                        <div className="flex items-center justify-center space-x-2 ">
+                          <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
+                          <span>
+                            {initialLoading ? "Loading..." : "Processing..."}
+                          </span>
+                        </div>
+                      ) : (
+                        "Generate Smart Invoice"
+                      )}
+                    </motion.button>
+                  </div>)
+                }
+                
                 <p
                   onClick={() => setShowSampleInvoices(true)}
                   className="text-gray-100 text-sm mt-4 text-center cursor-pointer hover:text-yellow-400 transition-colors"
