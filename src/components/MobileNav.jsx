@@ -47,14 +47,8 @@ function MobileNav() {
               </span>
             </Link>
             <Link
-              href="#about"
+              href="/why-invisifeed"
               className="flex flex-col items-center space-y-1"
-              onClick={(e) => {
-                e.preventDefault();
-                document
-                  .getElementById("about")
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }}
             >
               <BarChart2 className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
               <span className="text-xs text-gray-300">About</span>
@@ -133,14 +127,8 @@ function MobileNav() {
               </span>
             </Link>
             <Link
-              href="#about"
+              href="/why-invisifeed"
               className="flex flex-col items-center space-y-1"
-              onClick={(e) => {
-                e.preventDefault();
-                document
-                  .getElementById("about")
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }}
             >
               <BarChart2 className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
               <span className="text-xs text-gray-300">About</span>
