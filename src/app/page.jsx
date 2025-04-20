@@ -8,7 +8,7 @@ import FeaturesSection from "@/components/landing-page-components/FeaturesSectio
 import DashboardShowcaseSection from "@/components/landing-page-components/DashboardShowcaseSection";
 import BenefitsSection from "@/components/landing-page-components/BenefitsSection";
 import SampleInvoiceSection from "@/components/landing-page-components/SampleInvoiceSection";
-import TestimonialsSection from "@/components/landing-page-components/TestimonialsSection";
+import ReviewInvisifeed from "@/components/landing-page-components/ReviewInvisifeed";
 import SecuritySection from "@/components/landing-page-components/SecuritySection";
 
 import FAQSection from "@/components/landing-page-components/FAQSection";
@@ -31,11 +31,11 @@ export default function Home() {
           <DashboardShowcaseSection />
           <BenefitsSection />
           <SampleInvoiceSection />
-          <TestimonialsSection />
           <SecuritySection />
           <PricingSection />
           <FAQSection />
           <CTASection />
+          <ReviewInvisifeed />
         </div>
       </div>
       <GetStartedPopup />
