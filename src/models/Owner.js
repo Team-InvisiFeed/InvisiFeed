@@ -1,6 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 
-
 const OwnerSchema = new Schema({
   organizationName: {
     type: String,
@@ -89,7 +88,7 @@ const OwnerSchema = new Schema({
     type: String,
     required: false,
     default: "",
-    trim:true
+    trim: true,
   },
 
   address: {
@@ -124,21 +123,15 @@ const OwnerSchema = new Schema({
     },
   },
 
-  feedbacks: [{
-    type: Schema.Types.ObjectId,
-    ref: "Feedback",
-  }],
+  feedbacks: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Feedback",
+    },
+  ],
 
   uploadedInvoiceCount: {
-    count: {
-      type: Number,
-      default: 0,
-    },
-    lastUpdated: {
-      type: Date,
-      default: Date.now,
-    },
-    dailyUploads: {
+    dailyUploadCount: {
       type: Number,
       default: 0,
     },
