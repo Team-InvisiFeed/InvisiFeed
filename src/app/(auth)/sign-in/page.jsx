@@ -27,7 +27,8 @@ function SignInContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [isNavigatingToRegister, setIsNavigatingToRegister] = useState(false);
   const searchParams = useSearchParams();
-
+  const [isNavigatingToForgotPassword, setIsNavigatingToForgotPassword] =
+    useState(false);
   const { data: session } = useSession();
   const username = session?.user?.username;
   const router = useRouter();
@@ -275,12 +276,16 @@ function SignInContent() {
                 />
 
                 <div className="flex items-center justify-between">
-                  <Link
-                    href="/forgot-password"
-                    className="text-sm text-yellow-400 hover:text-yellow-300"
+                  <button
+                    onClick={() => {
+                      setIsNavigatingToForgotPassword(true);
+                      router.push("/forgot-password");
+                    }}
+                    className={`text-sm cursor-pointer text-yellow-400 hover:text-yellow-300`}
+                    disabled={isNavigatingToForgotPassword} // Disable button during loading
                   >
-                    Forgot password?
-                  </Link>
+                    {isNavigatingToForgotPassword ? "Loading..." : "Forgot password?"}
+                  </button>
                 </div>
 
                 <Button

@@ -23,6 +23,7 @@ export default function ManageCoupons() {
   const [couponToDelete, setCouponToDelete] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [deleting, setDeleting] = useState(false);
   const couponsPerPage = 10;
 
   useEffect(() => {
@@ -49,17 +50,22 @@ export default function ManageCoupons() {
 
   const handleDeleteCoupon = async (coupon) => {
     try {
+      setDeleting(true);
       const response = await axios.delete("/api/delete-coupon", {
         data: { invoiceId: coupon.invoiceId }, 
       });
       if (response?.data?.success) {
+        setDeleting(false);
         toast("Coupon marked as used successfully");
         setCoupons(coupons.filter((c) => c.invoiceId !== coupon.invoiceId));
         setShowDeleteDialog(false);
       }
     } catch (error) {
       toast(error?.response?.data?.message);
+      setDeleting(false);
       console.error("Error deleting coupon:", error);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -175,7 +181,7 @@ export default function ManageCoupons() {
                                   setCouponToDelete(coupon);
                                   setShowDeleteDialog(true);
                                 }}
-                                className="text-red-400 hover:text-red-300 transition-colors"
+                                className="text-red-400 hover:text-red-300 transition-colors cursor-pointer"
                               >
                                 <MdDelete className="w-5 h-5" />
                               </button>
@@ -239,7 +245,7 @@ export default function ManageCoupons() {
                           <button
                             key={page}
                             onClick={() => handlePageChange(page)}
-                            className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                            className={`px-3 py-1 rounded-md text-sm font-medium transition-colors cursor-pointer ${
                               currentPage === page
                                 ? "bg-yellow-400/20 text-yellow-400 border border-yellow-400/30"
                                 : "text-gray-300 hover:text-yellow-400"
@@ -252,7 +258,7 @@ export default function ManageCoupons() {
                       <button
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className="px-3 py-1 rounded-md text-sm font-medium text-gray-300 hover:text-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="px-3 py-1 rounded-md text-sm font-medium text-gray-300 hover:text-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                       >
                         Next
                       </button>
@@ -279,15 +285,16 @@ export default function ManageCoupons() {
             <div className="flex justify-end space-x-4">
               <button
                 onClick={() => setShowDeleteDialog(false)}
-                className="px-4 py-2 text-gray-400 hover:text-gray-300 transition-colors"
+                className="px-4 py-2 text-gray-400 hover:text-gray-300 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
-                onClick={() => handleDeleteCoupon(couponToDelete)}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                onClick={() =>  handleDeleteCoupon(couponToDelete)}
+                disabled={deleting}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors cursor-pointer"
               >
-                Delete
+                {deleting ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>

@@ -52,6 +52,7 @@ function FeedbackFormContent() {
 
   const [organizationName, setOrganizationName] = useState("");
 
+
   const [loadingFeedback, setLoadingFeedback] = useState(false);
   const [loadingSuggestion, setLoadingSuggestion] = useState(false);
   const [invalidInvoice, setInvalidInvoice] = useState(null);
@@ -62,6 +63,7 @@ function FeedbackFormContent() {
   const [feedbackSubmittedSuccess, setFeedbackSubmittedSuccess] =
     useState(false);
   const [couponInfo, setCouponInfo] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (key, value) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -130,6 +132,7 @@ function FeedbackFormContent() {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
+      setIsLoading(true);
       const response = await axios.post("/api/submit-feedback", {
         formData,
         username: decodedUsername,
@@ -141,15 +144,20 @@ function FeedbackFormContent() {
           username: decodedUsername,
           invoiceNumber: decodedInvoiceNumber,
         });
+        setIsLoading(false);
         if (result.status == 201) {
           toast.success("Feedback submitted successfully");
           setFeedbackSubmittedSuccess(true);
+          
         } else {
           toast.error("Failed to submit feedback. Please try again.");
         }
       }
     } catch (error) {
       toast.error("Failed to submit feedback. Please try again.");
+
+    }finally{
+      setIsLoading(false);
     }
   };
 
@@ -633,12 +641,21 @@ function FeedbackFormContent() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.8 }}
               >
-                <Button
+                {
+                  isLoading ? (<Button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold py-4 sm:py-6 rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 text-sm sm:text-base disabled"
+                  >
+                   Submitting...
+                  </Button>) : ( <Button
                   type="submit"
                   className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold py-4 sm:py-6 rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 text-sm sm:text-base"
                 >
                   Submit Feedback
-                </Button>
+                </Button>)
+                }
+                
+               
               </motion.div>
             </form>
           </CardContent>

@@ -28,6 +28,7 @@ import {
   FileCheck,
   UserCog,
   Database,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -241,6 +242,7 @@ const staggerContainer = {
 };
 
 const WhyInvisiFeedSection = () => {
+  const [isNavigatingToRegister, setIsNavigatingToRegister] = useState(false);
   const router = useRouter();
   return (
     <div className="min-h-screen  bg-[#0A0A0A] text-white">
@@ -262,17 +264,27 @@ const WhyInvisiFeedSection = () => {
             </p>
             <div className="flex gap-2 justify-center">
               <Button
-                className="bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105"
+                className={`bg-gradient-to-r ${isNavigatingToRegister ? "opacity-50 disabled" : "cursor-pointer"}  from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105`}
                 onClick={() => {
+                  setIsNavigatingToRegister(true);
                   router.push("/register");
                 }}
               >
-                Try InvisiFeed for Free
-                <ArrowRight className="ml-2 h-4 w-4" />
+                {isNavigatingToRegister ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Loading...{" "}
+                  </>
+                ) : (
+                  <>
+                    Try InvisiFeed for Free
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+                )}
               </Button>
               <Button
                 variant="outline"
-                className="border-yellow-500 text-yellow-500 hover:bg-yellow-500/10 rounded-xl transition-all duration-300"
+                className="border-yellow-500 text-yellow-500 hover:bg-yellow-500/50 cursor-pointer  rounded-xl transition-all duration-300"
                 onClick={() => {
                   window.scrollTo({
                     top: document.getElementById("features").offsetTop,
@@ -330,10 +342,11 @@ const WhyInvisiFeedSection = () => {
                     <CardTitle className="text-xl text-yellow-500">
                       {stat.title}
                     </CardTitle>
-                    <CardDescription className="text-gray-400 text-sm">{stat.subheading}</CardDescription>
+                    <CardDescription className="text-gray-400 text-sm">
+                      {stat.subheading}
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    
                     <div className="text-4xl font-bold text-yellow-500 mb-2">
                       {stat.value}
                     </div>
@@ -644,15 +657,24 @@ const WhyInvisiFeedSection = () => {
             <div className="flex gap-4 justify-center">
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105"
+                className={`bg-gradient-to-r ${isNavigatingToRegister ? "opacity-50 disabled" : "cursor-pointer"}  from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105`}
                 onClick={() => {
-                  window.location.href = "/register";
+                  setIsNavigatingToRegister(true);
+                  router.push("/register");
                 }}
               >
-                Try InvisiFeed for Free
-                <ArrowRight className="ml-2 h-4 w-4" />
+                {isNavigatingToRegister ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Loading...{" "}
+                  </>
+                ) : (
+                  <>
+                    Try InvisiFeed for Free
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+                )}
               </Button>
-             
             </div>
           </motion.div>
         </div>

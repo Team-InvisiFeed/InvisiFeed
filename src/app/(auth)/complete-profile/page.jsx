@@ -38,6 +38,7 @@ const completeProfileSchema = z.object({
 
 function Page() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSkipping , setIsSkipping] = useState(false) 
   const [isNavigatingToUserPage, setIsNavigatingToUserPage] = useState(false);
 
   const router = useRouter();
@@ -311,7 +312,7 @@ function Page() {
   const handleSkipProfile = async () => {
     setShowValidation(false);
     try {
-      setIsSubmitting(true);
+      setIsSkipping(true);
 
       // Submit empty data with skipProfile flag
       const { data } = await axios.patch("/api/complete-profile", {
@@ -329,6 +330,7 @@ function Page() {
 
       if (data.success) {
         toast.success(data.message);
+        setIsSkipping(false);
 
         // Update the session to reflect the new profile status
         await update({
@@ -344,6 +346,7 @@ function Page() {
         router.push(`/user/${session?.user?.username}`);
       } else {
         toast.error(data.message || "Failed to skip profile completion");
+        setIsSkipping(false);
       }
     } catch (error) {
       console.error("Error skipping profile:", error);
@@ -761,10 +764,17 @@ function Page() {
                     <Button
                       type="button"
                       onClick={handleSkipProfile}
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isSkipping}
                       className="w-full bg-transparent hover:bg-yellow-400/10 text-yellow-400 border border-yellow-400/20 font-medium cursor-pointer h-9"
                     >
-                      I'll do it later
+                      {isSkipping ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Please wait
+                        </>
+                      ) : (
+                        "I'll do it later"
+                      )}
                     </Button>
                   </div>
                 </motion.div>
