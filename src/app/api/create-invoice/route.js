@@ -203,6 +203,7 @@ export async function POST(req) {
         message: "Invoice created successfully",
         url: uploadResponse.secure_url,
         invoiceNumber: invoiceNumber,
+        feedbackUrl: qrData,
       },
       { status: 200 }
     );

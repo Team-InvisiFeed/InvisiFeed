@@ -185,13 +185,13 @@ export async function POST(req) {
     }
 
     // Generate QR Code PDF with modified coupon code if provided
-    const qrPdfBuffer = await generateQrPdf(
+    const {pdf , feedbackUrl} = await generateQrPdf(
       invoiceNumber,
       username,
       modifiedCouponCodeforURL,
       owner
     );
-    const mergedPdfBuffer = await mergePdfs(buffer, qrPdfBuffer);
+    const mergedPdfBuffer = await mergePdfs(buffer, pdf);
 
     // Upload Final Merged PDF to Cloudinary
     const finalUpload = await new Promise((resolve, reject) => {
@@ -200,6 +200,7 @@ export async function POST(req) {
       };
 
       const sanitizedInvoiceNumber = sanitiseString(invoiceNumber);
+      
       cloudinary.v2.uploader
         .upload_stream(
           {
@@ -248,6 +249,7 @@ export async function POST(req) {
         message: "Invoice uploaded successfully",
         url: finalPdfUrl,
         invoiceNumber,
+        feedbackUrl,
       },
       { status: 200 }
     );

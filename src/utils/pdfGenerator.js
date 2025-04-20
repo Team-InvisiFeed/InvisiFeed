@@ -273,6 +273,8 @@ const InvoiceDocument = ({
     coupon: invoiceData.coupon || undefined,
   };
 
+
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>

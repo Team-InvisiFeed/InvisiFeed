@@ -244,7 +244,7 @@ export async function generateQrPdf(
       for await (const chunk of stream) {
         chunks.push(chunk);
       }
-      return Buffer.concat(chunks);
+      return {pdf: Buffer.concat(chunks), feedbackUrl: qrData};
     } catch (error) {
       console.error("Error generating QR PDF:", error);
       throw error;
