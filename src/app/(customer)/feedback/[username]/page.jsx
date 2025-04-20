@@ -71,15 +71,17 @@ function FeedbackFormContent() {
     try {
       // Properly encode parameters
       const params = new URLSearchParams();
-      params.append('username', username);
-      params.append('invoiceNumber', invoiceNumber);
+      params.append("username", username);
+      params.append("invoiceNumber", invoiceNumber);
       if (couponCode) {
-        params.append('couponCode', couponCode);
+        params.append("couponCode", couponCode);
       }
 
       console.log(params.toString());
 
-      const { data } = await axios.get(`/api/check-invoice?${params.toString()}`);
+      const { data } = await axios.get(
+        `/api/check-invoice?${params.toString()}`
+      );
 
       setInvalidInvoice(false);
       setFeedbackAlreadySubmitted(false);
@@ -102,7 +104,10 @@ function FeedbackFormContent() {
         }
       }
     } catch (error) {
-      console.error('Invoice check error:', error.response?.data.message || error);
+      console.error(
+        "Invoice check error:",
+        error.response?.data.message || error
+      );
       if (error.response && error.response.status === 404) {
         if (error.response.data.message === "Feedback already submitted") {
           setFeedbackAlreadySubmitted(true);
@@ -111,7 +116,9 @@ function FeedbackFormContent() {
         }
       } else {
         console.error("An unexpected error occurred:", error.message);
-        toast.error(error.response?.data?.message || "Failed to verify invoice");
+        toast.error(
+          error.response?.data?.message || "Failed to verify invoice"
+        );
       }
     }
   };
@@ -486,7 +493,7 @@ function FeedbackFormContent() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Card className="w-full max-w-2xl mx-auto bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/20">
+        <Card className="w-full max-w-2xl mx-auto bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/20 ">
           <CardHeader className="border-b border-yellow-400/20 px-4 sm:px-6">
             <CardTitle className="text-xl sm:text-2xl font-bold text-yellow-400">
               Service Feedback for {organizationName}
@@ -636,6 +643,30 @@ function FeedbackFormContent() {
             </form>
           </CardContent>
         </Card>
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.9 }}
+        className="mt-8 sm:mt-10 text-center p-4 sm:p-6 rounded-lg border border-yellow-400/20 
+             bg-gradient-to-br   hover:from-yellow-400/20  transition-all duration-300 max-w-2xl mx-auto"
+      >
+        <p className="text-sm sm:text-base text-gray-200 font-medium">
+          Are you a service provider? Want to gather anonymous feedback and gain
+          valuable insights from your customers?
+        </p>
+        <p className="text-sm sm:text-base text-yellow-400 font-semibold mt-2">
+          Explore{" "}
+          <a
+            href="https://invisifeed.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-yellow-300"
+          >
+            InvisiFeed
+          </a>{" "}
+          now and transform the way you understand your audience!
+        </p>
       </motion.div>
     </div>
   );
