@@ -143,6 +143,10 @@ const VerifyAccount = () => {
               <p className="mt-1 text-sm text-gray-400">
                 Enter the verification code sent to your email
               </p>
+              <p className="text-[10px] text-gray-400">
+                [Kindly check your spam folder if you don't see it in your
+                inbox]
+              </p>
             </div>
 
             <form
