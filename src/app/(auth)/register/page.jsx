@@ -45,6 +45,7 @@ function Page() {
   // ✅ Form Setup
   const form = useForm({
     resolver: zodResolver(registerSchema),
+    mode: "onTouched",
     defaultValues: {
       organizationName: "",
       email: "",
