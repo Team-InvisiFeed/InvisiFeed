@@ -222,13 +222,10 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
 });
-// Format currency
-const formatCurrency = (amount) => {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(amount);
-};
+
+
+
+
 
 // Create PDF document
 const InvoiceDocument = ({
@@ -515,20 +512,20 @@ const InvoiceDocument = ({
             <View style={styles.summary}>
               <View style={styles.summaryTable}>
                 <View style={styles.summaryRow}>
-                  <Text>Subtotal</Text>
-                  <Text>{formatCurrency(subtotal)}</Text>
+                  <Text>Subtotal (INR)</Text>
+                  <Text>{(subtotal.toFixed(2))}</Text>
                 </View>
                 <View style={styles.summaryRow}>
-                  <Text>Discount</Text>
-                  <Text>{formatCurrency(discountTotal)}</Text>
+                  <Text>Discount (INR)</Text>
+                  <Text>{(discountTotal.toFixed(2))}</Text>
                 </View>
                 <View style={styles.summaryRow}>
-                  <Text>Tax ({filteredInvoiceData.taxRate}%)</Text>
-                  <Text>{formatCurrency(taxTotal)}</Text>
+                  <Text>Tax (INR)</Text>
+                  <Text>{(taxTotal.toFixed(2))}</Text>
                 </View>
                 <View style={[styles.summaryRow, styles.summaryRowLast]}>
-                  <Text>Total</Text>
-                  <Text>{formatCurrency(grandTotal)}</Text>
+                  <Text>Total (INR)</Text>
+                  <Text>{(grandTotal.toFixed(2))}</Text>
                 </View>
               </View>
             </View>
@@ -586,32 +583,26 @@ const InvoiceDocument = ({
 
           {/* Disclaimer */}
           <View
-            style={{
-              marginTop: 10,
-              backgroundColor: "#fff1f2",
-              padding: 8,
-              borderRadius: 4,
-              border: "1px solid #fecdd3",
-            }}
-          >
-            <Text
-              style={{
-                color: "#881337",
-                fontSize: 7,
-                textAlign: "center",
-                lineHeight: 1.5,
-              }}
-            >
-              Disclaimer: This tool is meant strictly for generating valid
-              business invoices. Any misuse, such as fake invoicing or GST
-              fraud, is punishable under the GST Act, 2017 and Bharatiya Nyaya
-              Sanhita (BNS), 2023 (Sections 316 & 333). The user is solely
-              responsible for the accuracy of GSTIN or any missing information;
-              as per Rule 46 of the CGST Rules, furnishing correct invoice
-              details is the supplier’s responsibility. We are not liable for
-              any incorrect, fake, or missing GSTIN entered by users.
-            </Text>
-          </View>
+        style={{
+          marginTop: 10,
+          backgroundColor: "#f9fafb",
+          padding: 8,
+          borderRadius: 4,
+             border: "1px solid #eaeaea",
+          
+        }}
+      >
+        <Text
+          style={{
+            color: "#4b5563",
+            fontSize: 7,
+            textAlign: "center",
+            lineHeight: 1.5,
+          }}
+        >
+          Disclaimer: This tool is meant strictly for generating valid business invoices. Any misuse, such as fake invoicing or GST fraud, is punishable under the GST Act, 2017 and Bharatiya Nyaya Sanhita (BNS), 2023 (Sections 316 & 333). The user is solely responsible for the accuracy of GSTIN or any missing information; as per Rule 46 of the CGST Rules, furnishing correct invoice details is the supplier’s responsibility. We are not liable for any incorrect, fake, or missing GSTIN entered by users.
+        </Text>
+      </View>
 
           {/* Created with */}
           <Text style={styles.createdWith}>

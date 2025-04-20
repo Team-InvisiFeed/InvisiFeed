@@ -96,13 +96,13 @@ const styles = StyleSheet.create({
     disclaimer: {
       marginTop: 30,
       padding: 10,
-      backgroundColor: "#fff1f2",
+      backgroundColor: "#f9fafb",
       borderRadius: 4,
-      border: "1px solid #fecdd3",
+      border: "1px solid #eaeaea",
     },
     disclaimerText: {
       fontSize: 7,
-      color: "#881337",
+      color: "#4b5563",
       textAlign: "center",
       lineHeight: 1.5,
     },
