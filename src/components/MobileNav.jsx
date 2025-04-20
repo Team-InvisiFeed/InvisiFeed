@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
-import { Home, BarChart2, Zap, Star, MessageCircle } from "lucide-react";
+import { Home, BarChart2, Zap, Star, MessageCircle, Book } from "lucide-react";
 
 function MobileNav() {
   const { data: session } = useSession();
@@ -52,6 +52,13 @@ function MobileNav() {
             >
               <BarChart2 className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
               <span className="text-xs text-gray-300">About</span>
+            </Link>
+            <Link
+              href="/guide"
+              className="flex flex-col items-center space-y-1"
+            >
+              <Book className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
+              <span className="text-xs text-gray-300">Guide</span>
             </Link>
             <Link
               href="#contact"
@@ -132,6 +139,13 @@ function MobileNav() {
             >
               <BarChart2 className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
               <span className="text-xs text-gray-300">About</span>
+            </Link>
+            <Link
+              href="/guide"
+              className="flex flex-col items-center space-y-1"
+            >
+              <Book className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
+              <span className="text-xs text-gray-300">Guide</span>
             </Link>
             <Link
               href="#contact"
