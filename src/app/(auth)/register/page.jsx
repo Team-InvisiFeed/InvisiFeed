@@ -153,18 +153,7 @@ function Page() {
       {/* Left Section with Gradient */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#000000] p-8 flex-col justify-center items-center text-white">
         <div className="max-w-md space-y-4">
-          <h1
-            className="text-4xl font-extrabold tracking-tight cursor-pointer"
-            onClick={() => router.push("/")}
-          >
-            InvisiFeed
-          </h1>
-          <h1
-            className="text-4xl font-extrabold tracking-tight cursor-pointer"
-            onClick={() => router.push("/")}
-          >
-            InvisiFeed
-          </h1>
+          <h1 className="text-4xl font-extrabold tracking-tight cursor-pointer" onClick={() => router.push("/")}>InvisiFeed</h1>
           <p className="text-lg text-gray-200">
             Transform your organization with honest, anonymous feedback
           </p>
@@ -190,7 +179,7 @@ function Page() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 0.3 }}
           className="w-full max-w-md space-y-4"
         >
           {/* Fixed Header Section */}
@@ -218,11 +207,7 @@ function Page() {
                     {stepNumber}
                   </div>
                   <span className="text-xs mt-1 text-gray-400">
-                    {stepNumber === 1
-                      ? "Organization"
-                      : stepNumber === 2
-                      ? "Username"
-                      : "Password"}
+                    {stepNumber === 1 ? "Organization" : stepNumber === 2 ? "Username" : "Password"}
                   </span>
                 </div>
                 {stepNumber < 3 && (
@@ -240,7 +225,7 @@ function Page() {
           </div>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 min-h-[350px]">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <AnimatePresence mode="wait">
                 {step === 1 && (
                   <motion.div
@@ -300,10 +285,9 @@ function Page() {
                       name="username"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-md text-gray-400">
+                             <FormLabel className="text-md text-gray-400">
                             Set up a unique username
                           </FormLabel>
-
                           <FormControl>
                             <div className="relative">
                               <Input
@@ -426,7 +410,7 @@ function Page() {
                     onClick={() => setStep(step - 1)}
                     className="w-full bg-transparent hover:bg-gray-800 text-gray-400 border border-gray-700 hover:text-white font-medium cursor-pointer h-9"
                   >
-                    <IoIosArrowBack className="h-4 w-4 mr-2" />
+                   
                     Back
                   </Button>
                 )}
@@ -435,12 +419,7 @@ function Page() {
                   <Button
                     type="button"
                     onClick={handleNext}
-                    disabled={
-                      isSubmitting ||
-                      (step === 2 &&
-                        (!usernameStatus.isAvailable ||
-                          usernameStatus.isChecking))
-                    }
+                    disabled={isSubmitting || (step === 2 && (!usernameStatus.isAvailable || usernameStatus.isChecking))}
                     className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium cursor-pointer h-9 shadow-lg shadow-yellow-500/20"
                   >
                     {isSubmitting ? (
