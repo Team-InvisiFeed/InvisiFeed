@@ -45,18 +45,17 @@ function Navbar() {
 
         {/* Navigation Links - Desktop */}
         <div className="hidden md:flex space-x-6 absolute left-1/2 -translate-x-1/2">
-          {pathname === "/" ? (
+          {pathname === "/" || pathname === "/why-invisifeed" || pathname === "/guide" ? (
             <>
               <Link
                 href="/"
-                className={`text-gray-300 hover:text-yellow-400 transition-colors ${
-                  pathname === "/" ? "font-bold text-yellow-400" : ""
+                className={`text-gray-300 hover:text-yellow-400 transition-colors 
                 }`}
               >
                 Home
               </Link>
               <Link
-                href="#about"
+                href="/why-invisifeed"
                 className="text-gray-300 hover:text-yellow-400 transition-colors"
               >
                 About
@@ -72,6 +71,12 @@ function Navbar() {
                 }}
               >
                 Contact
+              </Link>
+              <Link
+                href="/guide"
+                className="text-gray-300 hover:text-yellow-400 transition-colors"
+              >
+                Guide
               </Link>
             </>
           ) : owner ? (

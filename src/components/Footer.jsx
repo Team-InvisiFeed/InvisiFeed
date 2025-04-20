@@ -79,14 +79,16 @@ function Footer() {
               Quick Links
             </h4>
             <ul className="space-y-3">
-              {["Home", "About Us", "Privacy Policy"].map((link) => (
+              {["Home", "About Us", "Privacy Policy", "Guide"].map((link) => (
                 <li key={link}>
                   <Link
                     href={
                       link === "Home"
                         ? "/"
                         : link === "About Us"
-                        ? "/about-us"
+                        ? "/why-invisifeed"
+                        : link === "Guide"
+                        ? "/guide"
                         : "/privacy-policy"
                     }
                     className="text-gray-400 hover:text-yellow-400 transition-colors duration-200 flex items-center space-x-2 group"
