@@ -32,14 +32,19 @@ export async function GET(req) {
     const lastReset = new Date(owner.uploadedInvoiceCount.lastDailyReset);
     const hoursSinceLastReset = (now - lastReset) / (1000 * 60 * 60);
 
-    if (owner.uploadedInvoiceCount.dailyUploads >= 3) {
+    if(hoursSinceLastReset > 24){
+      owner.uploadedInvoiceCount.dailyUploadCount = 0;
+      await owner.save();
+    }
+
+    if (owner.uploadedInvoiceCount.dailyUploadCount >= 3) {
       timeLeft = Math.ceil(24 - hoursSinceLastReset);
     }
 
     return NextResponse.json({
       success: true,
       message: "Upload count fetched successfully",
-      dailyUploads: owner.uploadedInvoiceCount.dailyUploads,
+      dailyUploadCount: owner.uploadedInvoiceCount.dailyUploadCount,
       timeLeft,
       dailyLimit: 3,
     });

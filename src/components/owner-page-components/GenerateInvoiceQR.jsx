@@ -28,7 +28,7 @@ export default function Home() {
   const [feedbackUrl, setFeedbackUrl] = useState("");
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [loading, setLoading] = useState(false);
-  const [dailyUploads, setDailyUploads] = useState(0);
+  const [dailyUploadCount, setDailyUploadCount] = useState(0);
   const [timeLeft, setTimeLeft] = useState(null);
   const [initialLoading, setInitialLoading] = useState(true);
   const [customerEmail, setCustomerEmail] = useState("");
@@ -45,7 +45,6 @@ export default function Home() {
   });
   const [couponSaved, setCouponSaved] = useState(false);
   const [showCreateInvoice, setShowCreateInvoice] = useState(false);
-  const [uploadCount, setUploadCount] = useState(0);
   const [dailyLimit, setDailyLimit] = useState(3);
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -89,11 +88,10 @@ export default function Home() {
       try {
         const { data } = await axios.get(`/api/upload-count`);
         if (data.success) {
-          setDailyUploads(data.dailyUploads);
+          setDailyUploadCount(data.dailyUploadCount);
           if (data.timeLeft) {
             setTimeLeft(data.timeLeft);
           }
-          setUploadCount(data.count);
           if (data.dailyLimit) {
             setDailyLimit(data.dailyLimit);
           }
@@ -192,7 +190,7 @@ export default function Home() {
       return;
     }
 
-    if (uploadCount >= dailyLimit) {
+    if (dailyUploadCount >= dailyLimit) {
       toast.error(`Daily upload limit (${dailyLimit}) reached`);
       return;
     }
@@ -210,16 +208,17 @@ export default function Home() {
     formData.append("isSampleInvoice", isSampleInvoice);
 
     try {
-      const { data } = await axios.post("/api/upload-invoice", formData);
+      const response = await axios.post("/api/upload-invoice", formData);
+      const data = response.data;
 
       setPdfUrl(data.url);
       setFeedbackUrl(data.feedbackUrl);
       setInvoiceNumber(data.invoiceNumber);
-      setDailyUploads((prev) => prev + 1);
-      setUploadCount((prev) => prev + 1);
+      setDailyUploadCount(data.dailyUploadCount);
       setEmailSent(false);
       setCustomerEmail("");
       setCouponSaved(false);
+      setTimeLeft(data.timeLeft);
       setCouponData({
         couponCode: "",
         description: "",
@@ -316,22 +315,24 @@ export default function Home() {
   };
 
   const handleCreateInvoice = async (invoiceData) => {
-    if (uploadCount >= dailyLimit) {
+    if (dailyUploadCount >= dailyLimit) {
       toast.error(`Daily upload limit (${dailyLimit}) reached`);
       return;
     }
 
     setLoading(true);
     try {
-      const { data } = await axios.post("/api/create-invoice", {
+      const response = await axios.post("/api/create-invoice", {
         ...invoiceData,
       });
+      const data = response.data;
 
       if (data.success) {
         setPdfUrl(data.url);
         setFeedbackUrl(data.feedbackUrl);
         setInvoiceNumber(data.invoiceNumber);
-        setUploadCount((prev) => prev + 1);
+        setDailyUploadCount(data.dailyUploadCount);
+        setTimeLeft(data.timeLeft);
         setShowCreateInvoice(false);
         toast.success("Invoice created successfully");
       } else {
@@ -394,9 +395,12 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-yellow-400/5 rounded-full blur-3xl" />
           <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-yellow-400/5 rounded-full blur-3xl" />
+
           <button className="absolute top-4 right-4 rounded-full p-2 hover:bg-yellow-400/40 transition-colors cursor-pointer duration-300" onClick={handleRefreshComponent}>
-            <RefreshCw className="h-5 w-5 text-yellow-400" />
+            <RefreshCw className="h-5 w-5 text-yellow-400 cursor-pointer" />
           </button>
+  
+         
           <div className="relative z-10 w-full">
             <h1 className="text-3xl font-bold mb-2 text-center bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
               Invoice Management
@@ -419,7 +423,7 @@ export default function Home() {
                   <p className="text-sm text-gray-300">
                     Daily Uploads:{" "}
                     <span className="font-medium text-yellow-400">
-                      {dailyUploads}
+                      {dailyUploadCount}
                     </span>
                     /
                     <span className="font-medium text-yellow-400">
@@ -432,7 +436,7 @@ export default function Home() {
 
             {/* Action Buttons */}
             <div className="flex justify-center space-x-4 mb-8 ">
-              {file ? null : dailyUploads >= 3 ? (
+              {file ? null : dailyUploadCount >= 3 ? (
                 <div className="text-center">
                   <p className="text-yellow-400 text-lg font-medium mb-2">
                     Daily Limit Reached
@@ -462,7 +466,7 @@ export default function Home() {
             </div>
 
             {/* File Input Section */}
-            {!showCreateInvoice && dailyUploads < 3 && (
+            {!showCreateInvoice && dailyUploadCount < 3 && (
               <div className="mb-8 flex flex-col items-center w-full space-y-4">
                 {/* Display File Name */}
                 {file && (
@@ -574,14 +578,14 @@ export default function Home() {
                     <motion.button
                       onClick={handleUpload}
                       disabled={
-                        loading || !file || dailyUploads >= 3 || initialLoading
+                        loading || !file || dailyUploadCount >= 3 || initialLoading
                       }
                       className="w-full px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none cursor-pointer"
                       whileHover={{
-                        scale: dailyUploads < 3 && !initialLoading ? 1.02 : 1,
+                        scale: dailyUploadCount < 3 && !initialLoading ? 1.02 : 1,
                       }}
                       whileTap={{
-                        scale: dailyUploads < 3 && !initialLoading ? 0.98 : 1,
+                        scale: dailyUploadCount < 3 && !initialLoading ? 0.98 : 1,
                       }}
                     >
                       {loading || initialLoading ? (
@@ -601,7 +605,7 @@ export default function Home() {
                 <p
                   onClick={() => setShowSampleInvoices(true)}
                   className="text-gray-100 text-sm mt-4 text-center cursor-pointer hover:text-yellow-400 transition-colors"
-                  disabled={initialLoading || dailyUploads >= 3}
+                  disabled={initialLoading || dailyUploadCount >= 3}
                 >
                   Try out our sample invoices to get started
                 </p>
@@ -843,7 +847,7 @@ export default function Home() {
         )}
 
         {/* Sample Invoices Modal */}
-        {showSampleInvoices && dailyUploads < 3 && (
+        {showSampleInvoices && dailyUploadCount < 3 && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm p-4 overflow-">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -892,7 +896,7 @@ export default function Home() {
                     key={invoice.id}
                     onClick={() => handleSampleInvoiceSelect(invoice)}
                     className="w-full px-4 py-3 bg-[#0A0A0A] border border-yellow-400/20 rounded-xl text-white hover:bg-[#0A0A0A]/80 hover:border-yellow-400/40 transition-all duration-300 flex items-center justify-between cursor-pointer hover:scale-105"
-                    disabled={loading || dailyUploads >= 3}
+                    disabled={loading || dailyUploadCount >= 3}
                   >
                     <span className="text-sm">{invoice.name}</span>
                     {loading && file && file.name === `${invoice.name}.pdf` ? (

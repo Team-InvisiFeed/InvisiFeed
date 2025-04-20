@@ -109,17 +109,17 @@ export async function POST(req) {
     const now = new Date();
     const lastReset = new Date(owner.uploadedInvoiceCount.lastDailyReset);
     const hoursSinceLastReset = (now - lastReset) / (1000 * 60 * 60);
+    const timeLeft = 24 - hoursSinceLastReset;
+    const hoursLeft = Math.ceil(timeLeft);
 
     // Reset daily uploads if 24 hours have passed
     if (hoursSinceLastReset >= 24) {
-      owner.uploadedInvoiceCount.dailyUploads = 0;
+      owner.uploadedInvoiceCount.dailyUploadCount = 0;
       owner.uploadedInvoiceCount.lastDailyReset = now;
     }
 
     // Check if daily limit reached
-    if (owner.uploadedInvoiceCount.dailyUploads >= 3) {
-      const timeLeft = 24 - hoursSinceLastReset;
-      const hoursLeft = Math.ceil(timeLeft);
+    if (owner.uploadedInvoiceCount.dailyUploadCount >= 3) {
       return NextResponse.json(
         {
           success: false,
@@ -237,11 +237,11 @@ export async function POST(req) {
     await newInvoice.save();
 
     // Update upload counts
-    owner.uploadedInvoiceCount.count += 1;
-    owner.uploadedInvoiceCount.dailyUploads += 1;
-    owner.uploadedInvoiceCount.lastUpdated = now;
+    owner.uploadedInvoiceCount.dailyUploadCount += 1;
 
     await owner.save();
+
+
 
     return NextResponse.json(
       {
@@ -250,6 +250,8 @@ export async function POST(req) {
         url: finalPdfUrl,
         invoiceNumber,
         feedbackUrl,
+        dailyUploadCount: owner.uploadedInvoiceCount.dailyUploadCount,
+        timeLeft: hoursLeft,
       },
       { status: 200 }
     );
