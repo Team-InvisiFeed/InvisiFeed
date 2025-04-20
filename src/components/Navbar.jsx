@@ -61,6 +61,12 @@ function Navbar() {
                 About
               </Link>
               <Link
+                href="/guide"
+                className="text-gray-300 hover:text-yellow-400 transition-colors"
+              >
+                Guide
+              </Link>
+              <Link
                 href="#contact"
                 className="text-gray-300 hover:text-yellow-400 transition-colors"
                 onClick={(e) => {
@@ -72,12 +78,7 @@ function Navbar() {
               >
                 Contact
               </Link>
-              <Link
-                href="/guide"
-                className="text-gray-300 hover:text-yellow-400 transition-colors"
-              >
-                Guide
-              </Link>
+              
             </>
           ) : owner ? (
             <>
