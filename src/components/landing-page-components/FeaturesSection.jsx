@@ -8,6 +8,8 @@ import {
   Lock,
   Bell,
   TrendingUp,
+  FileText,
+  Gift,
 } from "lucide-react";
 import {
   Card,
@@ -31,9 +33,9 @@ const features = [
     delay: 0.2,
   },
   {
-    title: "Team Engagement",
-    description: "Foster better communication and team collaboration",
-    icon: Users,
+    title: "Invoice Generation",
+    description: "Generate invoices for your customers",
+    icon: FileText,
     delay: 0.3,
   },
   {
@@ -43,9 +45,9 @@ const features = [
     delay: 0.4,
   },
   {
-    title: "Smart Notifications",
-    description: "Stay updated with intelligent notification system",
-    icon: Bell,
+    title: "Create Coupons",
+    description: "Create coupons for your customers",
+    icon: Gift,
     delay: 0.5,
   },
   {
@@ -92,7 +94,7 @@ const FeaturesSection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: feature.delay }}
               >
-                <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
+                <Card className="bg-gradient-to-br h-full from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="relative">
                     <CardHeader>
