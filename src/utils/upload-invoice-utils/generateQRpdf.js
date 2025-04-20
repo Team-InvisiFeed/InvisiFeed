@@ -184,7 +184,7 @@ export async function generateQrPdf(
                 Scan this QR code to share your valuable feedback
               </Text>
               <Text style={[styles.infoText, styles.textCenter]}>
-                Your insights help us deliver exceptional service
+               Your feedback stays anonymous!
               </Text>
               <Text style={[styles.infoText, styles.textCenter]}>
                 Thank you for choosing InvisiFeed!
