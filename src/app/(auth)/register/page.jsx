@@ -40,6 +40,8 @@ function Page() {
   });
   const usernameCheckTimeout = useRef(null);
 
+
+
   // ✅ Form Setup
   const form = useForm({
     resolver: zodResolver(registerSchema),
@@ -96,6 +98,7 @@ function Page() {
       const response = await axios.get(
         `/api/check-username-unique?username=${encodeURIComponent(username)}`
       );
+      
       setUsernameStatus({
         isChecking: false,
         isAvailable: response.data.success,
@@ -377,7 +380,7 @@ function Page() {
                     <Button
                       type="button"
                       onClick={handleNext}
-                      disabled={isSubmitting || !usernameStatus.isAvailable}
+                      disabled={isSubmitting || !usernameStatus.isAvailable || usernameStatus.isChecking}
                       className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium cursor-pointer h-9 shadow-lg shadow-yellow-500/20"
                     >
                       {isSubmitting ? (
