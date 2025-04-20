@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Check, ArrowRight } from "lucide-react";
-
+import ContactAdminPopup from "./ContactAdminPopup";
+import { useRouter } from "next/navigation";
 const pricingPlans = [
   {
     name: "Free",
@@ -42,7 +43,10 @@ const pricingPlans = [
 ];
 
 const PricingSection = () => {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
   return (
+    <>
     <section className="py-24 bg-[#0A0A0A] relative">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#0A0A0A] via-[#0A0A0A] to-[#000000] opacity-50" />
 
@@ -103,6 +107,14 @@ const PricingSection = () => {
                 
                 <motion.button
                   whileHover={{ scale: 1.05 }}
+                  onClick={() => {
+                    if (plan.name === "Pro") {
+                      setOpen(true);
+                    } 
+                    else if (plan.name === "Free") {
+                      router.push("/register");
+                    }
+                  }}
                   whileTap={{ scale: 0.95 }}
                   className={`w-full py-3 px-4 rounded-lg font-medium flex items-center justify-center ${
                     plan.highlighted
@@ -128,6 +140,8 @@ const PricingSection = () => {
         </div>
       </div>
     </section>
+    <ContactAdminPopup open={open} onOpenChange={setOpen} />
+    </>
   );
 };
 
