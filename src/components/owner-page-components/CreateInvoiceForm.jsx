@@ -72,10 +72,10 @@ const formSchema = z.object({
   // Payment Info
   bankDetails: z.string().optional(),
   paymentMethod: z.string(),
-  paymentInstructions: z.string().optional(),
+  paymentInstructions: z.string().max(200, "Payment instructions must not exceed 200 characters").optional(),
 
   // Notes
-  notes: z.string().optional(),
+  notes: z.string().max(200, "Notes must not exceed 200 characters").optional(),
 
   // Add-ons
   includeFeedbackForm: z.boolean(),
