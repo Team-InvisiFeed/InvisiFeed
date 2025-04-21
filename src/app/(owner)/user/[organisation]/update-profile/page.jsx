@@ -27,6 +27,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
+import { useWatch } from "react-hook-form";
 
 const formSchema = z.object({
   organizationName: z.string().min(1, "Organization name is required"),
@@ -174,6 +175,9 @@ function UpdateProfilePage() {
       );
       return;
     }
+
+    
+
     const payload = {
       data,
     };
@@ -208,6 +212,28 @@ function UpdateProfilePage() {
     }
   };
 
+
+
+const [isSaveDisabled, setIsSaveDisabled] = useState(true);
+
+// Watch for changes in form values
+const watchedValues = useWatch({
+  control: form.control,
+});
+
+// Function to compare form values with `owner`
+const isFormUnchanged = (formData, ownerData) => {
+  return JSON.stringify(formData) === JSON.stringify(ownerData);
+};
+
+// Use effect to enable/disable the save button based on changes
+useEffect(() => {
+  const currentFormValues = form.getValues();
+  if (owner) {
+    const unchanged = isFormUnchanged(currentFormValues, owner);
+    setIsSaveDisabled(unchanged);
+  }
+}, [watchedValues, owner]);
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
@@ -464,12 +490,12 @@ function UpdateProfilePage() {
                 <div className="flex justify-center mt-8">
                   <Button
                     type="submit"
-                    disabled={saving || editingField === "all"}
+                    disabled={saving || isSaveDisabled}
                     className={`px-8 py-2 font-semibold ${
-                      editingField !== "all"
-                        ? "bg-yellow-400 hover:bg-yellow-500 text-black"
-                        : "bg-gray-700 text-gray-400 cursor-not-allowed"
-                    }`}
+                      editingField !== "all" 
+                        ? "bg-yellow-400 hover:bg-yellow-500  text-black"
+                        : "bg-gray-700 text-gray-400 "
+                    } ${isSaveDisabled || saving ? "cursor-not-allowed" : "cursor-pointer"}`}
                   >
                     {saving ? (
                       <>
