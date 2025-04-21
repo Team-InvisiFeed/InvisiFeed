@@ -19,7 +19,7 @@ export default function ContactAdminPopup({ open, onOpenChange }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[425px] bg-[#0A0A0A] border border-yellow-400/10">
+      <DialogContent className="max-w-[90vw] bg-[#0A0A0A] border hover:border-yellow-400 border-yellow-400/10">
         <DialogHeader>
           <DialogTitle className="text-white">Stay in touch</DialogTitle>
         </DialogHeader>
@@ -30,7 +30,7 @@ export default function ContactAdminPopup({ open, onOpenChange }) {
             </p>
           </div>
 
-          <Button onClick={handleSubmit}>Contact Admin</Button>
+          <Button className="bg-yellow-400 text-black hover:bg-yellow-500 cursor-pointer " onClick={handleSubmit}>Contact Admin</Button>
         </div>
       </DialogContent>
     </Dialog>
