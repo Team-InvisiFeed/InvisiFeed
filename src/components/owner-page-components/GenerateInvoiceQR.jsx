@@ -47,11 +47,12 @@ export default function Home() {
   const [couponSaved, setCouponSaved] = useState(false);
   const [showCreateInvoice, setShowCreateInvoice] = useState(false);
   const [dailyLimit, setDailyLimit] = useState(3);
-  const [showInvoiceForm, setShowInvoiceForm] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const [showCompleteProfileDialog, setShowCompleteProfileDialog] =
     useState(false);
   const [couponDeleteConfirm, setCouponDeleteConfirm] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   // Sample invoice data
   const sampleInvoices = [
@@ -321,7 +322,7 @@ export default function Home() {
       return;
     }
 
-    setLoading(true);
+setSaving(true);
     try {
       const response = await axios.post("/api/create-invoice", {
         ...invoiceData,
@@ -335,11 +336,13 @@ export default function Home() {
         setDailyUploadCount(data.dailyUploadCount);
         setTimeLeft(data.timeLeft);
         setShowCreateInvoice(false);
+        setSaving(false);
         toast.success("Invoice created successfully");
       } else {
         toast.error(
           data.message || "Failed to create invoice. Please try again."
         );
+        setSaving(false);
       }
     } catch (error) {
       console.error("Error creating invoice:", error);
@@ -348,7 +351,7 @@ export default function Home() {
           "Failed to create invoice. Please try again."
       );
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
@@ -367,6 +370,8 @@ export default function Home() {
           onSave={handleCreateInvoice}
           onCancel={() => setShowCreateInvoice(false)}
           open={showCreateInvoice}
+          saving={saving}
+          
           onOpenChange={setShowCreateInvoice}
         />
       )}

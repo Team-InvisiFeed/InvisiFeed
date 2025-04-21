@@ -94,6 +94,7 @@ export default function CreateInvoiceForm({
   onCancel,
   open,
   onOpenChange,
+  saving,
 }) {
   const { data: session } = useSession();
   const owner = session?.user;
@@ -161,6 +162,7 @@ export default function CreateInvoiceForm({
   const [taxTotal, setTaxTotal] = useState(0);
   const [discountTotal, setDiscountTotal] = useState(0);
   const [grandTotal, setGrandTotal] = useState(0);
+
 
   const calculateTotals = (items) => {
     let sub = 0;
@@ -1040,7 +1042,7 @@ export default function CreateInvoiceForm({
                       className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 cursor-pointer mr-4"
                     >
                       <Save className="w-4 h-4 mr-2" />
-                      Save Invoice
+               {saving ? "Saving..." : "Save Invoice"}
                     </Button>
                   </div>
    
