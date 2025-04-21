@@ -8,14 +8,15 @@ import { useRouter } from "next/navigation";
 const pricingPlans = [
   {
     name: "Free",
-    price: "$0",
-    description: "Perfect for freelancers and small businesses just getting started",
+    price: "₹0",
+    description: "Perfect for freelancers and agencies just starting out.",
     features: [
       "Unlimited feedback collection",
       "Basic analytics dashboard",
       "Standard feedback form",
-      "QR code generation",
-      "Email support",
+      "3 invoices per day",
+      "Coupons management tools",
+      "Email support access",
     ],
     cta: "Get Started Free",
     highlighted: false,
@@ -23,24 +24,23 @@ const pricingPlans = [
   },
   {
     name: "Pro",
-    price: "$19",
+    price: "₹99",
     period: "/month",
-    description: "Ideal for growing businesses and service providers",
+    description: "Designed for growing businesses and scaling agencies.",
     features: [
-      "Everything in Free plan",
+      "All Free plan features",
       "Advanced analytics dashboard",
-      "AI-generated feedback forms",
-      "Custom branding",
-      "Priority email support",
-      "Feedback filters and sorting",
-      "Data export capabilities",
-      "Coupon management",
+      "Multiple invoice templates",
+      "Custom feedback forms",
+      "Unlimited invoice creation",
+      "Monthly performance reports",
     ],
     cta: "Start Pro Trial",
     highlighted: true,
     delay: 0.2,
   },
 ];
+
 
 const PricingSection = () => {
   const router = useRouter();
