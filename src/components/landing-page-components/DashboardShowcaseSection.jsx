@@ -2,14 +2,14 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { 
-  BarChart, 
-  PieChart, 
-  LineChart, 
-  TrendingUp, 
-  Star, 
-  ThumbsUp, 
-  ThumbsDown 
+import {
+  BarChart,
+  PieChart,
+  LineChart,
+  TrendingUp,
+  Star,
+  ThumbsUp,
+  ThumbsDown,
 } from "lucide-react";
 import {
   BarChart as RechartsBarChart,
@@ -24,9 +24,9 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  Cell
+  Cell,
 } from "recharts";
-import {ChartContainer} from "@/components/ui/chart";
+import { ChartContainer } from "@/components/ui/chart";
 
 const DashboardShowcaseSection = () => {
   // Mock data for charts
@@ -83,7 +83,8 @@ const DashboardShowcaseSection = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-gray-400 text-base sm:text-lg max-w-2xl mx-auto"
           >
-            Visualize your feedback data with comprehensive analytics and AI-powered insights
+            Visualize your feedback data with comprehensive analytics and
+            AI-powered insights
           </motion.p>
         </div>
 
@@ -98,23 +99,33 @@ const DashboardShowcaseSection = () => {
             {/* Feedback per 100 invoices */}
             <div className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-yellow-400 font-medium text-sm sm:text-base">Feedback per 100 invoices</h3>
+                <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
+                  Feedback per 100 invoices
+                </h3>
                 <BarChart className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
               </div>
               <div className="h-48 sm:h-64 w-full overflow-hidden">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RechartsBarChart data={feedbackPer100Data} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+                  <RechartsBarChart
+                    data={feedbackPer100Data}
+                    margin={{ top: 5, right: 5, left: 0, bottom: 5 }}
+                  >
                     <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                    <XAxis dataKey="name" stroke="#888" tick={{ fontSize: 12 }} />
-                    <YAxis stroke="#888" tick={{ fontSize: 12 }} />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: "#0A0A0A", 
-                        border: "1px solid rgba(251, 191, 36, 0.2)",
-                        borderRadius: "0.5rem"
-                      }} 
+                    <XAxis
+                      dataKey="name"
+                      stroke="#888"
+                      tick={{ fontSize: 12 }}
                     />
-                    <Bar dataKey="value" fill="#FCD34D" radius={[4, 4, 0, 0]} />
+                    <YAxis stroke="#888" tick={{ fontSize: 12 }} />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#0A0A0A",
+                        border: "1px solid rgba(251, 191, 36, 0.2)",
+                        borderRadius: "0.5rem",
+                      }}
+                      cursor={{ fill: "rgba(250, 204, 21, 0.15)" }}
+                    />
+                    <Bar dataKey="value" fill="#FACC15" radius={[4, 4, 0, 0]} />
                   </RechartsBarChart>
                 </ResponsiveContainer>
               </div>
@@ -123,7 +134,9 @@ const DashboardShowcaseSection = () => {
             {/* Positive Feedback % */}
             <div className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-yellow-400 font-medium text-sm sm:text-base">Positive Feedback %</h3>
+                <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
+                  Positive Feedback %
+                </h3>
                 <PieChart className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
               </div>
               <div className="h-48 sm:h-64 w-full overflow-hidden">
@@ -136,22 +149,34 @@ const DashboardShowcaseSection = () => {
                       innerRadius={40}
                       outerRadius={60}
                       fill="#8884d8"
-                      paddingAngle={5}
+                      paddingAngle={0}
                       dataKey="value"
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                      stroke="none"
+                      label={({ name, percent }) =>
+                        `${name}: ${(percent * 100).toFixed(0)}%`
+                      }
                     >
                       {positiveFeedbackData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={index === 0 ? "#FCD34D" : index === 1 ? "#9CA3AF" : "#EF4444"} />
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={
+                            index === 0
+                              ? "#FACC15"
+                              : index === 1
+                              ? "#FFFCFC"
+                              : "#EF4444"
+                          }
+                        />
                       ))}
                     </Pie>
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: "#0A0A0A", 
+                    <Tooltip
+                      contentStyle={{
                         border: "1px solid rgba(251, 191, 36, 0.2)",
-                        borderRadius: "0.5rem"
-                      }} 
+                        borderRadius: "0.5rem",
+                      }}
                     />
-                    <Legend wrapperStyle={{ fontSize: '12px' }} />
+
+                    <Legend wrapperStyle={{ fontSize: "12px" }} />
                   </RechartsPieChart>
                 </ResponsiveContainer>
               </div>
@@ -160,16 +185,24 @@ const DashboardShowcaseSection = () => {
             {/* Average Rating */}
             <div className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-yellow-400 font-medium text-sm sm:text-base">Average Rating</h3>
+                <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
+                  Average Rating
+                </h3>
                 <Star className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
               </div>
               <div className="flex items-center justify-center h-24 sm:h-32">
-                <div className="text-4xl sm:text-5xl font-bold text-white">4.7</div>
+                <div className="text-4xl sm:text-5xl font-bold text-white">
+                  4.7
+                </div>
                 <div className="ml-3 sm:ml-4 flex">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <Star 
-                      key={star} 
-                      className={`w-5 h-5 sm:w-6 sm:h-6 ${star <= 4 ? "text-yellow-400 fill-yellow-400" : "text-gray-600"}`} 
+                    <Star
+                      key={star}
+                      className={`w-5 h-5 sm:w-6 sm:h-6 ${
+                        star <= 4
+                          ? "text-yellow-400 fill-yellow-400"
+                          : "text-gray-600"
+                      }`}
                     />
                   ))}
                 </div>
@@ -187,23 +220,39 @@ const DashboardShowcaseSection = () => {
             {/* 5-Rating Breakdown */}
             <div className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-yellow-400 font-medium text-sm sm:text-base">5-Rating Breakdown</h3>
+                <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
+                  5-Rating Breakdown
+                </h3>
                 <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
               </div>
               <div className="h-48 sm:h-64 w-full overflow-hidden">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RechartsBarChart data={ratingBreakdownData} layout="vertical" margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+                  <RechartsBarChart
+                    data={ratingBreakdownData}
+                    layout="vertical"
+                    margin={{ top: 5, right: 5, left: 0, bottom: 5 }}
+                  >
                     <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                    <XAxis type="number" stroke="#888" tick={{ fontSize: 12 }} />
-                    <YAxis dataKey="name" type="category" stroke="#888" tick={{ fontSize: 12 }} />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: "#0A0A0A", 
-                        border: "1px solid rgba(251, 191, 36, 0.2)",
-                        borderRadius: "0.5rem"
-                      }} 
+                    <XAxis
+                      type="number"
+                      stroke="#888"
+                      tick={{ fontSize: 12 }}
                     />
-                    <Bar dataKey="value" fill="#FCD34D" radius={[0, 4, 4, 0]} />
+                    <YAxis
+                      dataKey="name"
+                      type="category"
+                      stroke="#888"
+                      tick={{ fontSize: 12 }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#0A0A0A",
+                        border: "1px solid rgba(251, 191, 36, 0.2)",
+                        borderRadius: "0.5rem",
+                      }}
+                      cursor={{ fill: "rgba(250, 204, 21, 0.15)" }}
+                    />
+                    <Bar dataKey="value" fill="#FACC15" radius={[0, 4, 4, 0]} />
                   </RechartsBarChart>
                 </ResponsiveContainer>
               </div>
@@ -212,29 +261,42 @@ const DashboardShowcaseSection = () => {
             {/* Rating Trend Over Time */}
             <div className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-yellow-400 font-medium text-sm sm:text-base">Rating Trend Over Time</h3>
+                <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
+                  Rating Trend Over Time
+                </h3>
                 <LineChart className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
               </div>
               <div className="h-48 sm:h-64 w-full overflow-hidden">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RechartsLineChart data={ratingTrendData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+                  <RechartsLineChart
+                    data={ratingTrendData}
+                    margin={{ top: 5, right: 5, left: 0, bottom: 5 }}
+                  >
                     <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                    <XAxis dataKey="name" stroke="#888" tick={{ fontSize: 12 }} />
-                    <YAxis stroke="#888" domain={[3.5, 5]} tick={{ fontSize: 12 }} />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: "#0A0A0A", 
-                        border: "1px solid rgba(251, 191, 36, 0.2)",
-                        borderRadius: "0.5rem"
-                      }} 
+                    <XAxis
+                      dataKey="name"
+                      stroke="#888"
+                      tick={{ fontSize: 12 }}
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="value" 
-                      stroke="#FCD34D" 
-                      strokeWidth={2} 
-                      dot={{ fill: "#FCD34D", r: 3 }} 
-                      activeDot={{ r: 5, fill: "#F59E0B" }} 
+                    <YAxis
+                      stroke="#888"
+                      domain={[3.5, 5]}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#0A0A0A",
+                        border: "1px solid rgba(251, 191, 36, 0.2)",
+                        borderRadius: "0.5rem",
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#FACC15"
+                      strokeWidth={2}
+                      dot={{ fill: "#FACC15", r: 3 }}
+                      activeDot={{ r: 5, fill: "#FACC15" }}
                     />
                   </RechartsLineChart>
                 </ResponsiveContainer>
@@ -244,7 +306,9 @@ const DashboardShowcaseSection = () => {
             {/* AI-Powered Insights */}
             <div className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6">
               <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-yellow-400 font-medium text-sm sm:text-base">AI-Powered Insights</h3>
+                <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
+                  AI-Powered Insights
+                </h3>
                 <div className="flex space-x-2">
                   <ThumbsUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
                   <ThumbsDown className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
@@ -252,12 +316,20 @@ const DashboardShowcaseSection = () => {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 sm:p-4">
-                  <h4 className="text-green-400 font-medium mb-1 sm:mb-2 text-sm">Best Performing Area</h4>
-                  <p className="text-gray-300 text-xs sm:text-sm">Customer service responsiveness</p>
+                  <h4 className="text-green-400 font-medium mb-1 sm:mb-2 text-sm">
+                    Best Performing Area
+                  </h4>
+                  <p className="text-gray-300 text-xs sm:text-sm">
+                    Customer service responsiveness
+                  </p>
                 </div>
                 <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 sm:p-4">
-                  <h4 className="text-red-400 font-medium mb-1 sm:mb-2 text-sm">Area to Improve</h4>
-                  <p className="text-gray-300 text-xs sm:text-sm">Delivery time consistency</p>
+                  <h4 className="text-red-400 font-medium mb-1 sm:mb-2 text-sm">
+                    Area to Improve
+                  </h4>
+                  <p className="text-gray-300 text-xs sm:text-sm">
+                    Delivery time consistency
+                  </p>
                 </div>
               </div>
             </div>
@@ -268,4 +340,4 @@ const DashboardShowcaseSection = () => {
   );
 };
 
-export default DashboardShowcaseSection; 
+export default DashboardShowcaseSection;
