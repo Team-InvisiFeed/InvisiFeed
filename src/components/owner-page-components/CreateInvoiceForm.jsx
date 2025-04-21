@@ -1039,10 +1039,10 @@ export default function CreateInvoiceForm({
                     </Button>
                     <Button
                       type="submit"
-                      className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 cursor-pointer mr-4"
+                      className={`bg-yellow-400 text-gray-900 hover:bg-yellow-500 ${saving ? "cursor-not-allowed" : "cursor-pointer"} mr-4`}
                     >
                       <Save className="w-4 h-4 mr-2" />
-               {saving ? "Saving..." : "Save Invoice"}
+                      {saving ? "Saving..." : "Save Invoice"}
                     </Button>
                   </div>
    
