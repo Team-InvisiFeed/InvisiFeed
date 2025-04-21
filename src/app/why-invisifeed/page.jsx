@@ -244,8 +244,6 @@ const staggerContainer = {
 };
 
 const WhyInvisiFeedSection = () => {
-
-
   const [isNavigatingToRegister, setIsNavigatingToRegister] = useState(false);
   const router = useRouter();
   return (
@@ -492,12 +490,12 @@ const WhyInvisiFeedSection = () => {
                 variants={fadeInUp}
                 className="group relative overflow-hidden"
               >
-                <Card className="flex flex-col w-full h-full bg-gradient-to-br from-[#0A0A0A]/90 to-[#0A0A0A]/70 backdrop-blur-md text-white max-w-7xl shadow-2xl rounded-2xl border border-yellow-400/20 p-8 group relative overflow-hidden">
+                <Card className="flex flex-col w-full h-full bg-gradient-to-br from-[#0A0A0A]/90 to-[#0A0A0A]/70 backdrop-blur-md text-white max-w-[90vw] shadow-2xl rounded-2xl border border-yellow-400/20 p-6 group relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="absolute -top-24 -right-24 w-48 h-48 bg-yellow-400/5 rounded-full blur-3xl" />
                   <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-yellow-400/5 rounded-full blur-3xl" />
                   <CardHeader>
-                    <div className="w-12 h-12 rounded-lg bg-yellow-500/10 flex items-center justify-center mb-4">
+                    <div className="w-12 h-12 rounded-lg bg-yellow-500/10 flex items-center justify-center mb-2">
                       <item.icon className="w-6 h-6 text-yellow-500" />
                     </div>
                     <CardTitle className="text-xl text-yellow-500">
@@ -603,46 +601,48 @@ const WhyInvisiFeedSection = () => {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <Carousel className="w-full mx-auto relative overflow-hidden">
-              <CarouselContent>
-                {features.map((feature, index) => (
-                  <CarouselItem
-                    key={index}
-                    className="md:basis-1/2 lg:basis-1/3"
-                  >
-                    <Card className="h-full bg-gradient-to-br from-[#0A0A0A]/90 to-[#0A0A0A]/70 backdrop-blur-md text-white max-w-7xl shadow-2xl rounded-2xl border border-yellow-400/20 p-8 group relative overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      <div className="absolute -top-24 -right-24 w-48 h-48 bg-yellow-400/5 rounded-full blur-3xl" />
-                      <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-yellow-400/5 rounded-full blur-3xl" />
-                      <CardContent className="p-6">
-                        <div className="flex flex-col h-full">
-                          <div className="w-12 h-12 rounded-lg bg-yellow-500/10 flex items-center justify-center mb-4">
-                            <feature.icon className="w-6 h-6 text-yellow-500" />
-                          </div>
-                          <h3 className="text-xl font-semibold text-yellow-500 mb-2">
-                            {feature.title}
-                          </h3>
-                          <p className="text-gray-300 flex-grow">
-                            {feature.description}
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
+  initial={{ opacity: 0, y: 20 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.8 }}
+>
+<Carousel className="w-full max-w-[90vw] mx-auto relative">
+  <div className="relative mx-auto">
+    <CarouselPrevious className="hidden md:flex absolute -left-6 top-1/2 -translate-y-1/2 z-10 bg-[#0A0A0A] border-yellow-400/20 text-yellow-500 hover:bg-yellow-500/10 rounded-full p-2 transition-all duration-300" />
+    
+    <div className="mx-10"> {/* reduce width here */}
+      <CarouselContent className="w-full mx-auto">
+        {features.map((feature, index) => (
+          <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+            <Card className="h-full bg-gradient-to-br from-[#0A0A0A]/90 to-[#0A0A0A]/70 backdrop-blur-md text-white max-w-7xl shadow-2xl rounded-2xl border border-yellow-400/20 group relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute -top-24 -right-24 w-48 h-48 bg-yellow-400/5 rounded-full blur-3xl" />
+              <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-yellow-400/5 rounded-full blur-3xl" />
+              <CardContent className="p-6">
+                <div className="flex flex-col h-full">
+                  <div className="w-12 h-12 rounded-lg bg-yellow-500/10 flex items-center justify-center mb-4">
+                    <feature.icon className="w-6 h-6 text-yellow-500" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-yellow-500 mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-gray-300 flex-grow">{feature.description}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+    </div>
 
-              <CarouselPrevious className="bg-[#0A0A0A] border-yellow-400/20 text-yellow-500 hover:bg-yellow-500/10 rounded-xl transition-all duration-300" />
-              <CarouselNext className="bg-[#0A0A0A] border-yellow-400/20 text-yellow-500 hover:bg-yellow-500/10 rounded-xl transition-all duration-300" />
-              <CarouselDots />
-            </Carousel>
-              
-          </motion.div>
+    <CarouselNext className="hidden md:flex absolute -right-6 top-1/2 -translate-y-1/2 z-10 bg-[#0A0A0A] border-yellow-400/20 text-yellow-500 hover:bg-yellow-500/10 rounded-full p-2 transition-all duration-300" />
+  </div>
+
+  <CarouselDots />
+</Carousel>
+
+</motion.div>
+
         </div>
       </section>
 
