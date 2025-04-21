@@ -7,7 +7,8 @@ import {
   Brain, 
   TrendingUp, 
   Award, 
-  Gift 
+  Gift, 
+  Smile
 } from "lucide-react";
 
 const benefits = [
@@ -37,9 +38,15 @@ const benefits = [
   },
   {
     title: "Reward Your Customers",
-    description: "Surprise your customers with optional coupons for submitting feedback",
+    description: "Surprise your customers with coupons for submitting feedback",
     icon: Gift,
     delay: 0.5,
+  },
+  {
+    title: "Easy to Use",
+    description: "Our platform is designed to be user-friendly and easy to use",
+    icon: Smile,
+    delay: 0.6,
   },
 ];
 
