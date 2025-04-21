@@ -693,7 +693,7 @@ const Dashboard = () => {
                           margin={{
                             top: 15, // Reduced top
                             right: 15, // Reduced right
-                            left: isMobile ? 5 : 15, // Adjusted left slightly based on original logic
+                            left: isMobile ? 15 : 15, // Adjusted left slightly based on original logic
                             bottom: 50, // Kept bottom space for rotated labels
                           }}
                         >
@@ -707,15 +707,15 @@ const Dashboard = () => {
                             dataKey="date"
                             stroke="#9CA3AF"
                             tickLine={false}
-                            tickMargin={10}
+                            tickMargin={isMobile ? 7 : 10} // Mobile pe kam margin
                             axisLine={false}
-                            // Changed interval to prevent overlap on small screens
-                            interval={"preserveStartEnd"}
-                            angle={-45}
+                            interval={0} // Har label dikhane ke liye
+                            angle={isMobile ? -75 : -45} // Mobile pe kam tilt
                             textAnchor="end"
-                            // height={2} // Removed fixed height, let it adjust
-                            // Slightly increased font size for readability
-                            tick={{ fill: "#9CA3AF", fontSize: 9 }}
+                            tick={{
+                              fill: "#9CA3AF",
+                              fontSize: isMobile ? 8 : 10, // Mobile pe chhoti font size
+                            }}
                           />
                           <YAxis
                             stroke="#9CA3AF"
