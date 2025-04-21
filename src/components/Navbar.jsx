@@ -65,7 +65,9 @@ function Navbar() {
         <div className="hidden md:flex space-x-6 absolute left-1/2 -translate-x-1/2">
           {pathname === "/" ||
           pathname === "/purpose" ||
-          pathname === "/guide" ? (
+          pathname === "/guide" ||
+          pathname === "/privacy-policy" ||
+          pathname === "/terms-of-service"  ? (
             <>
               <motion.div
                 onClick={() => handleNavigation("/")}
@@ -205,9 +207,7 @@ function Navbar() {
             <>
               <motion.div
                 onClick={() => handleNavigation("/")}
-                className={`text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer ${
-                  pathname === "/" ? "font-bold text-yellow-400" : ""
-                }`}
+                className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
