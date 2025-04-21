@@ -26,8 +26,8 @@ const securityFeatures = [
     delay: 0.2,
   },
   {
-    title: "GDPR Compliant",
-    description: "Our platform adheres to GDPR regulations to ensure your data is protected.",
+    title: "DPDPA Compliant",
+    description: "Our platform adheres to DPDPA regulations to ensure your data is protected.",
     icon: FileCheck,
     delay: 0.3,
   },
