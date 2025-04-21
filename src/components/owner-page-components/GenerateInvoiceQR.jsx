@@ -51,6 +51,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [showCompleteProfileDialog, setShowCompleteProfileDialog] =
     useState(false);
+  const [couponDeleteConfirm, setCouponDeleteConfirm] = useState(false);
 
   // Sample invoice data
   const sampleInvoices = [
@@ -568,7 +569,8 @@ export default function Home() {
                         className="text-gray-500 hover:text-gray-900 rounded-full p-2 hover:bg-gray-200 cursor-pointer transition-all duration-200"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setCouponSaved(false);
+                          // setCouponSaved(false);
+                          setCouponDeleteConfirm(true)
                           setCouponData({
                             couponCode: "",
                             description: "",
@@ -923,6 +925,21 @@ export default function Home() {
               </div>
             </motion.div>
           </div>
+        )}
+
+        {/* Coupon Delete Confirm Modal */}
+        {couponDeleteConfirm && (
+          <ConfirmModal
+            message="Are you sure you want to delete this coupon?"
+            onConfirm={() => {
+              // Handle delete logic here
+              setCouponSaved(false);
+              setCouponDeleteConfirm(false);
+            }}
+            onCancel={() => {
+              setCouponDeleteConfirm(false);
+            }}
+          />
         )}
 
         
