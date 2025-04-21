@@ -9,7 +9,7 @@ import {
   Share2,
   FileUp,
   Plus,
-  RefreshCw ,
+  RefreshCw,
   X,
   Trash,
 } from "lucide-react";
@@ -35,6 +35,7 @@ export default function Home() {
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [showCouponForm, setShowCouponForm] = useState(false);
+  
   const [showSampleInvoices, setShowSampleInvoices] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
@@ -50,6 +51,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [showCompleteProfileDialog, setShowCompleteProfileDialog] =
     useState(false);
+  const [couponDeleteConfirm, setCouponDeleteConfirm] = useState(false);
 
   // Sample invoice data
   const sampleInvoices = [
@@ -112,7 +114,6 @@ export default function Home() {
     setConfirmAction(() => action);
     setShowConfirmModal(true);
   };
-
 
   const handleShowCreateInvoice = () => {
     if (owner?.isProfileCompleted !== "completed") {
@@ -396,11 +397,13 @@ export default function Home() {
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-yellow-400/5 rounded-full blur-3xl" />
           <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-yellow-400/5 rounded-full blur-3xl" />
 
-          <button className="absolute top-4 right-4 rounded-full p-2 hover:bg-yellow-400/40 transition-colors cursor-pointer duration-300" onClick={handleRefreshComponent}>
+          <button
+            className="absolute top-4 right-4 rounded-full p-2 hover:bg-yellow-400/40 transition-colors cursor-pointer duration-300"
+            onClick={handleRefreshComponent}
+          >
             <RefreshCw className="h-5 w-5 text-yellow-400 cursor-pointer" />
           </button>
-  
-         
+
           <div className="relative z-10 w-full">
             <h1 className="text-3xl font-bold mb-2 text-center bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
               Invoice Management
@@ -484,16 +487,19 @@ export default function Home() {
                           {file.name}
                         </span>
                       </span>
+                      <button onClick={() => setFile(null)} title="Remove File">
+                        <Trash
+                          size={17}
+                          className="text-white hover:text-gray-400  ml-auto cursor-pointer transition-all duration-200"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFile(null);
+                          }}
+                        />
+                      </button>
                     </div>
 
                     {/* Close Button */}
-                    <button
-                      onClick={() => setFile(null)}
-                      className="flex items-center justify-center w-6 h-6  text-white rounded-full transition-all duration-200"
-                      title="Remove File"
-                    >
-                      <Trash className="h-4 w-4 cursor-pointer " />
-                    </button>
                   </motion.div>
                 )}
 
@@ -509,7 +515,7 @@ export default function Home() {
                 {/* Custom Button */}
                 <label
                   htmlFor="file-upload"
-                  className={`w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl cursor-pointer transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105 ${
+                  className={`w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl cursor-pointer transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-102 ${
                     initialLoading ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                 >
@@ -521,7 +527,7 @@ export default function Home() {
                 {file && !couponSaved && (
                   <button
                     onClick={() => setShowCouponForm(true)}
-                    className="w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105 cursor-pointer"
+                    className="w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-102 cursor-pointer"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -543,32 +549,37 @@ export default function Home() {
                   <div className="w-full max-w-md flex flex-col items-center space-y-2">
                     <button
                       onClick={() => setShowCouponForm(true)}
-                      className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-xl transition-all duration-300 shadow-lg hover:scale-105 cursor-pointer"
+                      className="w-full flex items-center justify-between px-6 py-2 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-xl transition-all duration-300 shadow-lg cursor-pointer "
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                      </svg>
-                      <span>Edit Coupon</span>
+                      <div className="flex items-center justify-center space-x-2 flex-1">
+                        {/* Center the "Edit Coupon" */}
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        </svg>
+                        <span>Edit Coupon</span>
+                      </div>
+                      {/* Trash icon positioned to the far right */}
+                      <Trash
+                        size={35}
+                        className="text-gray-500 hover:text-gray-900 rounded-full p-2 hover:bg-gray-200 cursor-pointer transition-all duration-200"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // setCouponSaved(false);
+                          setCouponDeleteConfirm(true)
+                          setCouponData({
+                            couponCode: "",
+                            description: "",
+                            expiryDays: "30",
+                          });
+                          toast.success("Coupon deleted successfully");
+                        }}
+                      />
                     </button>
-                    <p
-                      onClick={() => {
-                        setCouponSaved(false);
-                        setCouponData({
-                          couponCode: "",
-                          description: "",
-                          expiryDays: "30",
-                        });
-                        toast.success("Coupon deleted successfully");
-                      }}
-                      className="text-gray-400 hover:text-yellow-400 text-sm cursor-pointer transition-colors"
-                    >
-                      Delete Coupon
-                    </p>
                   </div>
                 )}
 
@@ -578,14 +589,19 @@ export default function Home() {
                     <motion.button
                       onClick={handleUpload}
                       disabled={
-                        loading || !file || dailyUploadCount >= 3 || initialLoading
+                        loading ||
+                        !file ||
+                        dailyUploadCount >= 3 ||
+                        initialLoading
                       }
                       className="w-full px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none cursor-pointer"
                       whileHover={{
-                        scale: dailyUploadCount < 3 && !initialLoading ? 1.02 : 1,
+                        scale:
+                          dailyUploadCount < 3 && !initialLoading ? 1.02 : 1,
                       }}
                       whileTap={{
-                        scale: dailyUploadCount < 3 && !initialLoading ? 0.98 : 1,
+                        scale:
+                          dailyUploadCount < 3 && !initialLoading ? 0.98 : 1,
                       }}
                     >
                       {loading || initialLoading ? (
@@ -910,6 +926,23 @@ export default function Home() {
             </motion.div>
           </div>
         )}
+
+        {/* Coupon Delete Confirm Modal */}
+        {couponDeleteConfirm && (
+          <ConfirmModal
+            message="Are you sure you want to delete this coupon?"
+            onConfirm={() => {
+              // Handle delete logic here
+              setCouponSaved(false);
+              setCouponDeleteConfirm(false);
+            }}
+            onCancel={() => {
+              setCouponDeleteConfirm(false);
+            }}
+          />
+        )}
+
+        
       </div>
     </>
   );
