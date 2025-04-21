@@ -64,7 +64,7 @@ function Navbar() {
         {/* Navigation Links - Desktop */}
         <div className="hidden md:flex space-x-6 absolute left-1/2 -translate-x-1/2">
           {pathname === "/" ||
-          pathname === "/why-invisifeed" ||
+          pathname === "/purpose" ||
           pathname === "/guide" ? (
             <>
               <motion.div
@@ -76,12 +76,12 @@ function Navbar() {
                 Home
               </motion.div>
               <motion.div
-                onClick={() => handleNavigation("/why-invisifeed")}
+                onClick={() => handleNavigation("/purpose")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                About
+                Purpose
               </motion.div>
               <motion.div
                 onClick={() => handleNavigation("/guide")}
@@ -215,15 +215,13 @@ function Navbar() {
               </motion.div>
               <motion.div
                 onClick={() => {
-                  document
-                    .getElementById("about")
-                    ?.scrollIntoView({ behavior: "smooth" });
+                  handleNavigation("/purpose");
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                About
+                Purpose
               </motion.div>
               <motion.div
                 onClick={(e) => {

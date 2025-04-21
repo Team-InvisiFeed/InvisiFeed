@@ -107,9 +107,10 @@ function Footer() {
               <ul className="space-y-3">
                 {[
                   { label: "Home", route: "/" },
-                  { label: "About Us", route: "/why-invisifeed" },
-                  { label: "Privacy Policy", route: "/privacy-policy" },
+                  { label: "Purpose", route: "/purpose" },
                   { label: "Guide", route: "/guide" },
+                  { label: "Privacy Policy", route: "/privacy-policy" },
+                  { label: "Terms of Service", route: "/terms-of-service" },
                 ].map((link) => (
                   <motion.div
                     key={link.label}
@@ -177,13 +178,13 @@ function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-yellow-400/10">
+        <div className="pb-15 md:pb-0 border-t border-yellow-400/10">
           <div className="container mx-auto px-6 py-4">
             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
               <p className="text-sm text-gray-500">
                 © 2025 InvisiFeed. All rights reserved.
               </p>
-              <div className="flex space-x-6">
+              <div className="hidden md:flex space-x-6">
                 {["/terms-of-service", "/privacy-policy"].map(
                   (route, index) => (
                     <motion.div
