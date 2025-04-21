@@ -43,6 +43,7 @@ export async function POST(req) {
 
     // Set the feedback submitted flag on the specific invoice
     invoice.isFeedbackSubmitted = true;
+    invoice.feedbackSubmittedAt = new Date();
     await invoice.save(); 
 
     owner.feedbacks.push(feedback._id);

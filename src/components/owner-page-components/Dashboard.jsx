@@ -13,6 +13,7 @@ import {
   Lightbulb,
   Star,
   Calendar,
+  Clock,
 } from "lucide-react";
 import {
   Card,
@@ -281,10 +282,10 @@ const Dashboard = () => {
             delay={0.2}
           />
           <StatCard
-            title="Total Feedbacks"
-            value={metrics.totalFeedbacks}
-            subtitle="Total received"
-            icon={Users}
+            title="Average Response Time"
+            value={metrics.averageResponseTime.toFixed(1)}
+            subtitle="Avg. response time (in hours)"
+            icon={Clock}
             delay={0.3}
           />
           <StatCard

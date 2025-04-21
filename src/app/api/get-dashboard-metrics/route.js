@@ -250,6 +250,28 @@ function groupByMonth(feedbacks) {
     .sort((a, b) => monthOrder.indexOf(a.date) - monthOrder.indexOf(b.date));
 }
 
+const calculateAverageResponseTime = (invoiceWithFeedbackSubmitted) => {
+  // Get all invoices (Array) with feedback submitted
+  const responseTimeArray = invoiceWithFeedbackSubmitted.map((invoice) => {
+    const feedbackSubmittedAt = new Date(invoice.feedbackSubmittedAt);
+    const createdAt = new Date(invoice.createdAt);
+    const timeDifference = feedbackSubmittedAt - createdAt;
+    const timeDifferenceInHours = timeDifference / (1000 * 60 * 60);
+    return Number(timeDifferenceInHours.toFixed(1)); // Convert to number
+  });
+
+  if (responseTimeArray.length === 0) {
+    return 0;
+  }
+
+  // Calculate average response time
+  const averageResponseTime =
+    responseTimeArray.reduce((sum, time) => sum + time, 0) /
+    responseTimeArray.length;
+
+  return Number(averageResponseTime.toFixed(1));
+};
+
 export async function GET(req) {
   await dbConnect();
   try {
@@ -284,7 +306,24 @@ export async function GET(req) {
     const totalFeedbacks = feedbacks.length;
     const totalInvoices = invoices.length;
 
+    {
+      /* Calculate average response time */
+    }
+
+    // Get all invoices (Array) with feedback submitted
+    const invoiceWithFeedbackSubmitted = await InvoiceModel.find({
+      owner: owner._id,
+      isFeedbackSubmitted: true,
+    });
+
+    const averageResponseTime = calculateAverageResponseTime(
+      invoiceWithFeedbackSubmitted
+    );
+
+    console.log("Average Response Time (in hours):", averageResponseTime);
+
     // Calculate metrics
+
     const feedbackRatio = Number(
       ((totalFeedbacks / totalInvoices) * 100 || 0).toFixed(2)
     );
@@ -369,6 +408,7 @@ export async function GET(req) {
           negativePercentage,
           historicalRatings,
           availableYears,
+          averageResponseTime,
         },
       },
       { status: 200 }
