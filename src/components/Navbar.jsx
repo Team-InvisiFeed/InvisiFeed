@@ -1,15 +1,17 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import UserNav from "./UserNav";
+import LoadingScreen from "./LoadingScreen";
 
 function Navbar() {
   const { data: session } = useSession();
   const owner = session?.user;
   const [isMobile, setIsMobile] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const pathname = usePathname();
   const router = useRouter();
@@ -27,8 +29,24 @@ function Navbar() {
   }, []);
 
   const handleNavigation = (route) => {
+    if (route === pathname) {
+      // Same route, no loading screen
+      return;
+    }
+    setLoading(true);
     router.push(route);
   };
+  
+
+  useEffect(() => {
+    return () => {
+      setLoading(false);
+    };
+  }, [pathname]);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <nav className="p-4 md:p-6 bg-[#0A0A0A] text-white shadow-lg border-b border-yellow-400/10">
@@ -45,148 +63,181 @@ function Navbar() {
 
         {/* Navigation Links - Desktop */}
         <div className="hidden md:flex space-x-6 absolute left-1/2 -translate-x-1/2">
-          {pathname === "/" || pathname === "/why-invisifeed" || pathname === "/guide" ? (
+          {pathname === "/" ||
+          pathname === "/why-invisifeed" ||
+          pathname === "/guide" ? (
             <>
-              <Link
-                href="/"
-                className={`text-gray-300 hover:text-yellow-400 transition-colors 
-                }`}
+              <motion.div
+                onClick={() => handleNavigation("/")}
+                className={`text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 Home
-              </Link>
-              <Link
-                href="/why-invisifeed"
-                className="text-gray-300 hover:text-yellow-400 transition-colors"
+              </motion.div>
+              <motion.div
+                onClick={() => handleNavigation("/why-invisifeed")}
+                className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 About
-              </Link>
-              <Link
-                href="/guide"
-                className="text-gray-300 hover:text-yellow-400 transition-colors"
+              </motion.div>
+              <motion.div
+                onClick={() => handleNavigation("/guide")}
+                className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 Guide
-              </Link>
-              <Link
-                href="#contact"
-                className="text-gray-300 hover:text-yellow-400 transition-colors"
+              </motion.div>
+              <motion.div
                 onClick={(e) => {
                   e.preventDefault();
                   document
                     .getElementById("contact")
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
+                className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 Contact
-              </Link>
-              
+              </motion.div>
             </>
           ) : owner ? (
             <>
-              <motion.button
+              <motion.div
                 onClick={() => {
-                  handleNavigation(`/user/${owner?.username}#dashboard`);
-                  document
-                    .getElementById("dashboard")
-                    ?.scrollIntoView({ behavior: "smooth" });
+                  const currentPath = window.location.pathname;
+                  const targetPath = `/user/${owner?.username}`;
+
+                  if (currentPath === targetPath) {
+                    // Smooth scroll to the element with ID "dashboard"
+                    document.getElementById("dashboard")?.scrollIntoView({ behavior: "smooth" });
+                  } else {
+                    // Navigate to the target page
+                    router.push(`${targetPath}#dashboard`);
+                  }
                 }}
-                className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
-                  pathname === `/user/${owner?.username}`
-                }`}
+                className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 Dashboard
-              </motion.button>
-              <motion.button
+              </motion.div>
+              <motion.div
                 onClick={() => {
-                  handleNavigation(`/user/${owner?.username}#generate`);
-                  document
-                    .getElementById("generate")
-                    ?.scrollIntoView({ behavior: "smooth" });
+                  const currentPath = window.location.pathname;
+                  const targetPath = `/user/${owner?.username}`;
+
+                  if (currentPath === targetPath) {
+                    // Smooth scroll to the element with ID "generate"
+                    document.getElementById("generate")?.scrollIntoView({ behavior: "smooth" });
+                  } else {
+                    // Navigate to the target page
+                    router.push(`${targetPath}#generate`);
+                  }
                 }}
-                className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
-                  pathname === `/user/${owner?.username}`
-                }`}
+                className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 Generate
-              </motion.button>
-              <motion.button
+              </motion.div>
+              <motion.div
                 onClick={() => {
-                  handleNavigation(`/user/${owner?.username}#ratings`);
-                  document
-                    .getElementById("ratings")
-                    ?.scrollIntoView({ behavior: "smooth" });
+                  const currentPath = window.location.pathname;
+                  const targetPath = `/user/${owner?.username}`;
+
+                  if (currentPath === targetPath) {
+                    // Smooth scroll to the element with ID "ratings"
+                    document.getElementById("ratings")?.scrollIntoView({ behavior: "smooth" });
+                  } else {
+                    // Navigate to the target page
+                    router.push(`${targetPath}#ratings`);
+                  }
                 }}
-                className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
-                  pathname === `/user/${owner?.username}`
-                }`}
+                className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 Ratings
-              </motion.button>
-              <motion.button
+              </motion.div>
+              <motion.div
                 onClick={() => {
-                  handleNavigation(`/user/${owner?.username}#feedbacks`);
-                  document
-                    .getElementById("feedbacks")
-                    ?.scrollIntoView({ behavior: "smooth" });
+                  const currentPath = window.location.pathname;
+                  const targetPath = `/user/${owner?.username}`;
+
+                  if (currentPath === targetPath) {
+                    // Smooth scroll to the element with ID "feedbacks"
+                    document
+                      .getElementById("feedbacks")
+                      ?.scrollIntoView({ behavior: "smooth" });
+                  } else {
+                    // Navigate to the target page
+                    router.push(`${targetPath}#feedbacks`);
+                  }
                 }}
-                className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
-                  pathname === `/user/${owner?.username}`
-                }`}
+                className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 Feedbacks
-              </motion.button>
-              <motion.button
+              </motion.div>
+
+              <motion.div
                 onClick={(e) => {
                   e.preventDefault();
-                  handleNavigation(`/user/${owner?.username}#contact`);
+
                   document
                     .getElementById("contact")
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className={`text-gray-300 hover:text-yellow-400 cursor-pointer transition-colors ${
-                  pathname === `/user/${owner?.username}`
-                }`}
+                className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 Contact
-              </motion.button>
+              </motion.div>
             </>
           ) : (
             <>
-              <Link
-                href="/"
-                className={`text-gray-300 hover:text-yellow-400 transition-colors ${
+              <motion.div
+                onClick={() => handleNavigation("/")}
+                className={`text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer ${
                   pathname === "/" ? "font-bold text-yellow-400" : ""
                 }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 Home
-              </Link>
-              <Link
-                href="#about"
-                className="text-gray-300 hover:text-yellow-400 transition-colors"
+              </motion.div>
+              <motion.div
+                onClick={() => {
+                  document
+                    .getElementById("about")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 About
-              </Link>
-              <Link
-                href="#contact"
-                className="text-gray-300 hover:text-yellow-400 transition-colors"
+              </motion.div>
+              <motion.div
                 onClick={(e) => {
                   e.preventDefault();
                   document
                     .getElementById("contact")
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
+                className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 Contact
-              </Link>
+              </motion.div>
             </>
           )}
         </div>
