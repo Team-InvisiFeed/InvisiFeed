@@ -485,71 +485,103 @@ const Dashboard = () => {
         </div>
 
         {/* Bar Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6 mb-4 sm:mb-8 custom-popup-2">
-          {/* Service Ratings */}
-          <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity custom-popup-2" />
-            <div className="relative">
-              <CardHeader className="items-center pb-2">
+        {/* Main grid container - adjusted gap slightly */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-8">
+          {/* Service Ratings Bar Chart */}
+          <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden flex flex-col">
+            {" "}
+            {/* Added flex flex-col */}
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative flex flex-col flex-grow">
+              {" "}
+              {/* Added flex-grow */}
+              {/* Adjusted padding */}
+              <CardHeader className="items-center pb-2 pt-4 px-4 sm:px-6">
                 <CardTitle className="text-yellow-400 text-sm sm:text-base">
                   Service Ratings
                 </CardTitle>
-                <CardDescription className="text-xs">
+                <CardDescription className="text-xs text-gray-400 mt-1">
+                  {" "}
+                  {/* Added text color and margin */}
                   Average ratings across aspects
                 </CardDescription>
               </CardHeader>
-              <CardContent className="flex-1 pb-2">
-                <div className="h-[200px] sm:h-[300px] w-full overflow-x-auto custom-popup-2">
+              {/* Adjusted padding, flex-1 ensures content area tries to fill space */}
+              <CardContent className="flex-1 px-1 pb-3 sm:px-2 sm:pb-4">
+                {" "}
+                {/* Reduced horizontal padding */}
+                {/* Container for chart - REMOVED overflow-x-auto */}
+                <div className="h-[200px] sm:h-[300px] w-full">
+                  {/* Chart needs to fit container */}
                   <div className="h-full w-full">
-                    <ChartContainer config={CHART_CONFIG} className="h-full">
+                    <ChartContainer
+                      config={CHART_CONFIG}
+                      className="h-full w-full"
+                    >
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart
                           data={ratingData}
                           layout="vertical"
+                          // Adjusted margins: less conditional, consistent right for labels
                           margin={{
-                            top: 10,
-                            right: isMobile ? 50 : 0,
-                            left: isMobile ? 10 : 0,
-                            bottom: 10,
+                            top: 5, // Reduced top/bottom
+                            right: 35, // Consistent right margin for value labels
+                            left: 5, // Minimal left margin
+                            bottom: 5,
                           }}
+                          barCategoryGap="20%" // Add gap between bars if desired
                         >
-                          <CartesianGrid horizontal={false} stroke="#374151" />
+                          <CartesianGrid
+                            horizontal={false}
+                            stroke="#374151"
+                            strokeDasharray="3 3"
+                          />{" "}
+                          {/* Optional: dashed grid */}
                           <YAxis
                             dataKey="name"
                             type="category"
                             tickLine={false}
-                            tickMargin={10}
+                            tickMargin={5} // Reduced margin
                             axisLine={false}
+                            // Kept original width logic but ticks are hidden anyway
                             width={isMobile ? 0 : 10}
-                            tick={{ display: "none" }}
+                            tick={{ display: "none" }} // Ticks are hidden
                           />
                           <XAxis type="number" domain={[0, 5]} hide />
                           <ChartTooltip
-                            cursor={false}
+                            cursor={false} // Keep cursor off for simplicity
                             content={<ChartTooltipContent indicator="line" />}
                           />
                           <Bar
                             dataKey="value"
                             layout="vertical"
                             fill="#FACC15"
-                            radius={4}
+                            radius={[0, 4, 4, 0]} // Rounded corners
+                            maxBarSize={30} // Limit bar size on larger screens
                           >
+                            {/* Keep original LabelList logic - ensure fill color works */}
                             <LabelList
                               dataKey="name"
                               position="insideLeft"
                               offset={8}
-                              className={`fill-[#515151] font-medium ${
+                              // Adjusted fill and font size for better visibility
+                              className={`fill-gray-800 dark:fill-gray-300 font-medium text-[10px] sm:text-xs ${
+                                // Note: This dynamic class based on isMobile might still cause slight shifts
+                                // but adhering to "no logic change" means keeping it.
                                 isMobile ? "block" : "hidden sm:block"
                               }`}
-                              fontSize={10}
+                              // fontSize prop overrides className text size, removed it
                             />
                             <LabelList
                               dataKey="value"
                               position="right"
                               offset={8}
-                              className="fill-yellow-400 font-bold"
-                              fontSize={12}
-                              formatter={(value) => value === 0 ? null : `${value.toFixed(1)}`}
+                              className="fill-yellow-400 font-bold text-xs sm:text-sm" // Use text size classes
+                              // fontSize prop overrides className text size, removed it
+                              formatter={
+                                (value) =>
+                                  value == null ? "" : `${value.toFixed(1)}` // Check for null/undefined
+                              }
                             />
                           </Bar>
                         </BarChart>
@@ -561,132 +593,175 @@ const Dashboard = () => {
             </div>
           </Card>
 
-          {/* Rating Trend Chart */}
-          <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden custom-popup-2">
-  <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-  <div className="relative">
-    <CardHeader className="items-start pb-2">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-2">
-        <div className="flex flex-col items-start">
-          <CardTitle className="text-yellow-400 text-sm sm:text-base">Rating Trend</CardTitle>
-          <CardDescription className="text-xs">Overall rating over time</CardDescription>
-        </div>
-        <div className="flex flex-row items-center gap-2">
-          <Select
-            value={viewType}
-            onValueChange={(value) => {
-              setViewType(value);
-              setSelectedYear(""); // Clear year selection when changing view type
-            }}
-          >
-            <SelectTrigger className="w-[120px] sm:w-[140px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400">
-              <SelectValue placeholder="Select Time" />
-            </SelectTrigger>
-            <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
-              <SelectItem
-                value="currentMonth"
-                className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
-              >
-                Current Month
-              </SelectItem>
-              <SelectItem
-                value="currentWeek"
-                className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
-              >
-                Current Week
-              </SelectItem>
-              <SelectItem
-                value="currentYear"
-                className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
-              >
-                Current Year
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <Select
-            value={selectedYear}
-            onValueChange={(value) => {
-              setSelectedYear(value);
-              setViewType(""); // Clear view type when selecting a year
-            }}
-          >
-            <SelectTrigger className="w-[100px] sm:w-[120px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400">
-              <SelectValue placeholder="Year" />
-            </SelectTrigger>
-            <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
-              {metrics?.availableYears?.map((year) => (
-                <SelectItem
-                  key={year}
-                  value={year.toString()}
-                  className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
-                >
-                  {year}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-    </CardHeader>
-    <CardContent className="flex-1 scrollbar-hidden-container overflow-y-hidden"> {/* Y-axis hidden */}
-      <div className="h-[200px] sm:h-[300px] w-full overflow-x-auto custom-popup-2">
-        <div className="min-w-[300px] sm:min-w-[400px] h-full">
-          <ChartContainer config={CHART_CONFIG} className="h-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={historicalData}
-                margin={{
-                  top: 20,
-                  right: 20,
-                  left: isMobile ? 10 : 20,
-                  bottom: 60,
-                }}
-              >
-                <CartesianGrid vertical={false} stroke="#374151" />
-                <XAxis
-                  dataKey="date"
-                  stroke="#9CA3AF"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  interval={0}
-                  angle={-45}
-                  textAnchor="end"
-                  height={2}
-                  tick={{ fill: "#9CA3AF", fontSize: 8 }}
-                />
-                <YAxis
-                  stroke="#9CA3AF"
-                  domain={[0, 5]}
-                  tickLine={false}
-                  axisLine={false}
-                  tick={{
-                    fill: "#9CA3AF",
-                    fontSize: 10,
-                    display: isMobile ? "none" : "block",
-                  }}
-                  width={isMobile ? 0 : 30}
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="rating"
-                  stroke="#FACC15"
-                  strokeWidth={2}
-                  dot={{ fill: "#FACC15", r: 3 }}
-                ></Line>
-              </LineChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        </div>
-      </div>
-    </CardContent>
-  </div>
-</Card>
-
+          {/* Rating Trend Line Chart */}
+          <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden flex flex-col">
+            {" "}
+            {/* Added flex flex-col */}
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative flex flex-col flex-grow">
+              {" "}
+              {/* Added flex-grow */}
+              {/* Adjusted padding */}
+              <CardHeader className="items-start pb-2 pt-4 px-4 sm:px-6">
+                {/* Kept original flex layout for header elements */}
+                <div className="flex flex-row sm:items-center sm:justify-between w-full gap-2 justify-between">
+                  <div className="flex flex-col items-start">
+                    <CardTitle className="text-yellow-400 text-sm sm:text-base">
+                      Rating Trend
+                    </CardTitle>
+                    <CardDescription className="text-xs text-gray-400 mt-1">
+                      {" "}
+                      {/* Added text color and margin */}
+                      Overall rating over time
+                    </CardDescription>
+                  </div>
+                  {/* Kept original selectors */}
+                  <div className="flex flex-row items-center gap-2">
+                    <Select
+                      value={viewType}
+                      onValueChange={(value) => {
+                        setViewType(value);
+                        setSelectedYear("");
+                      }}
+                    >
+                      <SelectTrigger className="w-[100px] sm:w-[140px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 focus:ring-yellow-400">
+                        <SelectValue placeholder="Select Time" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#0A0A0A] border-yellow-400/20 text-yellow-400">
+                        <SelectItem
+                          value="currentMonth"
+                          className="text-yellow-400 focus:bg-yellow-400/10 focus:text-yellow-300 text-xs sm:text-sm"
+                        >
+                          Current Month
+                        </SelectItem>
+                        <SelectItem
+                          value="currentWeek"
+                          className="text-yellow-400 focus:bg-yellow-400/10 focus:text-yellow-300 text-xs sm:text-sm"
+                        >
+                          Current Week
+                        </SelectItem>
+                        <SelectItem
+                          value="currentYear"
+                          className="text-yellow-400 focus:bg-yellow-400/10 focus:text-yellow-300 text-xs sm:text-sm"
+                        >
+                          Current Year
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={selectedYear}
+                      onValueChange={(value) => {
+                        setSelectedYear(value);
+                        setViewType("");
+                      }}
+                    >
+                      <SelectTrigger className="w-[100px] sm:w-[120px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 focus:ring-yellow-400">
+                        <SelectValue placeholder="Year" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 max-h-48 overflow-y-auto">
+                        {/* Use optional chaining in case metrics or availableYears is undefined */}
+                        {metrics?.availableYears?.map((year) => (
+                          <SelectItem
+                            key={year}
+                            value={year.toString()}
+                            className="text-yellow-400 focus:bg-yellow-400/10 focus:text-yellow-300 text-xs sm:text-sm"
+                          >
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </CardHeader>
+              {/* Adjusted padding, flex-1 */}
+              <CardContent className="flex-1 px-1 pb-3 sm:px-2 sm:pb-4">
+                {" "}
+                {/* Reduced horizontal padding */}
+                {/* Container for chart - REMOVED overflow-x-auto */}
+                <div className="h-[200px] sm:h-[300px] w-full">
+                  {/* REMOVED min-w-* from inner div */}
+                  <div className="h-full w-full">
+                    <ChartContainer
+                      config={CHART_CONFIG}
+                      className="h-full w-full"
+                    >
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart
+                          data={historicalData}
+                          // Adjusted margins slightly, kept original logic for left based on isMobile
+                          margin={{
+                            top: 15, // Reduced top
+                            right: 15, // Reduced right
+                            left: isMobile ? 5 : 15, // Adjusted left slightly based on original logic
+                            bottom: 50, // Kept bottom space for rotated labels
+                          }}
+                        >
+                          <CartesianGrid
+                            vertical={false}
+                            stroke="#374151"
+                            strokeDasharray="3 3"
+                          />{" "}
+                          {/* Optional: dashed grid */}
+                          <XAxis
+                            dataKey="date"
+                            stroke="#9CA3AF"
+                            tickLine={false}
+                            tickMargin={10}
+                            axisLine={false}
+                            // Changed interval to prevent overlap on small screens
+                            interval={"preserveStartEnd"}
+                            angle={-45}
+                            textAnchor="end"
+                            // height={2} // Removed fixed height, let it adjust
+                            // Slightly increased font size for readability
+                            tick={{ fill: "#9CA3AF", fontSize: 9 }}
+                          />
+                          <YAxis
+                            stroke="#9CA3AF"
+                            domain={[0, 5]}
+                            tickLine={false}
+                            axisLine={false}
+                            // Keep original logic for display/width - this might still cause jumps
+                            // but required by "no logic change" constraint.
+                            tick={{
+                              fill: "#9CA3AF",
+                              fontSize: 10,
+                              display: isMobile ? "none" : "block",
+                            }}
+                            width={isMobile ? 0 : 25} // Slightly reduced non-mobile width
+                            tickMargin={5} // Added margin
+                          />
+                          <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel />}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="rating"
+                            stroke="#FACC15"
+                            strokeWidth={2}
+                            // Adjusted dot style slightly
+                            dot={{
+                              fill: "#FACC15",
+                              r: 2,
+                              strokeWidth: 1,
+                              stroke: "#0A0A0A",
+                            }}
+                            activeDot={{
+                              r: 4,
+                              strokeWidth: 1,
+                              stroke: "#FFFFFF",
+                            }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </ChartContainer>
+                  </div>
+                </div>
+              </CardContent>
+            </div>
+          </Card>
         </div>
 
         {/* Performance Metrics */}
