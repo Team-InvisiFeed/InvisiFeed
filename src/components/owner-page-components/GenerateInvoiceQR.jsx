@@ -396,13 +396,13 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-yellow-400/5 rounded-full blur-3xl" />
           <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-yellow-400/5 rounded-full blur-3xl" />
-
           <button
-            className="absolute top-4 right-4 rounded-full p-2 hover:bg-yellow-400/40 transition-colors cursor-pointer duration-300"
-            onClick={handleRefreshComponent}
-          >
-            <RefreshCw className="h-5 w-5 text-yellow-400 cursor-pointer" />
-          </button>
+  className="absolute top-2 sm:top-4 right-2 sm:right-4 rounded-full p-2 hover:bg-yellow-400/40 transition-colors cursor-pointer duration-300"
+  onClick={handleRefreshComponent}
+>
+  <RefreshCw className="h-5 w-5 text-yellow-400 cursor-pointer" />
+</button>
+
 
           <div className="relative z-10 w-full">
             <h1 className="text-3xl font-bold mb-2 text-center bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
