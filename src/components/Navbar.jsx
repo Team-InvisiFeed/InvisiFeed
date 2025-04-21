@@ -117,7 +117,7 @@ function Navbar() {
                     document.getElementById("dashboard")?.scrollIntoView({ behavior: "smooth" });
                   } else {
                     // Navigate to the target page
-                    router.push(`${targetPath}#dashboard`);
+                    handleNavigation(`${targetPath}#dashboard`);
                   }
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
@@ -136,7 +136,7 @@ function Navbar() {
                     document.getElementById("generate")?.scrollIntoView({ behavior: "smooth" });
                   } else {
                     // Navigate to the target page
-                    router.push(`${targetPath}#generate`);
+                    handleNavigation(`${targetPath}#generate`);
                   }
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
@@ -155,7 +155,7 @@ function Navbar() {
                     document.getElementById("ratings")?.scrollIntoView({ behavior: "smooth" });
                   } else {
                     // Navigate to the target page
-                    router.push(`${targetPath}#ratings`);
+                    handleNavigation(`${targetPath}#ratings`);
                   }
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
@@ -176,7 +176,7 @@ function Navbar() {
                       ?.scrollIntoView({ behavior: "smooth" });
                   } else {
                     // Navigate to the target page
-                    router.push(`${targetPath}#feedbacks`);
+                    handleNavigation(`${targetPath}#feedbacks`);
                   }
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
