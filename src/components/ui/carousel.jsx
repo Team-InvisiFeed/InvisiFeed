@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -77,8 +77,6 @@ function Carousel({
     onSelect(api);
     api.on("reInit", onSelect);
     api.on("select", onSelect);
-
-    // Fetch the available scroll snaps after initialization
     setScrollSnaps(api.scrollSnapList());
 
     return () => {
@@ -116,18 +114,11 @@ function Carousel({
   );
 }
 
-function CarouselContent({
-  className,
-  ...props
-}) {
+function CarouselContent({ className, ...props }) {
   const { carouselRef, orientation } = useCarousel();
 
   return (
-    <div
-      ref={carouselRef}
-      className="overflow-hidden"
-      data-slot="carousel-content"
-    >
+    <div ref={carouselRef} className="overflow-hidden" data-slot="carousel-content">
       <div
         className={cn(
           "flex",
@@ -140,10 +131,7 @@ function CarouselContent({
   );
 }
 
-function CarouselItem({
-  className,
-  ...props
-}) {
+function CarouselItem({ className, ...props }) {
   const { orientation } = useCarousel();
 
   return (
@@ -161,12 +149,7 @@ function CarouselItem({
   );
 }
 
-function CarouselPrevious({
-  className,
-  variant = "outline",
-  size = "icon",
-  ...props
-}) {
+function CarouselPrevious({ className, variant = "outline", size = "icon", ...props }) {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel();
 
   return (
@@ -175,7 +158,7 @@ function CarouselPrevious({
       variant={variant}
       size={size}
       className={cn(
-        "absolute size-8 rounded-full",
+        "absolute size-8 rounded-full hover:bg-muted transition sm:flex hidden",
         orientation === "horizontal"
           ? "top-1/2 -left-12 -translate-y-1/2"
           : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
@@ -185,18 +168,13 @@ function CarouselPrevious({
       onClick={scrollPrev}
       {...props}
     >
-      <ArrowLeft />
+      <ChevronLeft />
       <span className="sr-only">Previous slide</span>
     </Button>
   );
 }
 
-function CarouselNext({
-  className,
-  variant = "outline",
-  size = "icon",
-  ...props
-}) {
+function CarouselNext({ className, variant = "outline", size = "icon", ...props }) {
   const { orientation, scrollNext, canScrollNext } = useCarousel();
 
   return (
@@ -205,7 +183,7 @@ function CarouselNext({
       variant={variant}
       size={size}
       className={cn(
-        "absolute size-8 rounded-full",
+        "absolute size-8 rounded-full hover:bg-muted transition sm:flex hidden",
         orientation === "horizontal"
           ? "top-1/2 -right-12 -translate-y-1/2"
           : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
@@ -215,13 +193,12 @@ function CarouselNext({
       onClick={scrollNext}
       {...props}
     >
-      <ArrowRight />
+      <ChevronRight />
       <span className="sr-only">Next slide</span>
     </Button>
   );
 }
 
-// New Dot Pagination Component
 function CarouselDots() {
   const { scrollSnaps, selectedIndex, api } = useCarousel();
 
