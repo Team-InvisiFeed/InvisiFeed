@@ -60,6 +60,10 @@ const InvoiceSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  feedbackSubmittedAt: {
+    type: Date,
+    default: null,
+  },
   updatedRecommendedActions: {
     type: Boolean,
     default: false,
