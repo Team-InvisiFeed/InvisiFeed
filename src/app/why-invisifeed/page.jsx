@@ -53,6 +53,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  CarouselDots,
 } from "@/components/ui/carousel";
 import {
   ChartContainer,
@@ -68,6 +69,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useRouter } from "next/navigation";
+
 // Research Data
 const feedbackResearch = [
   {
@@ -242,6 +244,8 @@ const staggerContainer = {
 };
 
 const WhyInvisiFeedSection = () => {
+
+
   const [isNavigatingToRegister, setIsNavigatingToRegister] = useState(false);
   const router = useRouter();
   return (
@@ -256,7 +260,7 @@ const WhyInvisiFeedSection = () => {
             transition={{ duration: 0.8 }}
             className="text-center max-w-4xl mx-auto"
           >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-yellow-600">
+            <h1 className="text-5xl md:text-7xl font-bold mb-2 p-5 bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-yellow-600">
               More Than Just Invoices, We Deliver Insights
             </h1>
             <p className="text-xl text-gray-300 mb-8">
@@ -264,7 +268,11 @@ const WhyInvisiFeedSection = () => {
             </p>
             <div className="flex gap-2 justify-center">
               <Button
-                className={`bg-gradient-to-r ${isNavigatingToRegister ? "opacity-50 disabled" : "cursor-pointer"}  from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105`}
+                className={`bg-gradient-to-r ${
+                  isNavigatingToRegister
+                    ? "opacity-50 disabled"
+                    : "cursor-pointer"
+                }  from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105`}
                 onClick={() => {
                   setIsNavigatingToRegister(true);
                   router.push("/register");
@@ -631,7 +639,9 @@ const WhyInvisiFeedSection = () => {
 
               <CarouselPrevious className="bg-[#0A0A0A] border-yellow-400/20 text-yellow-500 hover:bg-yellow-500/10 rounded-xl transition-all duration-300" />
               <CarouselNext className="bg-[#0A0A0A] border-yellow-400/20 text-yellow-500 hover:bg-yellow-500/10 rounded-xl transition-all duration-300" />
+              <CarouselDots />
             </Carousel>
+              
           </motion.div>
         </div>
       </section>
@@ -657,7 +667,11 @@ const WhyInvisiFeedSection = () => {
             <div className="flex gap-4 justify-center">
               <Button
                 size="lg"
-                className={`bg-gradient-to-r ${isNavigatingToRegister ? "opacity-50 disabled" : "cursor-pointer"}  from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105`}
+                className={`bg-gradient-to-r ${
+                  isNavigatingToRegister
+                    ? "opacity-50 disabled"
+                    : "cursor-pointer"
+                }  from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105`}
                 onClick={() => {
                   setIsNavigatingToRegister(true);
                   router.push("/register");
