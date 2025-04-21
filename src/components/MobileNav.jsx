@@ -47,7 +47,7 @@ function MobileNav() {
               </span>
             </Link>
             <Link
-              href="/why-invisifeed"
+              href="/purpose"
               className="flex flex-col items-center space-y-1"
             >
               <BarChart2 className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
@@ -134,7 +134,7 @@ function MobileNav() {
               </span>
             </Link>
             <Link
-              href="/why-invisifeed"
+              href="/purpose"
               className="flex flex-col items-center space-y-1"
             >
               <BarChart2 className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
