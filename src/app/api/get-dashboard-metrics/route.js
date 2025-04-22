@@ -34,6 +34,52 @@ const calculateAverageRatings = (feedbacks, totalFeedbacks) => {
   );
 };
 
+const getTotalSales = (invoices) => {
+  const totalSales = invoices.reduce((sum, invoice) => sum + (invoice.customerDetails.amount || 0), 0);
+
+  if (!invoices || invoices.length === 0) {
+    console.log("No invoices provided");
+    return 0;
+  }
+  
+  return Number((totalSales).toFixed(2));
+}
+
+const getAverageRevisitFrequencyFromInvoices = async (invoices) => {
+  if (!invoices || invoices.length === 0) {
+    console.log("No invoices provided");
+    return 0;
+  }
+
+  // Group invoices by customerEmail
+  const customerRevisitCounts = invoices.reduce((acc, invoice) => {
+    const email = invoice.customerDetails?.customerEmail;
+    if (email) {
+      acc[email] = (acc[email] || 0) + 1; // Increment revisit count for each email
+    }
+    return acc;
+  }, {});
+
+  // Filter customers with revisitCount > 1
+  const filteredCustomers = Object.values(customerRevisitCounts).filter((count) => count > 1);
+
+  if (filteredCustomers.length === 0) {
+    console.log("No customers with revisit count > 1");
+    return 0;
+  }
+
+  // Calculate average revisit frequency
+  const averageRevisitFrequency =
+    filteredCustomers.reduce((sum, count) => sum + count, 0) / (filteredCustomers.length || 1); // Avoid divide by zero
+
+  console.log("Average Revisit Frequency (filtered):", averageRevisitFrequency);
+
+  return Number(averageRevisitFrequency.toFixed(1));
+};
+
+ 
+
+
 const getPerformanceMetrics = (averageRatings) => {
   const metricsArray = Object.entries(averageRatings)
     .filter(([key]) => key !== "overAllRating")
@@ -301,8 +347,11 @@ export async function GET(req) {
       );
     }
 
-    const feedbacks = await FeedbackModel.find({ givenTo: owner._id });
     const invoices = await InvoiceModel.find({ owner: owner._id });
+
+    const totalSales = getTotalSales(invoices);
+    
+    const feedbacks = await FeedbackModel.find({ givenTo: owner._id });
     const totalFeedbacks = feedbacks.length;
     const totalInvoices = invoices.length;
 
@@ -320,7 +369,11 @@ export async function GET(req) {
       invoiceWithFeedbackSubmitted
     );
 
-    console.log("Average Response Time (in hours):", averageResponseTime);
+    const averageRevisitFrequency = await getAverageRevisitFrequencyFromInvoices(invoices);
+
+    console.log("Average Revisit Frequency:", averageRevisitFrequency);
+
+
 
     // Calculate metrics
 
@@ -397,6 +450,8 @@ export async function GET(req) {
           totalFeedbacks,
           totalInvoices,
           apiMetrics: METRICS,
+          averageRevisitFrequency,
+          totalSales,
           bestPerforming,
           worstPerforming,
           improvements: owner.currentRecommendedActions?.improvements || [],

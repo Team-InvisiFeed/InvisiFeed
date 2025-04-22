@@ -21,6 +21,9 @@ export async function POST(req) {
     const data = await req.json();
     const { ...invoiceData } = data;
 
+    const { customerName, customerEmail} =
+      invoiceData;
+
     const session = await getServerSession(authOptions);
     const username = session?.user?.username;
 
@@ -134,6 +137,7 @@ export async function POST(req) {
     const grandTotal = sub - discount + tax;
     const taxTotal = tax;
 
+
     // Generate PDF using react-pdf/renderer
     const pdfBuffer = await generateInvoicePdf(
       invoiceData,
@@ -177,6 +181,11 @@ export async function POST(req) {
     const newInvoice = new InvoiceModel({
       invoiceId: invoiceNumber,
       owner: owner._id,
+      customerDetails: {
+        customerName,
+        customerEmail,
+        amount: grandTotal,
+      },
       mergedPdfUrl: uploadResponse.secure_url,
       AIuseCount: 0,
       couponAttached: invoiceData.addCoupon
