@@ -14,6 +14,9 @@ import {
   Star,
   Calendar,
   Clock,
+  Repeat,
+
+  TrendingUpDown,
 } from "lucide-react";
 import {
   Card,
@@ -54,6 +57,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { MdMoney } from "react-icons/md";
 
 // Constants
 const CHART_CONFIG = {
@@ -156,6 +160,14 @@ const Dashboard = () => {
     // Cleanup
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  const formatNumber = (number) => {
+    if (number >= 1e7) return (number / 1e7).toFixed(2) + " Cr"; // Crores
+    if (number >= 1e5) return (number / 1e5).toFixed(2) + " Lakh"; // Lakhs
+    if (number >= 1e3) return (number / 1e3).toFixed(2) + " K"; // Thousands
+    return number.toFixed(2); // Default decimal format
+  };
+  
 
   const fetchMetrics = useCallback(async () => {
     try {
@@ -268,10 +280,10 @@ const Dashboard = () => {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-4 sm:mb-8">
           <StatCard
-            title="Feedback Ratio"
-            value={`${metrics.feedbackRatio}%`}
-            subtitle="Feedbacks per 100 invoices"
-            icon={FileText}
+            title="Total Sales"
+            value={formatNumber(metrics.totalSales)}
+            subtitle="Total sales amount (INR) "
+            icon={TrendingUpDown}
             delay={0.1}
           />
           <StatCard
@@ -288,11 +300,12 @@ const Dashboard = () => {
             icon={Clock}
             delay={0.3}
           />
+         
           <StatCard
-            title="Positive Feedback %"
-            value={`${metrics.positivePercentage.toFixed(1)}%`}
-            subtitle="Positive feedbacks"
-            icon={Activity}
+            title="Average Revisit Frequency"
+            value={`${metrics.averageRevisitFrequency} times`}
+            subtitle="Avg. times customers revisit"
+            icon={Repeat}
             delay={0.4}
           />
         </div>
@@ -498,12 +511,12 @@ const Dashboard = () => {
               {/* Adjusted padding */}
               <CardHeader className="items-center pb-2 pt-4 px-4 sm:px-6">
                 <CardTitle className="text-yellow-400 text-sm sm:text-base">
-                  Service Ratings
+                  Total Sales
                 </CardTitle>
                 <CardDescription className="text-xs text-gray-400 mt-1">
                   {" "}
                   {/* Added text color and margin */}
-                  Average ratings across aspects
+                  Total sales amount
                 </CardDescription>
               </CardHeader>
               {/* Adjusted padding, flex-1 ensures content area tries to fill space */}
