@@ -318,6 +318,64 @@ const calculateAverageResponseTime = (invoiceWithFeedbackSubmitted) => {
   return Number(averageResponseTime.toFixed(1));
 };
 
+// Helper function to group sales by date
+function groupSalesByDate(invoices, viewType) {
+  const grouped = {};
+  const currentDate = new Date();
+
+  // Initialize based on view type
+  if (viewType === 'currentMonth') {
+    const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+      const dateKey = date.toLocaleDateString("en-US", { day: "numeric", month: "short" });
+      grouped[dateKey] = { date: dateKey, sales: 0 };
+    }
+  } else if (viewType === 'currentWeek') {
+    const startOfWeek = new Date(currentDate);
+    startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(startOfWeek);
+      date.setDate(startOfWeek.getDate() + i);
+      const dateKey = date.toLocaleDateString("en-US", { weekday: "short" });
+      grouped[dateKey] = { date: dateKey, sales: 0 };
+    }
+  } else if (viewType === 'currentYear') {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    months.forEach(month => {
+      grouped[month] = { date: month, sales: 0 };
+    });
+  }
+
+  // Add actual sales data
+  invoices.forEach(invoice => {
+    const invoiceDate = new Date(invoice.createdAt);
+    let dateKey;
+
+    if (viewType === 'currentMonth') {
+      dateKey = invoiceDate.toLocaleDateString("en-US", { day: "numeric", month: "short" });
+    } else if (viewType === 'currentWeek') {
+      dateKey = invoiceDate.toLocaleDateString("en-US", { weekday: "short" });
+    } else if (viewType === 'currentYear') {
+      dateKey = invoiceDate.toLocaleDateString("en-US", { month: "short" });
+    }
+
+    if (grouped[dateKey]) {
+      grouped[dateKey].sales += invoice.customerDetails.amount || 0;
+    }
+  });
+
+  // Convert to array and sort
+  return Object.values(grouped).sort((a, b) => {
+    if (viewType === 'currentMonth' || viewType === 'currentWeek') {
+      return new Date(a.date) - new Date(b.date);
+    } else {
+      const monthOrder = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return monthOrder.indexOf(a.date) - monthOrder.indexOf(b.date);
+    }
+  });
+}
+
 export async function GET(req) {
   await dbConnect();
   try {
@@ -331,13 +389,10 @@ export async function GET(req) {
     }
 
     const username = session?.user?.username;
-
-    // Input validation
     const URLParams = req.nextUrl.searchParams;
     const year = URLParams.get("year");
     const viewType = URLParams.get("viewType");
 
-    // Optimize database query
     const owner = await OwnerModel.findOne({ username });
 
     if (!owner) {
@@ -348,15 +403,23 @@ export async function GET(req) {
     }
 
     const invoices = await InvoiceModel.find({ owner: owner._id });
-
     const totalSales = getTotalSales(invoices);
-    
     const feedbacks = await FeedbackModel.find({ givenTo: owner._id });
     const totalFeedbacks = feedbacks.length;
     const totalInvoices = invoices.length;
 
-    {
-      /* Calculate average response time */
+    // Get sales data based on view type
+    let salesData = [];
+    if (year) {
+      const filteredInvoices = invoices.filter(invoice => {
+        const invoiceYear = new Date(invoice.createdAt).getFullYear();
+        return invoiceYear === parseInt(year);
+      });
+      salesData = groupSalesByDate(filteredInvoices, 'currentYear');
+    } else if (viewType) {
+      salesData = groupSalesByDate(invoices, viewType);
+    } else {
+      salesData = groupSalesByDate(invoices, 'currentYear');
     }
 
     // Get all invoices (Array) with feedback submitted
@@ -373,10 +436,7 @@ export async function GET(req) {
 
     console.log("Average Revisit Frequency:", averageRevisitFrequency);
 
-
-
     // Calculate metrics
-
     const feedbackRatio = Number(
       ((totalFeedbacks / totalInvoices) * 100 || 0).toFixed(2)
     );
@@ -464,6 +524,7 @@ export async function GET(req) {
           historicalRatings,
           availableYears,
           averageResponseTime,
+          salesData,
         },
       },
       { status: 200 }

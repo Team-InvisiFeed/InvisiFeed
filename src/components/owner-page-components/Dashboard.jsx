@@ -15,7 +15,6 @@ import {
   Calendar,
   Clock,
   Repeat,
-
   TrendingUpDown,
 } from "lucide-react";
 import {
@@ -167,7 +166,6 @@ const Dashboard = () => {
     if (number >= 1e3) return (number / 1e3).toFixed(2) + " K"; // Thousands
     return number.toFixed(2); // Default decimal format
   };
-  
 
   const fetchMetrics = useCallback(async () => {
     try {
@@ -260,6 +258,15 @@ const Dashboard = () => {
     return metrics.historicalRatings;
   }, [metrics]);
 
+  const salesData = useMemo(() => {
+    if (!metrics?.salesData) return [];
+    return metrics.salesData.map((item) => ({
+      name: item.date,
+      value: item.sales,
+      fill: CHART_CONFIG.feedbackRatio.color,
+    }));
+  }, [metrics]);
+
   if (loading) return <LoadingState />;
   if (error) return <ErrorState error={error} />;
 
@@ -300,7 +307,7 @@ const Dashboard = () => {
             icon={Clock}
             delay={0.3}
           />
-         
+
           <StatCard
             title="Average Revisit Frequency"
             value={`${metrics.averageRevisitFrequency} times`}
@@ -498,34 +505,81 @@ const Dashboard = () => {
         </div>
 
         {/* Bar Charts Section */}
-        {/* Main grid container - adjusted gap slightly */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-8">
-          {/* Service Ratings Bar Chart */}
+          {/* Sales Analysis Bar Chart */}
           <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden flex flex-col">
-            {" "}
-            {/* Added flex flex-col */}
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative flex flex-col flex-grow">
-              {" "}
-              {/* Added flex-grow */}
-              {/* Adjusted padding */}
-              <CardHeader className="items-center pb-2 pt-4 px-4 sm:px-6">
-                <CardTitle className="text-yellow-400 text-sm sm:text-base">
-                  Total Sales
-                </CardTitle>
-                <CardDescription className="text-xs text-gray-400 mt-1">
-                  {" "}
-                  {/* Added text color and margin */}
-                  Total sales amount
-                </CardDescription>
+              <CardHeader className="items-start pb-2 pt-4 px-4 sm:px-6">
+                <div className="flex flex-row sm:items-center sm:justify-between w-full gap-2 justify-between">
+                  <div className="flex flex-col items-start">
+                    <CardTitle className="text-yellow-400 text-sm sm:text-base">
+                      Sales Analysis
+                    </CardTitle>
+                    <CardDescription className="text-xs text-gray-400 mt-1">
+                      Sales performance over time
+                    </CardDescription>
+                  </div>
+                  <div className="flex flex-row items-center gap-2">
+                    {/* Select components remain unchanged */}
+                    <Select
+                      value={viewType}
+                      onValueChange={(value) => {
+                        setViewType(value);
+                        setSelectedYear("");
+                      }}
+                    >
+                      <SelectTrigger className="w-[100px] sm:w-[140px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 focus:ring-yellow-400">
+                        <SelectValue placeholder="Select Time" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#0A0A0A] border-yellow-400/20 text-yellow-400">
+                        <SelectItem
+                          value="currentMonth"
+                          className="text-yellow-400 focus:bg-yellow-400/10 focus:text-yellow-300 text-xs sm:text-sm"
+                        >
+                          Current Month
+                        </SelectItem>
+                        <SelectItem
+                          value="currentWeek"
+                          className="text-yellow-400 focus:bg-yellow-400/10 focus:text-yellow-300 text-xs sm:text-sm"
+                        >
+                          Current Week
+                        </SelectItem>
+                        <SelectItem
+                          value="currentYear"
+                          className="text-yellow-400 focus:bg-yellow-400/10 focus:text-yellow-300 text-xs sm:text-sm"
+                        >
+                          Current Year
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={selectedYear}
+                      onValueChange={(value) => {
+                        setSelectedYear(value);
+                        setViewType("");
+                      }}
+                    >
+                      <SelectTrigger className="w-[100px] sm:w-[120px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 focus:ring-yellow-400">
+                        <SelectValue placeholder="Year" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 max-h-48 overflow-y-auto">
+                        {metrics?.availableYears?.map((year) => (
+                          <SelectItem
+                            key={year}
+                            value={year.toString()}
+                            className="text-yellow-400 focus:bg-yellow-400/10 focus:text-yellow-300 text-xs sm:text-sm"
+                          >
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </CardHeader>
-              {/* Adjusted padding, flex-1 ensures content area tries to fill space */}
               <CardContent className="flex-1 px-1 pb-3 sm:px-2 sm:pb-4">
-                {" "}
-                {/* Reduced horizontal padding */}
-                {/* Container for chart - REMOVED overflow-x-auto */}
                 <div className="h-[200px] sm:h-[300px] w-full">
-                  {/* Chart needs to fit container */}
                   <div className="h-full w-full">
                     <ChartContainer
                       config={CHART_CONFIG}
@@ -533,69 +587,80 @@ const Dashboard = () => {
                     >
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart
-                          data={ratingData}
-                          layout="vertical"
-                          // Adjusted margins: less conditional, consistent right for labels
+                          data={salesData}
+                          // layout="horizontal" is default, removed layout prop
                           margin={{
-                            top: 5, // Reduced top/bottom
-                            right: 35, // Consistent right margin for value labels
-                            left: 5, // Minimal left margin
+                            top: 25, // Increased top margin for labels
+                            right: 5,
+                            left: 5, // Adjusted left margin
                             bottom: 5,
                           }}
-                          barCategoryGap="20%" // Add gap between bars if desired
+                          barCategoryGap="20%"
                         >
                           <CartesianGrid
-                            horizontal={false}
-                            stroke="#374151"
+                            vertical={false} // Show horizontal grid lines
+                            stroke="#374151" // gray-700
                             strokeDasharray="3 3"
-                          />{" "}
-                          {/* Optional: dashed grid */}
-                          <YAxis
-                            dataKey="name"
+                          />
+                          <XAxis
+                            dataKey="name" // Category axis (e.g., Month)
                             type="category"
                             tickLine={false}
-                            tickMargin={5} // Reduced margin
+                            tickMargin={8} // Space between tick and text
                             axisLine={false}
-                            // Kept original width logic but ticks are hidden anyway
-                            width={isMobile ? 0 : 10}
-                            tick={{ display: "none" }} // Ticks are hidden
+                            stroke="#9CA3AF" // gray-400
+                            fontSize={isMobile ? 10 : 12}
                           />
-                          <XAxis type="number" domain={[0, 5]} hide />
+                          <YAxis
+                            type="number" // Value axis
+                            stroke="#9CA3AF" // gray-400
+                            fontSize={isMobile ? 10 : 12}
+                            tickLine={false}
+                            axisLine={false}
+                            tickMargin={5}
+                            // domain={[0, 'dataMax + 1000']} // Optional: Adjust domain slightly
+                            tickFormatter={
+                              (value) => `₹${value / 1000}k` // Example: Format ticks as thousands
+                            }
+                          />
                           <ChartTooltip
-                            cursor={false} // Keep cursor off for simplicity
-                            content={<ChartTooltipContent indicator="line" />}
+                            cursor={false}
+                            content={
+                              <ChartTooltipContent indicator="dot" hideLabel />
+                            } // Use 'dot' indicator, hide default label
+                            formatter={(value, name, props) => [
+                              // Custom tooltip formatter
+                              `₹${value.toLocaleString()}`, // Formatted value
+                              props.payload.name, // Use the category name as the label
+                            ]}
+                            labelClassName="font-bold text-sm"
+                            wrapperClassName="[&_.recharts-tooltip-item]:!text-yellow-400" // Style tooltip item text
+                            contentStyle={{
+                              // Style tooltip box
+                              backgroundColor: "rgba(10, 10, 10, 0.8)", // bg-[#0A0A0A]/80
+                              borderColor: "rgba(250, 204, 21, 0.2)", // border-yellow-400/20
+                              color: "#FDE047", // text-yellow-300 (adjust as needed)
+                            }}
                           />
                           <Bar
                             dataKey="value"
-                            layout="vertical"
-                            fill="#FACC15"
-                            radius={[0, 4, 4, 0]} // Rounded corners
-                            maxBarSize={30} // Limit bar size on larger screens
+                            // layout prop removed
+                            fill="#FACC15" // yellow-400
+                            radius={[4, 4, 0, 0]} // Rounded top corners
+                            maxBarSize={isMobile ? 30 : 40} // Adjust bar size
                           >
-                            {/* Keep original LabelList logic - ensure fill color works */}
-                            <LabelList
-                              dataKey="name"
-                              position="insideLeft"
-                              offset={8}
-                              // Adjusted fill and font size for better visibility
-                              className={`fill-gray-800 dark:fill-gray-300 font-medium text-[10px] sm:text-xs ${
-                                // Note: This dynamic class based on isMobile might still cause slight shifts
-                                // but adhering to "no logic change" means keeping it.
-                                isMobile ? "block" : "hidden sm:block"
-                              }`}
-                              // fontSize prop overrides className text size, removed it
-                            />
                             <LabelList
                               dataKey="value"
-                              position="right"
+                              position="top" // Position value label above the bar
                               offset={8}
-                              className="fill-yellow-400 font-bold text-xs sm:text-sm" // Use text size classes
-                              // fontSize prop overrides className text size, removed it
-                              formatter={
-                                (value) =>
-                                  value == null ? "" : `${value.toFixed(1)}` // Check for null/undefined
+                              className="fill-yellow-400 font-bold text-[10px] sm:text-xs"
+                              formatter={(value) =>
+                                value == null
+                                  ? ""
+                                  : `₹${value.toLocaleString()}`
                               }
                             />
+                            {/* Removed the LabelList for 'name' as XAxis ticks handle this */}
                           </Bar>
                         </BarChart>
                       </ResponsiveContainer>
