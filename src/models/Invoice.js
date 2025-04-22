@@ -42,6 +42,22 @@ const InvoiceSchema = new Schema({
     ref: "Owner",
     required: true,
   },
+  customerDetails: {
+    customerName: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    customerEmail: {
+      type: String,
+      trim: true,
+      default: null,
+    },
+    amount: {
+      type: Number,
+      default: null,
+    },
+  },
   mergedPdfUrl: {
     type: String,
     // required: true,
