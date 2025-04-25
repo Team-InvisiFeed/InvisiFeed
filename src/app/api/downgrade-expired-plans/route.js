@@ -4,15 +4,6 @@ import OwnerModel from "@/models/Owner";
 
 export async function GET(req) {
   try {
-    // Only allow requests from Vercel Cron
-    const authHeader = req.headers.get("authorization");
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
     await dbConnect();
 
     // Find all users with expired Pro plans
