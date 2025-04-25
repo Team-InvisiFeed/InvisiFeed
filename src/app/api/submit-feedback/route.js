@@ -9,6 +9,8 @@ export async function POST(req) {
 
   const { formData, username, invoiceNumber } = await req.json();
 
+  console.log(formData);
+
   try {
     const owner = await OwnerModel.findOne({ username: username });
 
@@ -32,19 +34,55 @@ export async function POST(req) {
       );
     }
 
+    const {
+      satisfactionRating,
+      communicationRating,
+      qualityOfServiceRating,
+      valueForMoneyRating,
+      recommendRating,
+      overAllRating,
+      feedbackContent,
+      suggestionContent,
+      anonymousFeedback,
+    } = formData;
+
+    console.log(anonymousFeedback);
+
+    let feedback = null;
     // Add the new feedback to the owner's feedbacks array
-
-    const feedback = await FeedbackModel.create({
-      ...formData,
-      givenTo: owner._id,
-    });
-
-    await feedback.save();
+    if (anonymousFeedback) {
+      feedback = await FeedbackModel.create({
+        satisfactionRating,
+        communicationRating,
+        qualityOfServiceRating,
+        valueForMoneyRating,
+        recommendRating,
+        overAllRating,
+        feedbackContent,
+        suggestionContent,
+        givenTo: owner._id,
+      });
+      await feedback.save();
+    } else {
+      feedback = await FeedbackModel.create({
+        satisfactionRating,
+        communicationRating,
+        qualityOfServiceRating,
+        valueForMoneyRating,
+        recommendRating,
+        overAllRating,
+        feedbackContent,
+        suggestionContent,
+        givenTo: owner._id,
+        invoiceId: invoice._id,
+      });
+      await feedback.save();
+    }
 
     // Set the feedback submitted flag on the specific invoice
     invoice.isFeedbackSubmitted = true;
     invoice.feedbackSubmittedAt = new Date();
-    await invoice.save(); 
+    await invoice.save();
 
     owner.feedbacks.push(feedback._id);
     await owner.save();
