@@ -121,6 +121,7 @@ export const authOptions = {
             user.address = existingUser.address;
             user.gstinDetails = existingUser.gstinDetails;
             user.plan = existingUser.plan;
+            user.proTrialUsed = existingUser.proTrialUsed;
 
 
             return true;
@@ -169,6 +170,7 @@ export const authOptions = {
           user.address = newUser.address;
           user.gstinDetails = newUser.gstinDetails;
           user.plan = newUser.plan;
+          user.proTrialUsed = newUser.proTrialUsed;
           return true;
         } catch (error) {
           console.error("Google Sign-In Error:", error);
@@ -186,47 +188,27 @@ export const authOptions = {
         token.provider = account.provider;
         token.username = user.username;
         token.gstinDetails = user.gstinDetails;
+        token.organizationName = user.organizationName;
+        token.isProfileCompleted = user.isProfileCompleted || "pending";
+        token.phoneNumber = user.phoneNumber;
+        token.address = user.address;
+        token.plan = user.plan;
+        token.proTrialUsed = user.proTrialUsed;
 
         if (account.provider === "google") {
           token.email = profile.email;
-          token.organizationName = user.organizationName;
-          token.isProfileCompleted = user.isProfileCompleted || "pending";
-          token.gstinDetails = user.gstinDetails;
-          token.phoneNumber = user.phoneNumber;
-          token.address = user.address;
-
-          // For Google sign-in, ensure we have the username
-          try {
-            const existingUser = await OwnerModel.findOne({
-              email: profile.email,
-            });
-            if (existingUser) {
-              token.username = existingUser.username;
-              token.isProfileCompleted =
-                existingUser.isProfileCompleted || "pending";
-              token.gstinDetails = existingUser.gstinDetails;
-              token.plan = existingUser.plan;
-            }
-          } catch (error) {
-            console.error("Error finding user in JWT callback:", error);
-          }
         } else {
           // Existing credentials logic
           token.accessToken = user.accessToken;
           token.refreshToken = user.refreshToken;
-          token.gstinDetails = user.gstinDetails;
-          token.organizationName = user.organizationName;
-          token.phoneNumber = user.phoneNumber;
-          token.address = user.address;
           token.accessTokenExpiry = user.accessTokenExpiry;
           token.refreshTokenExpiry = user.refreshTokenExpiry;
-          token.isProfileCompleted = user.isProfileCompleted || "pending";
-          token.plan = user.plan;
+
         }
       }
 
       // Check if plan has expired and update if needed
-      if (token.plan?.planName === "pro") {
+      if (token.plan?.planName === "pro" || token.plan?.planName === "pro-trial") {
         const now = new Date();
         if (new Date(token.plan.planEndDate) < now) {
           try {
@@ -255,6 +237,7 @@ export const authOptions = {
         token.phoneNumber = session.user.phoneNumber;
         token.address = session.user.address;
         token.plan = session.user.plan;
+        token.proTrialUsed = session.user.proTrialUsed;
       }
 
       return token;
@@ -271,6 +254,7 @@ export const authOptions = {
         session.user.phoneNumber = token.phoneNumber;
         session.user.address = token.address;
         session.user.plan = token.plan;
+        session.user.proTrialUsed = token.proTrialUsed;
 
         if (token.provider !== "google") {
           session.accessToken = token.accessToken;
