@@ -50,7 +50,7 @@ export async function GET(req) {
     // Find all users with expired Pro plans
     const now = new Date();
     const expiredUsers = await OwnerModel.find({
-      "plan.planName": "pro",
+      "plan.planName": { $in: ["pro", "pro-trial"] },
       "plan.planEndDate": { $lt: now },
     });
 
@@ -60,8 +60,8 @@ export async function GET(req) {
         await Promise.all(expiredUsers.map(user => {
             user.plan = {
                 planName: "free",
-                planStartDate: null, // Explicitly set to null
-                planEndDate: null,   // Explicitly set to null
+                planStartDate: null,
+                planEndDate: null,
             };
             return user.save(); // Return the promise from save()
         }));
