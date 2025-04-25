@@ -57,7 +57,7 @@ const PricingSection = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          amount: 2, // Amount in rupees
+          amount: 0.01, // Amount in rupees
           currency: "INR",
         }),
       });
