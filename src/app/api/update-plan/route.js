@@ -16,7 +16,7 @@ export async function POST(req) {
 
     const { planName } = await req.json();
 
-    if (!["free", "pro"].includes(planName)) {
+    if (!["free", "pro" , "pro-trial"].includes(planName)) {
       return NextResponse.json(
         { success: false, message: "Invalid plan name" },
         { status: 400 }
@@ -39,6 +39,13 @@ export async function POST(req) {
         planStartDate: null,
         planEndDate: null,
       };
+    }else if (planName === "pro-trial") {
+      user.plan = {
+        planName: "pro-trial",
+        planStartDate: new Date(),
+        planEndDate: new Date().setDate(new Date().getDate() + 7),
+      };
+      user.proTrialUsed = true;
     }
 
     await user.save();
@@ -46,7 +53,8 @@ export async function POST(req) {
     return NextResponse.json({
       success: true,
       message: "Plan updated successfully",
-    });
+      user
+    } , { status: 200 });
   } catch (error) {
     console.error("Error updating plan:", error);
     return NextResponse.json(
@@ -58,3 +66,4 @@ export async function POST(req) {
     );
   }
 } 
+    
