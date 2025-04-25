@@ -31,6 +31,25 @@ const OwnerSchema = new Schema({
     required: [true, "Verify code is required"],
   },
 
+  plan: {
+    planName: {
+      type: String,
+      enum: ["free", "pro"],
+      required: false,
+      default: "free",
+    },
+    planStartDate: {
+      type: Date,
+      required: false,
+      default: null,
+    },
+    planEndDate: {
+      type: Date,
+      required: false,
+      default: null,
+    },
+  },
+
   gstinDetails: {
     gstinNumber: {
       type: String,
@@ -151,6 +170,7 @@ const OwnerSchema = new Schema({
       default: [],
     },
   },
+
 });
 
 const OwnerModel =
