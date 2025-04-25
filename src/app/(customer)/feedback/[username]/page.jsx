@@ -48,6 +48,7 @@ function FeedbackFormContent() {
     overAllRating: 3,
     feedbackContent: "",
     suggestionContent: "",
+    anonymousFeedback: false,
   });
 
   const [organizationName, setOrganizationName] = useState("");
@@ -634,6 +635,23 @@ function FeedbackFormContent() {
                   </Button>
                 </div>
               </motion.div>
+
+              {/* Checkbox for anonymous feedback */}
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="anonymousFeedback"
+                  checked={formData.anonymousFeedback}
+                  onChange={(e) =>
+                    handleChange("anonymousFeedback", e.target.checked)
+                  }
+                  className="w-4 h-4 text-yellow-400"
+                />
+                <Label htmlFor="anonymousFeedback" className="text-gray-200">
+                  Submit anonymously  
+                </Label>
+              </div>
+
 
               {/* Submit Button */}
               <motion.div
