@@ -48,6 +48,7 @@
     "puppeteer": "^24.6.1",
     "puppeteer-core": "^24.6.1",
     "qrcode": "^1.5.4",
+    "razorpay": "^2.9.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
