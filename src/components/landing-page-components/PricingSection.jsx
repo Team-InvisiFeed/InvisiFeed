@@ -5,12 +5,16 @@ import { motion } from "framer-motion";
 import { Check, ArrowRight } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import ConfirmModal from "../ConfirmModal";
+import LoadingScreen from "../LoadingScreen";
 
 const PricingSection = () => {
   const { data: session, update } = useSession();
   const user = session?.user;
   const [isFreeLoading, setIsFreeLoading] = useState(false);
   const [isProLoading, setIsProLoading] = useState(false);
+  const [isProTrialLoading, setIsProTrialLoading] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const handlePayment = async (plan) => {
     if (plan === "free") {
@@ -35,7 +39,7 @@ const PricingSection = () => {
               plan: data.user.plan,
             },
           });
-  
+
           toast.success("Successfully switched to Free plan");
         } else {
           toast.error(data.message || "Failed to update plan");
@@ -45,6 +49,49 @@ const PricingSection = () => {
         toast.error("Failed to update plan");
       } finally {
         setIsFreeLoading(false);
+      }
+      return;
+    }
+
+    if (plan === "pro-trial") {
+      try {
+        setIsProTrialLoading(true);
+        const response = await fetch("/api/update-plan", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            planName: "pro-trial",
+          }),
+        });
+
+        const data = await response.json();
+
+        console.log(data);
+
+        if (data.success) {
+          await update({
+            user: {
+              ...session.user,
+              plan: data.user.plan,
+              proTrialUsed: true,
+            },
+          });
+
+          toast.success("Successfully switched to Pro trial plan");
+          setShowConfirmModal(false);
+          setIsProTrialLoading(false);
+        } else {
+          setIsProTrialLoading(true);
+          toast.error(data.message || "Failed to update plan");
+        }
+      } catch (error) {
+        console.error("Error updating plan:", error);
+        toast.error("Failed to update plan");
+      } finally {
+        setIsProTrialLoading(false);
+        setShowConfirmModal(false);
       }
       return;
     }
@@ -98,7 +145,7 @@ const PricingSection = () => {
                   plan: verifyData.user.plan,
                 },
               });
-      
+
               toast.success("You've successfully upgraded to Pro Plan!");
             } else {
               toast.error(verifyData.message || "Payment verification failed");
@@ -128,8 +175,19 @@ const PricingSection = () => {
     }
   };
 
+  const handleConfirmModal = async (planName) => {
+    setShowConfirmModal(true);
+  };
+
+ 
+
   const isProPlan = user?.plan?.planName === "pro";
   const isFreePlan = user?.plan?.planName === "free";
+  const isProTrial = user?.plan?.planName === "pro-trial";
+
+  if (isProTrialLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <section className="py-24 bg-[#0A0A0A] relative">
@@ -194,9 +252,13 @@ const PricingSection = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handlePayment("free")}
-                disabled={isFreeLoading || isFreePlan || isProPlan}
+                disabled={
+                  isFreeLoading || isFreePlan || isProPlan || isProTrial
+                }
                 className={`w-full py-3 px-4 rounded-lg font-medium flex items-center justify-center bg-transparent border-2 border-yellow-400/20 text-yellow-400 hover:border-yellow-400/40 ${
-                  (isFreeLoading || isFreePlan) ? "opacity-50 cursor-not-allowed" : ""
+                  isFreeLoading || isFreePlan
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
                 }`}
               >
                 <span>
@@ -204,9 +266,15 @@ const PricingSection = () => {
                     ? "Processing..."
                     : isFreePlan
                     ? "You're on Free Plan"
-                    : "Pro Plan is Active"}
+                    : isProPlan
+                    ? "Pro Plan is Active"
+                    : isProTrial
+                    ? "Pro Trial is Active"
+                    : "Subscribe to Pro"}
                 </span>
-                {!isFreeLoading && !isFreePlan && <ArrowRight className="w-4 h-4 ml-2" />}
+                {!isFreeLoading && !isFreePlan && (
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                )}
               </motion.button>
             </div>
           </motion.div>
@@ -221,7 +289,9 @@ const PricingSection = () => {
               <div className="mb-6">
                 <h3 className="text-2xl font-bold text-white mb-2">Pro</h3>
                 <div className="flex items-baseline mb-4">
-                  <span className="text-4xl font-bold text-yellow-400">₹299</span>
+                  <span className="text-4xl font-bold text-yellow-400">
+                    ₹299
+                  </span>
                   <span className="text-gray-400 ml-2">/month</span>
                 </div>
                 <p className="text-gray-400">
@@ -250,9 +320,11 @@ const PricingSection = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handlePayment("pro")}
-                disabled={isProLoading || isProPlan}
+                disabled={isProLoading || isProPlan || isProTrial}
                 className={`w-full py-3 px-4 rounded-lg font-medium flex items-center justify-center bg-gradient-to-r from-yellow-500 to-yellow-400 text-gray-900 shadow-lg shadow-yellow-500/20 ${
-                  (isProLoading || isProPlan) ? "opacity-50 cursor-not-allowed" : ""
+                  isProLoading || isProPlan || isProTrial
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
                 }`}
               >
                 <span>
@@ -260,17 +332,47 @@ const PricingSection = () => {
                     ? "Processing..."
                     : isProPlan
                     ? "Already Subscribed"
+                    : isProTrial
+                    ? "Pro Trial is Active"
                     : "Subscribe to Pro"}
                 </span>
-                {!isProLoading && !isProPlan && <ArrowRight className="w-4 h-4 ml-2" />}
+                {!isProLoading && !isProPlan && !isProTrial && (
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                )}
               </motion.button>
             </div>
           </motion.div>
-        </div>
 
-        <div className="text-center mt-12">
-          <p className="text-gray-400">
-            All plans include a 14-day free trial. No credit card required.
+          {/* Add this container to center the pro-trial info */}
+        </div>
+                {console.log(user)}
+        {(user?.plan?.planName === "free" || user?.plan?.proTrialUsed) && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-center mt-12"
+          >
+            <p className="text-gray-400">
+              Go for 7 day free trial.{" "}
+              <span
+                className="text-yellow-400 hover:underline cursor-pointer"
+                onClick={() => handleConfirmModal("pro-trial")}
+              >
+                Click Here
+              </span>
+            </p>
+          </motion.div>
+        )}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className={`text-center ${(user?.plan?.planName === "free" || user?.plan?.proTrialUsed) ? "mt-2" : "mt-12"}`}
+        >
+          <p className="text-gray-500 text-sm ">
+           Current Plan : {user?.plan?.planName}
+           {user?.plan?.proTrialUsed && (" (Pro Trial Used)")}
           </p>
           <p className="text-gray-500 text-sm mt-2">
             Need a custom plan for your enterprise?{" "}
@@ -278,10 +380,17 @@ const PricingSection = () => {
               Contact us
             </a>
           </p>
-        </div>
+        </motion.div>
+        {showConfirmModal && (
+          <ConfirmModal
+            message="Are you sure you want to switch to Pro trial?"
+            onConfirm={() => handlePayment("pro-trial")}
+            onCancel={() => setShowConfirmModal(false)}
+          />
+        )}
       </div>
     </section>
   );
 };
 
-export default PricingSection; 
+export default PricingSection;
