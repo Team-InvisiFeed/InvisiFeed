@@ -13,31 +13,31 @@ import { usePathname, useRouter } from "next/navigation";
 import { Loader2, UserCircle2, User, Ticket, LogOut, CheckCircle2 } from "lucide-react";
 import GSTINVerificationDialog from "@/components/owner-page-components/GSTINVerificationDialog";
 import LoadingScreen from "./LoadingScreen";
+import { MdMoney } from "react-icons/md";
 
 function UserNav({ isMobile = false }) {
   const { data: session } = useSession();
   const owner = session?.user;
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isNavigatingToSignIn, setIsNavigatingToSignIn] = useState(false);
-  const [isNavigatingToProfile, setIsNavigatingToProfile] = useState(false);
-  const [isNavigatingToCoupons, setIsNavigatingToCoupons] = useState(false);
+  
   const [isGSTINDialogOpen, setIsGSTINDialogOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);  // Added state for controlling dropdown
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const onManageProfile = () => {
-    setIsNavigatingToProfile(true);
-    setLoading(true); // Start loading state
-    setIsDropdownOpen(false); // Close dropdown
-    router.push(`/user/${owner?.username}/update-profile`);
+    handleNavigation(`/user/${owner?.username}/update-profile`);
+    
+    
+  };
+
+  const onManagePlan = () => {
+    handleNavigation(`/pricing`);
   };
 
   const onManageCoupons = () => {
-    setIsNavigatingToCoupons(true);
-    setLoading(true); // Start loading state
-    setIsDropdownOpen(false); // Close dropdown
-    router.push(`/user/${owner?.username}/manage-coupons`);
+    handleNavigation(`/user/${owner?.username}/manage-coupons`);
   };
 
   const handleSignOut = async () => {
@@ -54,9 +54,19 @@ function UserNav({ isMobile = false }) {
     router.push("/sign-in");
   };
 
+
   const handleUsernameClick = () => {
     setIsDropdownOpen(false); // Close dropdown
-    router.push(`/user/${owner?.username}`);
+    handleNavigation(`/user/${owner?.username}`);
+  };
+
+  const handleNavigation = (route) => {
+    if (route === pathname) {
+      // Same route, no loading screen
+      return;
+    }
+    setLoading(true);
+    router.push(route);
   };
 
   const pathname = usePathname();
@@ -123,6 +133,13 @@ function UserNav({ isMobile = false }) {
           >
             <User className="mr-2 h-4 w-4 text-yellow-400" />
             <span>Manage Profile</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 focus:bg-yellow-400/5 focus:text-yellow-400 cursor-pointer"
+            onClick={onManagePlan}
+          >
+            <MdMoney className="mr-2 h-4 w-4 text-yellow-400" />
+            <span>Pricing Section</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 focus:bg-yellow-400/5 focus:text-yellow-400 cursor-pointer"
