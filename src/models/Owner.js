@@ -34,7 +34,7 @@ const OwnerSchema = new Schema({
   plan: {
     planName: {
       type: String,
-      enum: ["free", "pro"],
+      enum: ["free", "pro", "pro-trial"],
       required: false,
       default: "free",
     },
@@ -48,6 +48,11 @@ const OwnerSchema = new Schema({
       required: false,
       default: null,
     },
+  },
+
+  proTrialUsed: {
+    type: Boolean,
+    default: false,
   },
 
   gstinDetails: {
