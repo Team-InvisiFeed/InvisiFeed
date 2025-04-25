@@ -32,6 +32,9 @@ export default function Home() {
   const [timeLeft, setTimeLeft] = useState(null);
   const [initialLoading, setInitialLoading] = useState(true);
   const [customerEmail, setCustomerEmail] = useState("");
+  const [extractedCustomerEmail, setExtractedCustomerEmail] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [customerAmount, setCustomerAmount] = useState("");
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [showCouponForm, setShowCouponForm] = useState(false);
@@ -216,6 +219,9 @@ export default function Home() {
       setPdfUrl(data.url);
       setFeedbackUrl(data.feedbackUrl);
       setInvoiceNumber(data.invoiceNumber);
+      setCustomerName(data.customerName);
+      setExtractedCustomerEmail(data.customerEmail);
+      setCustomerAmount(data.customerAmount);
       setDailyUploadCount(data.dailyUploadCount);
       setEmailSent(false);
       setCustomerEmail("");
@@ -333,6 +339,9 @@ setSaving(true);
         setPdfUrl(data.url);
         setFeedbackUrl(data.feedbackUrl);
         setInvoiceNumber(data.invoiceNumber);
+        setCustomerName(data.customerName);
+        setExtractedCustomerEmail(data.customerEmail);
+        setCustomerAmount(data.customerAmount);
         setDailyUploadCount(data.dailyUploadCount);
         setTimeLeft(data.timeLeft);
         setShowCreateInvoice(false);
@@ -657,6 +666,30 @@ setSaving(true);
                   </h2>
                   <p className="text-2xl font-bold text-white">
                     {invoiceNumber}
+                  </p>
+                </div>
+                <div className="relative">
+                  <h2 className="text-lg font-semibold mb-2 text-yellow-400">
+                    Extracted Customer Name
+                  </h2>
+                  <p className="text-2xl font-bold text-white">
+                    {customerName}
+                  </p>
+                </div>
+                <div className="relative">
+                  <h2 className="text-lg font-semibold mb-2 text-yellow-400">
+                    Extracted Customer Email
+                  </h2>
+                  <p className="text-2xl font-bold text-white">
+                    {extractedCustomerEmail}
+                  </p>
+                </div>
+                <div className="relative">
+                  <h2 className="text-lg font-semibold mb-2 text-yellow-400">
+                    Extracted Customer Amount
+                  </h2>
+                  <p className="text-2xl font-bold text-white">
+                    {customerAmount}
                   </p>
                 </div>
               </motion.div>
