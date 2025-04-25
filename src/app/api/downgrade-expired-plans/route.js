@@ -20,7 +20,7 @@ export async function GET(req) {
   }
 
   // Get the authorization header from the incoming request
-  const authHeader = req.headers.get("authorization");
+  const authHeader = req.headers.get("Authorization");
 
   // Check if the header exists and follows the "Bearer <token>" format
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
