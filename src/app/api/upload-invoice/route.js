@@ -130,11 +130,11 @@ export async function POST(req) {
       );
     }
 
-    const invoiceNumber = await extractInvoiceNumberFromPdf(file);
+    const invoiceData = await extractInvoiceNumberFromPdf(file);
     if (
-      !invoiceNumber ||
-      invoiceNumber === "Not Found" ||
-      invoiceNumber === "Extraction Failed"
+      !invoiceData.invoiceId ||
+      invoiceData.invoiceId === "Not Found" ||
+      invoiceData.invoiceId === "Extraction Failed"
     ) {
       return NextResponse.json(
         { success: false, message: "Invoice number not found" },
@@ -143,7 +143,7 @@ export async function POST(req) {
     }
 
     const existedInvoice = await InvoiceModel.findOne({
-      invoiceId: invoiceNumber,
+      invoiceId: invoiceData.invoiceId,
       owner: owner._id,
     });
 
@@ -186,7 +186,7 @@ export async function POST(req) {
 
     // Generate QR Code PDF with modified coupon code if provided
     const {pdf , feedbackUrl} = await generateQrPdf(
-      invoiceNumber,
+      invoiceData.invoiceId,
       username,
       modifiedCouponCodeforURL,
       owner
@@ -199,7 +199,7 @@ export async function POST(req) {
         return str.replace(/[^a-zA-Z0-9-_\.]/g, "_");
       };
 
-      const sanitizedInvoiceNumber = sanitiseString(invoiceNumber);
+      const sanitizedInvoiceNumber = sanitiseString(invoiceData.invoiceId);
       
       cloudinary.v2.uploader
         .upload_stream(
@@ -220,8 +220,13 @@ export async function POST(req) {
     // Add new invoice with initial AIuseCount, coupon if provided, and PDF URLs
     console.log("DB COUPON CODE", dbCouponCode);
     const newInvoice = new InvoiceModel({
-      invoiceId: invoiceNumber,
+      invoiceId: invoiceData.invoiceId,
       owner: owner._id,
+      customerDetails: {
+        customerName: invoiceData.customerName,
+        customerEmail: invoiceData.customerEmail,
+        amount: invoiceData.totalAmount !== "Not Found" ? parseFloat(invoiceData.totalAmount).toFixed(2) : null
+      },
       mergedPdfUrl: finalPdfUrl,
       AIuseCount: 0,
       couponAttached: couponData
@@ -241,14 +246,15 @@ export async function POST(req) {
 
     await owner.save();
 
-
-
     return NextResponse.json(
       {
         success: true,
         message: "Invoice uploaded successfully",
         url: finalPdfUrl,
-        invoiceNumber,
+        invoiceNumber: invoiceData.invoiceId,
+        customerName: invoiceData.customerName,
+        customerEmail: invoiceData.customerEmail,
+        customerAmount: invoiceData.totalAmount !== "Not Found" ? parseFloat(invoiceData.totalAmount).toFixed(2) : null,
         feedbackUrl,
         dailyUploadCount: owner.uploadedInvoiceCount.dailyUploadCount,
         timeLeft: hoursLeft,
