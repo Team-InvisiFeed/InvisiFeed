@@ -99,6 +99,23 @@ export default function CreateInvoiceForm({
   const { data: session } = useSession();
   const owner = session?.user;
   const [showVerifyGstinDialog, setShowVerifyGstinDialog] = useState(false);
+  const [charCount, setCharCount] = useState(129);
+  const maxLength = 200;
+  const [notesCharCount , setNotesCharCount] = useState(147);
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    if (value.length <= maxLength) {
+      setCharCount(value.length);
+    }
+  };
+
+  const handleNotesChange = (e) => {
+    const value = e.target.value;
+    if (value.length <= maxLength) {
+      setNotesCharCount(value.length);
+    }
+  };
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -834,23 +851,27 @@ export default function CreateInvoiceForm({
                           )}
                         />
                         <FormField
-                          control={form.control}
-                          name="paymentInstructions"
-                          render={({ field }) => (
-                            <FormItem className="md:col-span-2">
-                              <FormLabel className="text-gray-300">
-                                Payment Instructions
-                              </FormLabel>
-                              <FormControl>
-                                <Textarea
-                                  {...field}
-                                  className="bg-[#0A0A0A] text-white border-yellow-400/20"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+      control={form.control}
+      name="paymentInstructions"
+      render={({ field }) => (
+        <FormItem className="md:col-span-2">
+          <FormLabel className="text-gray-300">Payment Instructions</FormLabel>
+          <FormControl>
+            <Textarea
+              {...field}
+              onChange={(e) => {
+                field.onChange(e); // Keep the original form's onChange
+                handleChange(e); // Track character count
+              }}
+              className="bg-[#0A0A0A] text-white border-yellow-400/20"
+              maxLength={maxLength} // This limits the input to 200 characters
+            />
+          </FormControl>
+          <div className="text-sm text-gray-400 mt-1">{charCount}/{maxLength}</div> {/* Character count display */}
+          <FormMessage />
+        </FormItem>
+      )}
+    />
                       </div>
                     </CardContent>
                   </Card>
@@ -869,10 +890,16 @@ export default function CreateInvoiceForm({
                             <FormControl>
                               <Textarea
                                 {...field}
+                                onChange={(e) => {
+                                  field.onChange(e); // Keep the original form's onChange
+                                  handleNotesChange(e); // Track character count
+                                }}
+                                maxLength={maxLength}
                                 className="bg-[#0A0A0A] text-white border-yellow-400/20"
                                 placeholder="Add any additional notes for your client..."
                               />
                             </FormControl>
+                            <div className="text-sm text-gray-400 mt-1">{notesCharCount}/{maxLength}</div> {/* Character count display */}
                             <FormMessage />
                           </FormItem>
                         )}
@@ -887,24 +914,7 @@ export default function CreateInvoiceForm({
                         Add-ons
                       </h3>
                       <div className="space-y-4">
-                        <FormField
-                          control={form.control}
-                          name="includeFeedbackForm"
-                          render={({ field }) => (
-                            <FormItem className="flex items-center space-x-2">
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                  className="border-yellow-400/20 data-[state=checked]:bg-yellow-400 data-[state=checked]:text-gray-900"
-                                />
-                              </FormControl>
-                              <FormLabel className="text-gray-300">
-                                Include Feedback Form in Invoice PDF
-                              </FormLabel>
-                            </FormItem>
-                          )}
-                        />
+                        
                         <FormField
                           control={form.control}
                           name="addCoupon"
