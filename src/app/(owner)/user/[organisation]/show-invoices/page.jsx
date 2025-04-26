@@ -128,7 +128,7 @@ export default function ShowInvoicesPage({ params }) {
         <div className="text-center space-y-6">
           <div className="flex flex-col items-center space-y-4">
             <span className="text-xl font-semibold text-yellow-400">
-              Upgrade to Pro to manage coupons
+              Upgrade to Pro to View Invoices
             </span>
           </div>
 
