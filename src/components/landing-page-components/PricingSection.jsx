@@ -257,8 +257,8 @@ const PricingSection = () => {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
                   if (!session) {
-                   router.push("/sign-in")
-                  } 
+                    router.push("/sign-in");
+                  }
                 }}
                 disabled={
                   isFreeLoading || isFreePlan || isProPlan || isProTrial
@@ -281,8 +281,6 @@ const PricingSection = () => {
                     : !session
                     ? "Get Started Free"
                     : "Get Started Free"}
-
-                 
                 </span>
                 {!isFreeLoading && !isFreePlan && (
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -331,7 +329,6 @@ const PricingSection = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-               
                 disabled={isProLoading || isProPlan || isProTrial}
                 className={`w-full py-3 px-4 rounded-lg font-medium flex items-center justify-center bg-gradient-to-r from-yellow-500 to-yellow-400 text-gray-900 shadow-lg shadow-yellow-500/20 ${
                   isProLoading || isProPlan || isProTrial
@@ -340,7 +337,7 @@ const PricingSection = () => {
                 }`}
               >
                 {user?.proTrialUsed === true && (
-                  <span  onClick={() => handlePayment("pro")}>
+                  <span onClick={() => handlePayment("pro")}>
                     {isProLoading
                       ? "Processing..."
                       : isProPlan
@@ -350,13 +347,13 @@ const PricingSection = () => {
                       : "Subscribe to Pro"}
                   </span>
                 )}
-                {
-                  ((user?.plan?.planName === "free" && user?.proTrialUsed === false) || !session) && (
-                    <span onClick={() => handleConfirmModal("pro-trial")}>
-                      Activate 7 day pro trial
-                    </span>
-                  )
-                }
+                {((user?.plan?.planName === "free" &&
+                  user?.proTrialUsed === false) ||
+                  !session) && (
+                  <span onClick={() => handleConfirmModal("pro-trial")}>
+                    Activate 7 day pro trial
+                  </span>
+                )}
 
                 {!isProLoading && !isProPlan && !isProTrial && (
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -367,44 +364,36 @@ const PricingSection = () => {
 
           {/* Add this container to center the pro-trial info */}
         </div>
-        {console.log(user)}
-        {(user?.plan?.planName === "free" || user?.plan?.proTrialUsed) && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-center mt-12"
-          >
-            <p className="text-gray-400">
-              Go for 7 day free trial.{" "}
-              <span
-                className="text-yellow-400 hover:underline cursor-pointer"
-                onClick={() => handleConfirmModal("pro-trial")}
-              >
-                Click Here
-              </span>
-            </p>
-          </motion.div>
-        )}
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
           className={`text-center ${
             user?.plan?.planName === "free" || user?.plan?.proTrialUsed
-              ? "mt-2"
+              ? "mt-7"
               : "mt-12"
           }`}
         >
+          <p className="text-gray-100 text-sm ">
+            Current Plan :{" "}
+            <span className="text-yellow-400">
+              {user?.plan?.planName.toUpperCase()}
+            </span>
+          </p>
           <p className="text-gray-500 text-sm ">
-            Current Plan : {user?.plan?.planName}
-            {user?.plan?.proTrialUsed && " (Pro Trial Used)"}
+            {user?.proTrialUsed === true && " (Pro Trial Used)"}
           </p>
           <p className="text-gray-500 text-sm mt-2">
             Need a custom plan for your enterprise?{" "}
-            <a href="#" className="text-yellow-400 hover:underline">
+            <button
+              className="text-yellow-400 hover:underline cursor-pointer"
+              onClick={() => {
+                window.open("mailto:invisifeed@gmail.com", "_blank");
+              }}
+            >
               Contact us
-            </a>
+            </button>
           </p>
         </motion.div>
         {showConfirmModal && (
