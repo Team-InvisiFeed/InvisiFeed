@@ -19,10 +19,14 @@ import CreateInvoiceForm from "./CreateInvoiceForm";
 import CompleteProfileDialog from "./CompleteProfileDialog";
 import axios from "axios";
 import { SubscriptionPopup } from "../SubscriptionPopup";
+import { usePathname, useRouter } from "next/navigation";
+import LoadingScreen from "../LoadingScreen";
 
 export default function Home() {
   const { data: session } = useSession();
   const owner = session?.user;
+  const router = useRouter();
+  const pathname = usePathname();
 
   const [file, setFile] = useState(null);
   const [pdfUrl, setPdfUrl] = useState("");
@@ -50,7 +54,8 @@ export default function Home() {
   });
   const [couponSaved, setCouponSaved] = useState(false);
   const [showCreateInvoice, setShowCreateInvoice] = useState(false);
-  const [dailyLimit, setDailyLimit] = useState(3);
+  
+  const [dailyLimit, setDailyLimit] = useState(owner?.plan?.planName === "pro" && owner?.plan?.planEndDate > new Date() ? 10 : 3);
 
   const [isLoading, setIsLoading] = useState(false);
   const [showCompleteProfileDialog, setShowCompleteProfileDialog] =
@@ -156,6 +161,26 @@ export default function Home() {
     setShowCouponForm(false);
     toast.success("Coupon saved successfully");
   };
+
+  const handleNavigation = (route) => {
+      if (route === pathname) {
+        // Same route, no loading screen
+        return;
+      }
+      setLoading(true);
+      router.push(route);
+    };
+    
+  
+    useEffect(() => {
+      return () => {
+        setLoading(false);
+      };
+    }, [pathname]);
+  
+    if (loading) {
+      return <LoadingScreen />;
+    }
 
   const handleSampleInvoiceSelect = async (sampleInvoice) => {
     try {
@@ -460,7 +485,7 @@ export default function Home() {
 
             {/* Action Buttons */}
             <div className="flex justify-center space-x-4 mb-8 ">
-              {file ? null : dailyUploadCount >= 3 ? (
+              {file ? null : dailyUploadCount >= dailyLimit ? (
                 <div className="text-center">
                   <p className="text-yellow-400 text-lg font-medium mb-2">
                     Daily Limit Reached
@@ -469,6 +494,11 @@ export default function Home() {
                     You have reached your daily upload limit. Please try again
                     in {timeLeft}h.
                   </p>
+                  {
+                    (owner?.plan?.planName === "free" || owner?.plan?.planEndDate < new Date() )? (
+                      <button className="text-yellow-400 text-sm mt-3 cursor-pointer p-3 rounded-full border border-yellow-400/20 bg-gradient-to-br hover:from-yellow-400/20 hover:to-yellow-400/10" onClick={() => handleNavigation("/pricing")}>Please upgrade your plan to upload more invoices.</button>
+                    ) : null
+                  }
                 </div>
               ) : !showCreateInvoice ? (
                 <button
@@ -490,7 +520,7 @@ export default function Home() {
             </div>
 
             {/* File Input Section */}
-            {!showCreateInvoice && dailyUploadCount < 3 && (
+            {!showCreateInvoice && dailyUploadCount < dailyLimit && (
               <div className="mb-8 flex flex-col items-center w-full space-y-4">
                 {/* Display File Name */}
                 {file && (
@@ -614,17 +644,17 @@ export default function Home() {
                       disabled={
                         loading ||
                         !file ||
-                        dailyUploadCount >= 3 ||
+                        dailyUploadCount >= dailyLimit ||
                         initialLoading
                       }
                       className="w-full px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none cursor-pointer"
                       whileHover={{
                         scale:
-                          dailyUploadCount < 3 && !initialLoading ? 1.02 : 1,
+                          dailyUploadCount < dailyLimit && !initialLoading ? 1.02 : 1,
                       }}
                       whileTap={{
                         scale:
-                          dailyUploadCount < 3 && !initialLoading ? 0.98 : 1,
+                          dailyUploadCount < dailyLimit && !initialLoading ? 0.98 : 1,
                       }}
                     >
                       {loading || initialLoading ? (
@@ -644,7 +674,7 @@ export default function Home() {
                 <p
                   onClick={() => setShowSampleInvoices(true)}
                   className="text-gray-100 text-sm mt-4 text-center cursor-pointer hover:text-yellow-400 transition-colors"
-                  disabled={initialLoading || dailyUploadCount >= 3}
+                  disabled={initialLoading || dailyUploadCount >= dailyLimit}
                 >
                   Try out our sample invoices to get started
                 </p>
@@ -910,7 +940,7 @@ export default function Home() {
         )}
 
         {/* Sample Invoices Modal */}
-        {showSampleInvoices && dailyUploadCount < 3 && (
+        {showSampleInvoices && dailyUploadCount < dailyLimit && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm p-4 overflow-">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -959,7 +989,7 @@ export default function Home() {
                     key={invoice.id}
                     onClick={() => handleSampleInvoiceSelect(invoice)}
                     className="w-full px-4 py-3 bg-[#0A0A0A] border border-yellow-400/20 rounded-xl text-white hover:bg-[#0A0A0A]/80 hover:border-yellow-400/40 transition-all duration-300 flex items-center justify-between cursor-pointer hover:scale-105"
-                    disabled={loading || dailyUploadCount >= 3}
+                    disabled={loading || dailyUploadCount >= dailyLimit}
                   >
                     <span className="text-sm">{invoice.name}</span>
                     {loading && file && file.name === `${invoice.name}.pdf` ? (
