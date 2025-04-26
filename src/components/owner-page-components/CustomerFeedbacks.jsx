@@ -36,29 +36,38 @@ const RatingDisplay = ({ rating, label }) => (
   </div>
 );
 
-const CustomerDetails = ({ details }) => (
-  <div className="mt-4 p-4 bg-gradient-to-br from-yellow-400/5 to-transparent rounded-lg border border-yellow-400/10">
-    <h3 className="text-sm font-medium text-gray-400 mb-2">Customer Details</h3>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <span className="text-gray-400">Name:</span>
-        <span className="ml-2 text-gray-300">{details.customerName}</span>
-      </div>
-      <div>
-        <span className="text-gray-400">Email:</span>
-        <span className="ml-2 text-gray-300">{details.customerEmail}</span>
-      </div>
-      {details.amount && (
-        <div>
-          <span className="text-gray-400">Amount:</span>
-          <span className="ml-2 text-gray-300">
-            ₹{parseFloat(details.amount).toLocaleString('en-IN')}
-          </span>
+const CustomerDetails = ({ details, invoiceId }) => {
+  return (
+    <div className="mt-4 p-4 bg-gradient-to-br from-yellow-400/5 to-transparent rounded-lg border border-yellow-400/10">
+      <h3 className="text-sm font-medium text-gray-400 mb-2">Customer Details</h3>
+      {invoiceId ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <span className="text-gray-400">Name:</span>
+            <span className="ml-2 text-gray-300">{details.customerName}</span>
+          </div>
+          <div>
+            <span className="text-gray-400">Email:</span>
+            <span className="ml-2 text-gray-300">{details.customerEmail}</span>
+          </div>
+          {details.amount && (
+            <div>
+              <span className="text-gray-400">Amount:</span>
+              <span className="ml-2 text-gray-300">
+                ₹{parseFloat(details.amount).toLocaleString('en-IN')}
+              </span>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="text-gray-300">
+          <span>Sent Anonymously</span>
         </div>
       )}
     </div>
-  </div>
-);
+  );
+};
+
 
 const CustomerFeedbacks = () => {
   const params = useParams();
@@ -101,6 +110,7 @@ const CustomerFeedbacks = () => {
 
   useEffect(() => {
     fetchFeedbacks(currentPage);
+    console.log(feedbacks);
   }, [currentPage, organisation, sortBy]);
 
   const handlePrevPage = () => {
@@ -220,6 +230,9 @@ const CustomerFeedbacks = () => {
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-4">
+                        {feedback.customerDetails && (
+                          <CustomerDetails details={feedback.customerDetails} invoiceId={feedback.invoiceId} />
+                        )}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <RatingDisplay
                             rating={feedback.satisfactionRating}
@@ -247,9 +260,7 @@ const CustomerFeedbacks = () => {
                           />
                         </div>
 
-                        {feedback.customerDetails && (
-                          <CustomerDetails details={feedback.customerDetails} />
-                        )}
+                        
 
                         {feedback.feedbackContent && (
                           <div className="mt-4">
