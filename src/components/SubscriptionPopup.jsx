@@ -1,10 +1,34 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
+import LoadingScreen from "./LoadingScreen";
 
 export const SubscriptionPopup = ({ isOpen, onClose }) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const [loading, setLoading] = useState(false);
+   const handleNavigation = (route) => {
+      if (route === pathname) {
+        // Same route, no loading screen
+        return;
+      }
+      setLoading(true);
+      router.push(route);
+    };
+    
+  
+    useEffect(() => {
+      return () => {
+        setLoading(false);
+      };
+    }, [pathname]);
+  
+    if (loading) {
+      return <LoadingScreen />;
+    }
   return (
     <AnimatePresence>
       {isOpen && (
@@ -39,11 +63,11 @@ export const SubscriptionPopup = ({ isOpen, onClose }) => {
               </p>
 
               <div className="pt-4">
-                <Link href="/pricing">
-                  <Button className="w-full">
+                
+                  <Button className="w-full cursor-pointer" onClick={() => handleNavigation("/pricing")}>
                     View Pricing Plans
                   </Button>
-                </Link>
+               
               </div>
             </div>
           </motion.div>
