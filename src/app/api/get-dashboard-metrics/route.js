@@ -35,15 +35,18 @@ const calculateAverageRatings = (feedbacks, totalFeedbacks) => {
 };
 
 const getTotalSales = (invoices) => {
-  const totalSales = invoices.reduce((sum, invoice) => sum + (invoice.customerDetails.amount || 0), 0);
+  const totalSales = invoices.reduce(
+    (sum, invoice) => sum + (invoice.customerDetails.amount || 0),
+    0
+  );
 
   if (!invoices || invoices.length === 0) {
     console.log("No invoices provided");
     return 0;
   }
-  
-  return Number((totalSales).toFixed(2));
-}
+
+  return Number(totalSales.toFixed(2));
+};
 
 const getAverageRevisitFrequencyFromInvoices = async (invoices) => {
   if (!invoices || invoices.length === 0) {
@@ -61,7 +64,9 @@ const getAverageRevisitFrequencyFromInvoices = async (invoices) => {
   }, {});
 
   // Filter customers with revisitCount > 1
-  const filteredCustomers = Object.values(customerRevisitCounts).filter((count) => count > 1);
+  const filteredCustomers = Object.values(customerRevisitCounts).filter(
+    (count) => count > 1
+  );
 
   if (filteredCustomers.length === 0) {
     console.log("No customers with revisit count > 1");
@@ -70,15 +75,13 @@ const getAverageRevisitFrequencyFromInvoices = async (invoices) => {
 
   // Calculate average revisit frequency
   const averageRevisitFrequency =
-    filteredCustomers.reduce((sum, count) => sum + count, 0) / (filteredCustomers.length || 1); // Avoid divide by zero
+    filteredCustomers.reduce((sum, count) => sum + count, 0) /
+    (filteredCustomers.length || 1); // Avoid divide by zero
 
   console.log("Average Revisit Frequency (filtered):", averageRevisitFrequency);
 
   return Number(averageRevisitFrequency.toFixed(1));
 };
-
- 
-
 
 const getPerformanceMetrics = (averageRatings) => {
   const metricsArray = Object.entries(averageRatings)
@@ -324,14 +327,25 @@ function groupSalesByDate(invoices, viewType) {
   const currentDate = new Date();
 
   // Initialize based on view type
-  if (viewType === 'currentMonth') {
-    const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
+  if (viewType === "currentMonth") {
+    const daysInMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      0
+    ).getDate();
     for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-      const dateKey = date.toLocaleDateString("en-US", { day: "numeric", month: "short" });
+      const date = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        day
+      );
+      const dateKey = date.toLocaleDateString("en-US", {
+        day: "numeric",
+        month: "short",
+      });
       grouped[dateKey] = { date: dateKey, sales: 0 };
     }
-  } else if (viewType === 'currentWeek') {
+  } else if (viewType === "currentWeek") {
     const startOfWeek = new Date(currentDate);
     startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
     for (let i = 0; i < 7; i++) {
@@ -340,23 +354,39 @@ function groupSalesByDate(invoices, viewType) {
       const dateKey = date.toLocaleDateString("en-US", { weekday: "short" });
       grouped[dateKey] = { date: dateKey, sales: 0 };
     }
-  } else if (viewType === 'currentYear') {
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    months.forEach(month => {
+  } else if (viewType === "currentYear") {
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    months.forEach((month) => {
       grouped[month] = { date: month, sales: 0 };
     });
   }
 
   // Add actual sales data
-  invoices.forEach(invoice => {
+  invoices.forEach((invoice) => {
     const invoiceDate = new Date(invoice.createdAt);
     let dateKey;
 
-    if (viewType === 'currentMonth') {
-      dateKey = invoiceDate.toLocaleDateString("en-US", { day: "numeric", month: "short" });
-    } else if (viewType === 'currentWeek') {
+    if (viewType === "currentMonth") {
+      dateKey = invoiceDate.toLocaleDateString("en-US", {
+        day: "numeric",
+        month: "short",
+      });
+    } else if (viewType === "currentWeek") {
       dateKey = invoiceDate.toLocaleDateString("en-US", { weekday: "short" });
-    } else if (viewType === 'currentYear') {
+    } else if (viewType === "currentYear") {
       dateKey = invoiceDate.toLocaleDateString("en-US", { month: "short" });
     }
 
@@ -367,10 +397,23 @@ function groupSalesByDate(invoices, viewType) {
 
   // Convert to array and sort
   return Object.values(grouped).sort((a, b) => {
-    if (viewType === 'currentMonth' || viewType === 'currentWeek') {
+    if (viewType === "currentMonth" || viewType === "currentWeek") {
       return new Date(a.date) - new Date(b.date);
     } else {
-      const monthOrder = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const monthOrder = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
       return monthOrder.indexOf(a.date) - monthOrder.indexOf(b.date);
     }
   });
@@ -411,17 +454,26 @@ export async function GET(req) {
     const totalInvoices = invoices.length;
 
     // Get sales data based on sales view type
+
+    const isProPlan =
+      (owner?.plan?.planName === "pro" ||
+        owner?.plan?.planName === "pro-trial") &&
+      owner?.plan?.planEndDate > new Date();
+
     let salesData = [];
-    if (salesYear) {
-      const filteredInvoices = invoices.filter(invoice => {
-        const invoiceYear = new Date(invoice.createdAt).getFullYear();
-        return invoiceYear === parseInt(salesYear);
-      });
-      salesData = groupSalesByDate(filteredInvoices, 'currentYear');
-    } else if (salesViewType) {
-      salesData = groupSalesByDate(invoices, salesViewType);
-    } else {
-      salesData = groupSalesByDate(invoices, 'currentYear');
+
+    if (isProPlan) {
+      if (salesYear) {
+        const filteredInvoices = invoices.filter((invoice) => {
+          const invoiceYear = new Date(invoice.createdAt).getFullYear();
+          return invoiceYear === parseInt(salesYear);
+        });
+        salesData = groupSalesByDate(filteredInvoices, "currentYear");
+      } else if (salesViewType) {
+        salesData = groupSalesByDate(invoices, salesViewType);
+      } else {
+        salesData = groupSalesByDate(invoices, "currentYear");
+      }
     }
 
     // Get all invoices (Array) with feedback submitted
@@ -434,7 +486,8 @@ export async function GET(req) {
       invoiceWithFeedbackSubmitted
     );
 
-    const averageRevisitFrequency = await getAverageRevisitFrequencyFromInvoices(invoices);
+    const averageRevisitFrequency =
+      await getAverageRevisitFrequencyFromInvoices(invoices);
 
     console.log("Average Revisit Frequency:", averageRevisitFrequency);
 
@@ -462,45 +515,51 @@ export async function GET(req) {
     let historicalRatings = [];
     let filteredFeedbacks = [...feedbacks];
 
-    // Handle historical year data
-    if (ratingsYear) {
-      filteredFeedbacks = feedbacks.filter((feedback) => {
-        const feedbackYear = new Date(feedback.createdAt).getFullYear();
-        return feedbackYear === parseInt(ratingsYear);
-      });
-      historicalRatings = groupByMonth(filteredFeedbacks);
-    } else if (ratingsViewType) {
-      // Handle current time period data
-      switch (ratingsViewType) {
-        case "currentMonth":
-          filteredFeedbacks = getCurrentMonthFeedbacks(feedbacks);
-          historicalRatings = groupByDate(filteredFeedbacks);
-          break;
-        case "currentWeek":
-          filteredFeedbacks = getCurrentWeekFeedbacks(feedbacks);
-          historicalRatings = groupByDay(filteredFeedbacks);
-          break;
-        case "currentYear":
-          filteredFeedbacks = getCurrentYearFeedbacks(feedbacks);
-          historicalRatings = groupByMonth(filteredFeedbacks);
-          break;
-        default:
-          // Default to current year if no view type selected
-          filteredFeedbacks = getCurrentYearFeedbacks(feedbacks);
-          historicalRatings = groupByMonth(filteredFeedbacks);
+    if (isProPlan) {
+      // Handle historical year data
+      if (ratingsYear) {
+        filteredFeedbacks = feedbacks.filter((feedback) => {
+          const feedbackYear = new Date(feedback.createdAt).getFullYear();
+          return feedbackYear === parseInt(ratingsYear);
+        });
+        historicalRatings = groupByMonth(filteredFeedbacks);
+      } else if (ratingsViewType) {
+        // Handle current time period data
+        switch (ratingsViewType) {
+          case "currentMonth":
+            filteredFeedbacks = getCurrentMonthFeedbacks(feedbacks);
+            historicalRatings = groupByDate(filteredFeedbacks);
+            break;
+          case "currentWeek":
+            filteredFeedbacks = getCurrentWeekFeedbacks(feedbacks);
+            historicalRatings = groupByDay(filteredFeedbacks);
+            break;
+          case "currentYear":
+            filteredFeedbacks = getCurrentYearFeedbacks(feedbacks);
+            historicalRatings = groupByMonth(filteredFeedbacks);
+            break;
+          default:
+            // Default to current year if no view type selected
+            filteredFeedbacks = getCurrentYearFeedbacks(feedbacks);
+            historicalRatings = groupByMonth(filteredFeedbacks);
+        }
+      } else {
+        // If neither year nor view type is selected, default to current year
+        filteredFeedbacks = getCurrentYearFeedbacks(feedbacks);
+        historicalRatings = groupByMonth(filteredFeedbacks);
       }
-    } else {
-      // If neither year nor view type is selected, default to current year
-      filteredFeedbacks = getCurrentYearFeedbacks(feedbacks);
-      historicalRatings = groupByMonth(filteredFeedbacks);
     }
 
     // Get available years for the dropdown
-    const availableYears = [
-      ...new Set(
-        feedbacks.map((feedback) => new Date(feedback.createdAt).getFullYear())
-      ),
-    ].sort((a, b) => b - a);
+    let availableYears = []
+    if(isProPlan){
+       availableYears = [
+        ...new Set(
+          feedbacks.map((feedback) => new Date(feedback.createdAt).getFullYear())
+        ),
+      ].sort((a, b) => b - a);
+    }
+   
 
     return NextResponse.json(
       {
@@ -523,10 +582,10 @@ export async function GET(req) {
           negativeFeedbacks,
           averageRatings,
           negativePercentage,
-          historicalRatings,
-          availableYears,
+          historicalRatings : isProPlan ? historicalRatings : [],
+          availableYears : isProPlan ? availableYears : [],
           averageResponseTime,
-          salesData,
+          salesData : isProPlan ? salesData : [],
         },
       },
       { status: 200 }
