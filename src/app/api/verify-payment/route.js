@@ -72,7 +72,7 @@ export async function POST(req) {
       success: true,
       message: "Payment verified and plan updated successfully",
       user
-    });
+    } , {status:200});
   } catch (error) {
     console.error("Error verifying payment:", error);
     return NextResponse.json(
