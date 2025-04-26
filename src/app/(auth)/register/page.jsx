@@ -81,7 +81,7 @@ function Page() {
       toast(response.data.message);
       router.replace(`/verify/${data.username}`);
     } catch (error) {
-      toast("Sign-up failed");
+      toast(error?.response?.data?.message || "Sign-up failed");
     } finally {
       setIsSubmitting(false);
     }
