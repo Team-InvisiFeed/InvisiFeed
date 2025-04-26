@@ -669,19 +669,15 @@ const Dashboard = () => {
                           <ChartTooltip
                             cursor={false}
                             content={
-                              <ChartTooltipContent indicator="dot" hideLabel />
+                              <ChartTooltipContent indicator="dot" />
                             }
                             formatter={(value, name, props) => [
-                              `₹${value.toLocaleString()}`,
-                              props.payload.name,
+                              `₹${value }`,
+                              
                             ]}
                             labelClassName="font-bold text-sm"
                             wrapperClassName="[&_.recharts-tooltip-item]:!text-yellow-400"
-                            contentStyle={{
-                              backgroundColor: "rgba(10, 10, 10, 0.8)",
-                              borderColor: "rgba(250, 204, 21, 0.2)",
-                              color: "#FDE047",
-                            }}
+                           className="bg-[#fff] border-yellow-400/20  "
                           />
                           <Bar
                             dataKey="value"
@@ -689,17 +685,7 @@ const Dashboard = () => {
                             radius={[4, 4, 0, 0]}
                             maxBarSize={isMobile ? 30 : 40}
                           >
-                            <LabelList
-                              dataKey="value"
-                              position="top"
-                              offset={8}
-                              className="fill-yellow-400 font-bold text-[10px] sm:text-xs"
-                              formatter={(value) =>
-                                value == null
-                                  ? ""
-                                  : `₹${value.toLocaleString()}`
-                              }
-                            />
+                            
                           </Bar>
                         </BarChart>
                       </ResponsiveContainer>
