@@ -31,7 +31,7 @@ import {
   Cell,
   Label,
 } from "recharts";
-import { ChartContainer } from "@/components/ui/chart";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Progress } from "@/components/ui/progress";
 import {
   Card,
@@ -41,16 +41,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+
 const DashboardShowcaseSection = () => {
   // Mock data for charts
   const feedbackRatioData = [
-    { name: "Feedbacks", value: 75 },
-    { name: "Remaining", value: 25 },
+    { name: "Feedbacks", value: 75 , fill: "#EAB308" },
+    { name: "Remaining", value: 25 , fill: "#FFFFFF" },
   ];
 
   const positiveNegativeData = [
-    { name: "Positive", value: 85 },
-    { name: "Negative", value: 15 },
+    { name: "Positive", value: 85 , fill: "#EAB308" },
+    { name: "Negative", value: 15 , fill: "#FFFFFF" },
   ];
 
   const ratingData = [
@@ -184,40 +185,77 @@ const DashboardShowcaseSection = () => {
               <PieChart className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
             </div>
             <div className="h-48 sm:h-64 w-full overflow-hidden">
-              <ResponsiveContainer width="100%" height="100%">
-                <RechartsPieChart>
-                  <Pie
-                    data={feedbackRatioData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    paddingAngle={0}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {feedbackRatioData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={index === 0 ? "#FACC15" : "#FFFFFF"}
+              <div className="flex flex-col sm:flex-row items-center justify-between">
+                <ChartContainer
+                  className="w-full sm:w-[60%] aspect-square max-h-[200px]"
+                >
+                  <RechartsPieChart>
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent hideLabel />}
+                    />
+                    <Pie
+                      data={feedbackRatioData}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={60}
+                      outerRadius={80}
+                      strokeWidth={4}
+                      style={{
+                        filter: "drop-shadow(0 0 8px rgba(234, 179, 8, 0.3))",
+                      }}
+                    >
+                      <Label
+                        content={({ viewBox }) => {
+                          if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                            return (
+                              <text
+                                x={viewBox.cx}
+                                y={viewBox.cy}
+                                textAnchor="middle"
+                                dominantBaseline="middle"
+                              >
+                                <tspan
+                                  x={viewBox.cx}
+                                  y={viewBox.cy}
+                                  className="text-2xl sm:text-3xl font-bold text-yellow-400 fill-yellow-400"
+                                  style={{
+                                    textShadow:
+                                      "0 0 10px rgba(234, 179, 8, 0.5)",
+                                  }}
+                                >
+                                  75%
+                                </tspan>
+                                <tspan
+                                  x={viewBox.cx}
+                                  y={(viewBox.cy || 0) + 24}
+                                  className="fill-muted-foreground text-xs"
+                                >
+                                  Feedback Rate
+                                </tspan>
+                              </text>
+                            );
+                          }
+                        }}
                       />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#0A0A0A",
-                      border: "1px solid rgba(251, 191, 36, 0.2)",
-                      borderRadius: "0.5rem",
-                    }}
-                  />
-                  <Label
-                    value="75%"
-                    position="center"
-                    className="text-2xl font-bold text-yellow-400"
-                  />
-                </RechartsPieChart>
-              </ResponsiveContainer>
+                    </Pie>
+                  </RechartsPieChart>
+                </ChartContainer>
+                <div className="w-full sm:w-[40%] space-y-4 mt-4 sm:mt-0">
+                  <div className="text-center sm:text-right">
+                    <p className="text-gray-400 text-sm">Total Invoices</p>
+                    <p className="text-xl sm:text-2xl font-bold text-white">
+                      1,500
+                    </p>
+                  </div>
+                  <div className="text-center sm:text-right">
+                    <p className="text-gray-400 text-sm">Total Feedbacks</p>
+                    <p className="text-xl sm:text-2xl font-bold text-white">
+                      1,125
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </motion.div>
 
@@ -238,40 +276,79 @@ const DashboardShowcaseSection = () => {
               </div>
             </div>
             <div className="h-48 sm:h-64 w-full overflow-hidden">
-              <ResponsiveContainer width="100%" height="100%">
-                <RechartsPieChart>
-                  <Pie
-                    data={positiveNegativeData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    paddingAngle={0}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {positiveNegativeData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={index === 0 ? "#22C55E" : "#EF4444"}
+              <div className="flex flex-col sm:flex-row items-center justify-between">
+                <ChartContainer
+                  className="w-full sm:w-[60%] aspect-square max-h-[200px]"
+                >
+                  <RechartsPieChart>
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent hideLabel />}
+                    />
+                    <Pie
+                      data={positiveNegativeData}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={60}
+                      outerRadius={80}
+                      strokeWidth={4}
+                      fill="#FACC15"
+
+                      style={{
+                        filter: "drop-shadow(0 0 8px rgba(34, 197, 94, 0.3))",
+                      }}
+                    >
+                      <Label
+                        content={({ viewBox }) => {
+                          if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                            return (
+                              <text
+                                x={viewBox.cx}
+                                y={viewBox.cy}
+                                textAnchor="middle"
+                                dominantBaseline="middle"
+                              >
+                                <tspan
+                                  x={viewBox.cx}
+                                  y={viewBox.cy}
+                                  className="text-2xl sm:text-3xl font-bold text-yellow-400 fill-yellow-400"
+                                  style={{
+                                    textShadow:
+                                      "0 0 10px rgba(234, 179, 8, 0.5)",
+                                  }}
+                                >
+                                  85%
+                                </tspan>
+                                <tspan
+                                  x={viewBox.cx}
+                                  y={(viewBox.cy || 0) + 24}
+                                  className="fill-muted-foreground text-xs"
+                                >
+                                  Positive Feedbacks
+                                </tspan>
+                              </text>
+                            );
+                          }
+                        }}
                       />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#0A0A0A",
-                      border: "1px solid rgba(251, 191, 36, 0.2)",
-                      borderRadius: "0.5rem",
-                    }}
-                  />
-                  <Label
-                    value="85%"
-                    position="center"
-                    className="text-2xl font-bold text-yellow-400"
-                  />
-                </RechartsPieChart>
-              </ResponsiveContainer>
+                    </Pie>
+                  </RechartsPieChart>
+                </ChartContainer>
+                <div className="w-full sm:w-[40%] space-y-4 mt-4 sm:mt-0">
+                  <div className="text-center sm:text-right">
+                    <p className="text-gray-400 text-sm">Positive Feedbacks</p>
+                    <p className="text-xl sm:text-2xl font-bold text-white">
+                      956
+                    </p>
+                  </div>
+                  <div className="text-center sm:text-right">
+                    <p className="text-gray-400 text-sm">Negative Feedbacks</p>
+                    <p className="text-xl sm:text-2xl font-bold text-white">
+                      169
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </motion.div>
         </div>
