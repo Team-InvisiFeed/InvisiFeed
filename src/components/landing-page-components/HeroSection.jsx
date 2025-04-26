@@ -15,13 +15,15 @@ import {
   BarChart,
 } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import LoadingScreen from "../LoadingScreen";
 
 function HeroSection() {
   const router = useRouter();
   const [isLandscape, setIsLandscape] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Check device orientation and size
   useEffect(() => {
@@ -45,6 +47,26 @@ function HeroSection() {
       window.removeEventListener("orientationchange", checkDevice);
     };
   }, []);
+
+  const pathname = usePathname();
+  
+  const handleNavigation = (route) => {
+    if (route === pathname) {
+      // Same route, no loading screen
+      return;
+      }
+      setLoading(true);
+      router.push(route);
+    };
+    useEffect(() => {
+      return () => {
+        setLoading(false);
+      };
+    }, [pathname]);
+  
+    if (loading) {
+      return <LoadingScreen />;
+    }
 
   return (
     <section
@@ -96,7 +118,7 @@ function HeroSection() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="cursor-pointer group flex items-center justify-center space-x-2 sm:space-x-3 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 w-full sm:w-auto"
-                onClick={() => router.push("/register")}
+                onClick={() => handleNavigation("/register")}
               >
                 <span className="text-sm sm:text-base">
                   Generate Your First Smart Invoice
