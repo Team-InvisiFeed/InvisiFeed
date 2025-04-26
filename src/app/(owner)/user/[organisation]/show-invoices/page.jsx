@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import {
@@ -30,10 +30,13 @@ import {
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight, Search, Star } from "lucide-react";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export default function ShowInvoicesPage({ params }) {
   const { data: session } = useSession();
+  const owner = session?.user;
   const router = useRouter();
+  const pathname = usePathname();
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -96,6 +99,50 @@ export default function ShowInvoicesPage({ params }) {
       </span>
     );
   };
+
+  const handleNavigation = (route) => {
+    if (route === pathname) {
+      // Same route, no loading screen
+      return;
+    }
+    setLoading(true);
+    router.push(route);
+  };
+
+  useEffect(() => {
+    return () => {
+      setLoading(false);
+    };
+  }, [pathname]);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  if (
+    owner?.plan?.planName === "free" ||
+    owner?.plan?.planEndDate < new Date()
+  ) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
+        <div className="text-center space-y-6">
+          <div className="flex flex-col items-center space-y-4">
+            <span className="text-xl font-semibold text-yellow-400">
+              Upgrade to Pro to manage coupons
+            </span>
+          </div>
+
+          <button
+            className="bg-yellow-400 text-[#0A0A0A] py-2 px-6 font-semibold rounded-full shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 transition duration-300 ease-in-out cursor-pointer"
+            onClick={() => handleNavigation("/pricing")}
+          >
+            Subscribe to Pro
+          </button>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] py-6 sm:py-12 px-3 sm:px-4">
