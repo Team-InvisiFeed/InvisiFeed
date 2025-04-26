@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import ConfirmModal from "../ConfirmModal";
 import LoadingScreen from "../LoadingScreen";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const PricingSection = () => {
   const { data: session, update } = useSession();
@@ -19,42 +20,6 @@ const PricingSection = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const handlePayment = async (plan) => {
-    if (plan === "free") {
-      try {
-        setIsFreeLoading(true);
-        const response = await fetch("/api/update-plan", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            planName: "free",
-          }),
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          await update({
-            user: {
-              ...session.user,
-              plan: data.user.plan,
-            },
-          });
-
-          toast.success("Successfully switched to Free plan");
-        } else {
-          toast.error(data.message || "Failed to update plan");
-        }
-      } catch (error) {
-        console.error("Error updating plan:", error);
-        toast.error("Failed to update plan");
-      } finally {
-        setIsFreeLoading(false);
-      }
-      return;
-    }
-
     if (plan === "pro-trial") {
       try {
         if (!session) {
@@ -62,19 +27,12 @@ const PricingSection = () => {
           return;
         }
         setIsProTrialLoading(true);
-        const response = await fetch("/api/update-plan", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            planName: "pro-trial",
-          }),
+        const response = await axios.post("/api/update-plan", {
+          planName: "pro-trial",
         });
 
-        const data = await response.json();
+        const data = await response.data;
 
-        console.log(data);
 
         if (data.success) {
           await update({
@@ -94,7 +52,7 @@ const PricingSection = () => {
         }
       } catch (error) {
         console.error("Error updating plan:", error);
-        toast.error("Failed to update plan");
+        toast.error(error?.response?.data?.message || "Failed to update plan");
       } finally {
         setIsProTrialLoading(false);
         setShowConfirmModal(false);
@@ -104,18 +62,9 @@ const PricingSection = () => {
 
     try {
       setIsProLoading(true);
-      const response = await fetch("/api/create-order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount: 2, // Amount in rupees
-          currency: "INR",
-        }),
-      });
+      const response = await axios.post("/api/create-order");
 
-      const data = await response.json();
+      const data = await response.data;
 
       if (!data.success) {
         throw new Error(data.message || "Failed to create order");
@@ -130,19 +79,13 @@ const PricingSection = () => {
         order_id: data.order.id,
         handler: async function (response) {
           try {
-            const verifyResponse = await fetch("/api/verify-payment", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-              }),
+            const verifyResponse = await axios.post("/api/verify-payment", {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
             });
 
-            const verifyData = await verifyResponse.json();
+            const verifyData = await verifyResponse.data;
 
             if (verifyData.success) {
               await update({
@@ -158,7 +101,9 @@ const PricingSection = () => {
             }
           } catch (error) {
             console.error("Error verifying payment:", error);
-            toast.error("Failed to verify payment");
+            toast.error(
+              error?.response?.data?.message || "Failed to verify payment"
+            );
           }
         },
         prefill: {
@@ -330,14 +275,25 @@ const PricingSection = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 disabled={isProLoading || isProPlan || isProTrial}
+                onClick={() => {
+                  if (user?.proTrialUsed === true) {
+                    handlePayment("pro");
+                  } else if (
+                    (user?.plan?.planName === "free" &&
+                      user?.proTrialUsed === false) ||
+                    !session
+                  ) {
+                    handleConfirmModal("pro-trial");
+                  }
+                }}
                 className={`w-full py-3 px-4 rounded-lg font-medium flex items-center justify-center bg-gradient-to-r from-yellow-500 to-yellow-400 text-gray-900 shadow-lg shadow-yellow-500/20 ${
                   isProLoading || isProPlan || isProTrial
                     ? "opacity-50 cursor-not-allowed"
                     : ""
                 }`}
               >
-                {user?.proTrialUsed === true && (
-                  <span onClick={() => handlePayment("pro")}>
+                {user?.proTrialUsed === true ? (
+                  <span>
                     {isProLoading
                       ? "Processing..."
                       : isProPlan
@@ -346,13 +302,10 @@ const PricingSection = () => {
                       ? "Pro Trial is Active"
                       : "Subscribe to Pro"}
                   </span>
-                )}
-                {((user?.plan?.planName === "free" &&
-                  user?.proTrialUsed === false) ||
-                  !session) && (
-                  <span onClick={() => handleConfirmModal("pro-trial")}>
-                    Activate 7 day pro trial
-                  </span>
+                ) : (
+                  ((user?.plan?.planName === "free" &&
+                    user?.proTrialUsed === false) ||
+                    !session) && <span>Activate 7 day pro trial</span>
                 )}
 
                 {!isProLoading && !isProPlan && !isProTrial && (
@@ -388,7 +341,7 @@ const PricingSection = () => {
               </p>
             </>
           )}
-          
+
           <p className="text-gray-500 text-sm mt-2">
             Need a custom plan for your enterprise?{" "}
             <button
