@@ -34,8 +34,17 @@ function Navbar() {
       return;
     }
     setLoading(true);
-    router.push(route);
+    
   };
+
+  const handleSamePageNavigation = (route) => {
+    if (route === pathname) {
+      // Same route, no loading screen
+      return;
+    }
+    setLoading(true);
+    router.push(route);
+  }
   
 
   useEffect(() => {
@@ -45,21 +54,24 @@ function Navbar() {
   }, [pathname]);
 
   if (loading) {
-    return <LoadingScreen />;
+    return (
+      <LoadingScreen />
+    );
   }
 
   return (
     <nav className="p-4 md:p-6 bg-[#0A0A0A] text-white shadow-lg border-b border-yellow-400/10">
       <div className="container mx-auto flex items-center justify-between">
         {/* Logo/Brand Name */}
-        <div
+        <Link
+          href="/"
           onClick={() => handleNavigation("/")}
           className="flex items-center space-x-2 cursor-pointer"
         >
           <span className="text-2xl font-bold text-yellow-400 cursor-pointer">
             InvisiFeed
           </span>
-        </div>
+        </Link>
 
         {/* Navigation Links - Desktop */}
         <div className="hidden md:flex space-x-6 absolute left-1/2 -translate-x-1/2">
@@ -69,34 +81,34 @@ function Navbar() {
           pathname === "/privacy-policy" ||
           pathname === "/terms-of-service" ? (
             <>
-              <motion.div
+              <Link href={"/"}
                 onClick={() => handleNavigation("/")}
                 className={`text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer`}
                 
               >
                 Home
-              </motion.div>
-              <motion.div
+              </Link >
+              <Link href={"/purpose"}
                 onClick={() => handleNavigation("/purpose")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
                 
               >
                 Purpose
-              </motion.div>
-              <motion.div
+              </Link>
+              <Link href={"/guide"}
                 onClick={() => handleNavigation("/guide")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
                 
               >
                 Guide
-              </motion.div>
-              <motion.div
+              </Link>
+              <Link href={"/pricing"}
                 onClick={() => handleNavigation("/pricing")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
               
               >
                 Pricing
-              </motion.div>
+              </Link>
               <motion.div
                 onClick={(e) => {
                   e.preventDefault();
@@ -122,7 +134,7 @@ function Navbar() {
                     document.getElementById("dashboard")?.scrollIntoView({ behavior: "smooth" });
                   } else {
                     // Navigate to the target page
-                    handleNavigation(`${targetPath}#dashboard`);
+                    handleSamePageNavigation(`${targetPath}#dashboard`);
                   }
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
@@ -140,7 +152,7 @@ function Navbar() {
                     document.getElementById("generate")?.scrollIntoView({ behavior: "smooth" });
                   } else {
                     // Navigate to the target page
-                    handleNavigation(`${targetPath}#generate`);
+                    handleSamePageNavigation(`${targetPath}#generate`);
                   }
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
@@ -158,7 +170,7 @@ function Navbar() {
                     document.getElementById("ratings")?.scrollIntoView({ behavior: "smooth" });
                   } else {
                     // Navigate to the target page
-                    handleNavigation(`${targetPath}#ratings`);
+                    handleSamePageNavigation(`${targetPath}#ratings`);
                   }
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
@@ -178,7 +190,7 @@ function Navbar() {
                       ?.scrollIntoView({ behavior: "smooth" });
                   } else {
                     // Navigate to the target page
-                    handleNavigation(`${targetPath}#feedbacks`);
+                    handleSamePageNavigation(`${targetPath}#feedbacks`);
                   }
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
@@ -203,40 +215,36 @@ function Navbar() {
             </>
           ) : (
             <>
-              <motion.div
+              <Link href={"/"}
                 onClick={() => handleNavigation("/")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
            
               >
                 Home
-              </motion.div>
-              <motion.div
-                onClick={() => {
-                  handleNavigation("/purpose");
-                }}
+              </Link>
+              <Link href={"/purpose"}
+                onClick={() => handleNavigation("/purpose")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
              
               >
                 Purpose
-              </motion.div>
-              <motion.div
-                onClick={() => {
-                  handleNavigation("/guide");
-                }}
+              </Link>
+              <Link href={"/guide"}
+                onClick={() => handleNavigation("/guide")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
             
               >
                 Guide
-              </motion.div>
+              </Link>
 
 
-              <motion.div
+              <Link href={"/pricing"}
                 onClick={() => handleNavigation("/pricing")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
                
               >
                 Pricing
-              </motion.div>
+              </Link>
               <motion.div
                 onClick={(e) => {
                   e.preventDefault();
