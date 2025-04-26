@@ -63,11 +63,11 @@ function Navbar() {
 
         {/* Navigation Links - Desktop */}
         <div className="hidden md:flex space-x-6 absolute left-1/2 -translate-x-1/2">
-          {pathname === "/" ||
+          {pathname === "/" || pathname === "/pricing" ||
           pathname === "/purpose" ||
           pathname === "/guide" ||
           pathname === "/privacy-policy" ||
-          pathname === "/terms-of-service"  ? (
+          pathname === "/terms-of-service" ? (
             <>
               <motion.div
                 onClick={() => handleNavigation("/")}
@@ -92,6 +92,14 @@ function Navbar() {
                 whileTap={{ scale: 0.95 }}
               >
                 Guide
+              </motion.div>
+              <motion.div
+                onClick={() => handleNavigation("/pricing")}
+                className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Pricing
               </motion.div>
               <motion.div
                 onClick={(e) => {
@@ -222,6 +230,26 @@ function Navbar() {
                 whileTap={{ scale: 0.95 }}
               >
                 Purpose
+              </motion.div>
+              <motion.div
+                onClick={() => {
+                  handleNavigation("/guide");
+                }}
+                className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Guide
+              </motion.div>
+
+
+              <motion.div
+                onClick={() => handleNavigation("/pricing")}
+                className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Pricing
               </motion.div>
               <motion.div
                 onClick={(e) => {
