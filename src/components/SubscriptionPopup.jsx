@@ -12,6 +12,7 @@ export const SubscriptionPopup = ({ isOpen, onClose }) => {
 
   const handleNavigation = (route) => {
     if (route === pathname) {
+      onClose()
       return; // Same route, no loading screen
     }
     setLoading(true);
