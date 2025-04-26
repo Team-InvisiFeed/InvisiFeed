@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { usePathname, useRouter } from "next/navigation";
-import { Loader2, UserCircle2, User, Ticket, LogOut, CheckCircle2 } from "lucide-react";
+import { Loader2, UserCircle2, User, Ticket, LogOut, CheckCircle2, Receipt } from "lucide-react";
 import GSTINVerificationDialog from "@/components/owner-page-components/GSTINVerificationDialog";
 import LoadingScreen from "./LoadingScreen";
 import { MdMoney } from "react-icons/md";
@@ -32,8 +32,9 @@ function UserNav({ isMobile = false }) {
     
   };
 
-  const onManagePlan = () => {
-    handleNavigation(`/pricing`);
+
+  const onManageInvoice = () => {
+    handleNavigation(`/user/${owner?.username}/show-invoices`);
   };
 
   const onManageCoupons = () => {
@@ -136,10 +137,10 @@ function UserNav({ isMobile = false }) {
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 focus:bg-yellow-400/5 focus:text-yellow-400 cursor-pointer"
-            onClick={onManagePlan}
+            onClick={onManageInvoice}
           >
-            <MdMoney className="mr-2 h-4 w-4 text-yellow-400" />
-            <span>Pricing Section</span>
+            <Receipt className="mr-2 h-4 w-4 text-yellow-400" />
+            <span>Show Invoices</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             className="text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 focus:bg-yellow-400/5 focus:text-yellow-400 cursor-pointer"
