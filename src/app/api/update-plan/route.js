@@ -33,13 +33,14 @@ export async function POST(req) {
       );
     }
 
-    if (planName === "free") {
-      user.plan = {
-        planName: "free",
-        planStartDate: null,
-        planEndDate: null,
-      };
-    }else if (planName === "pro-trial") {
+   if(user.planName === "pro"){
+    return NextResponse.json({
+      success: false,
+      message: "You're already on Pro Plan",
+    }, { status: 400 });
+  }
+
+    if (planName === "pro-trial") {
       user.plan = {
         planName: "pro-trial",
         planStartDate: new Date(),
