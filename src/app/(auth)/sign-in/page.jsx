@@ -88,6 +88,7 @@ function SignInContent() {
   };
 
   const error = searchParams.get("error");
+  
   if (error === "DIFFERENT_SIGNIN_METHOD") {
     return (
       <div className="flex h-screen overflow-hidden">
@@ -149,6 +150,69 @@ function SignInContent() {
       </div>
     );
   }
+
+  if (error === "ACCOUNT_DELETED") {
+    const remainingDays = searchParams.get("remainingDays");
+    return (
+      <div className="flex h-screen overflow-hidden">
+        {/* Left Section with Gradient */}
+        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#000000] p-8 flex-col justify-center items-center text-white">
+          <div className="max-w-md space-y-4">
+            <h1
+              className="text-4xl font-extrabold tracking-tight cursor-pointer"
+              onClick={() => router.push("/")}
+            >
+              InvisiFeed
+            </h1>
+            <p className="text-lg text-gray-200">
+              Welcome back! Sign in to continue your journey
+            </p>
+            <div className="space-y-3 mt-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                <p>Secure and anonymous feedback system</p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                <p>Real-time insights and analytics</p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                <p>Build a culture of trust and transparency</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Section with Error Message */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-[#0A0A0A]">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="w-full max-w-md space-y-6 text-center"
+          >
+            <div className="space-y-2">
+              <h1 className="text-2xl font-bold tracking-tight text-white">
+                Account Deleted
+              </h1>
+              <p className="text-gray-400">
+                Your account has been deleted. Please try again after {remainingDays} days.
+              </p>
+            </div>
+
+            <Button
+              onClick={() => router.push("/register")}
+              className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium cursor-pointer h-9 shadow-lg shadow-yellow-500/20"
+            >
+              Create a new account
+            </Button>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
   // Update Google sign in handler
   const handleGoogleSignIn = async (e) => {
     e.preventDefault(); // Prevent form submission
@@ -284,7 +348,9 @@ function SignInContent() {
                     className={`text-sm cursor-pointer text-yellow-400 hover:text-yellow-300`}
                     disabled={isNavigatingToForgotPassword} // Disable button during loading
                   >
-                    {isNavigatingToForgotPassword ? "Loading..." : "Forgot password?"}
+                    {isNavigatingToForgotPassword
+                      ? "Loading..."
+                      : "Forgot password?"}
                   </button>
                 </div>
 
