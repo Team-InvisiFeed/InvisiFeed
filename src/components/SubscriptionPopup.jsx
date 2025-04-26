@@ -35,7 +35,7 @@ export const SubscriptionPopup = ({ isOpen, onClose }) => {
               <h3 className="text-xl font-semibold">Upgrade to Pro</h3>
               
               <p className="text-gray-600">
-                You've reached the limit for the free plan. Upgrade to Pro to access all your feedbacks and unlock premium features.
+                Upgrade to Pro to unlock premium features.
               </p>
 
               <div className="pt-4">
