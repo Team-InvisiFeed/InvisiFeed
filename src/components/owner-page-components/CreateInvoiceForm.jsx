@@ -117,6 +117,8 @@ export default function CreateInvoiceForm({
     }
   };
 
+
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -914,8 +916,10 @@ export default function CreateInvoiceForm({
                         Add-ons
                       </h3>
                       <div className="space-y-4">
-                        
-                        <FormField
+                       {
+                        owner?.plan?.planName === "pro" || owner?.plan?.planName === "pro-trial" || owner?.plan?.planEndDate > new Date() && (
+                          <>
+                          <FormField
                           control={form.control}
                           name="addCoupon"
                           render={({ field }) => (
@@ -1009,6 +1013,14 @@ export default function CreateInvoiceForm({
                             </CardContent>
                           </Card>
                         )}
+                          </>
+                        )
+                       } 
+
+                       <button className="text-gray-100 cursor-pointer hover:text-yellow-500 text-sm" onClick={() => window.open("/pricing", "_blank", "noopener,noreferrer")}>
+                        Upgrade to Pro for coupon feature.
+                       </button>
+                        
                       </div>
                     </CardContent>
                   </Card>
