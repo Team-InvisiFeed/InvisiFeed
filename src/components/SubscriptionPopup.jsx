@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import LoadingScreen from "./LoadingScreen";
 
@@ -10,25 +9,26 @@ export const SubscriptionPopup = ({ isOpen, onClose }) => {
   const router = useRouter();
   const pathname = usePathname();
   const [loading, setLoading] = useState(false);
-   const handleNavigation = (route) => {
-      if (route === pathname) {
-        // Same route, no loading screen
-        return;
-      }
-      setLoading(true);
-      router.push(route);
-    };
-    
-  
-    useEffect(() => {
-      return () => {
-        setLoading(false);
-      };
-    }, [pathname]);
-  
-    if (loading) {
-      return <LoadingScreen />;
+
+  const handleNavigation = (route) => {
+    if (route === pathname) {
+      return; // Same route, no loading screen
     }
+    setLoading(true);
+    onClose();
+    router.push(route);
+  };
+
+  useEffect(() => {
+    return () => {
+      setLoading(false);
+    };
+  }, [pathname]);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -36,38 +36,39 @@ export const SubscriptionPopup = ({ isOpen, onClose }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center "
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white rounded-lg p-6 max-w-md w-full mx-4 relative"
+            className="bg-[#0A0A0A] border-yellow-400/40 border rounded-lg p-6 max-w-md w-full mx-4 relative text-yellow-400  bg-gradient-to-br   hover:from-yellow-400/10 transition-all"
           >
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+              className="absolute top-4 right-4 text-yellow-400 hover:text-yellow-300"
             >
               <X className="h-5 w-5" />
             </button>
 
-            <div className="text-center space-y-4">
+            <div className="text-center space-y-6">
               <div className="flex justify-center">
-                <Lock className="h-12 w-12 text-primary" />
+                <Lock className="h-12 w-12 text-yellow-400" />
               </div>
-              
+
               <h3 className="text-xl font-semibold">Upgrade to Pro</h3>
-              
-              <p className="text-gray-600">
-                Upgrade to Pro to unlock premium features.
+
+              <p className="text-yellow-300 text-sm">
+                Unlock premium features and take your experience to the next level!
               </p>
 
               <div className="pt-4">
-                
-                  <Button className="w-full cursor-pointer" onClick={() => handleNavigation("/pricing")}>
-                    View Pricing Plans
-                  </Button>
-               
+                <Button
+                  className="w-full bg-yellow-400 text-black font-semibold py-2 rounded-full shadow-md hover:bg-yellow-500/80 focus:ring-2 focus:ring-yellow-300 transition duration-300 cursor-pointer"
+                  onClick={() => handleNavigation("/pricing")}
+                >
+                  View Pricing Plans
+                </Button>
               </div>
             </div>
           </motion.div>
