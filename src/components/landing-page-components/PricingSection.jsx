@@ -375,15 +375,20 @@ const PricingSection = () => {
               : "mt-12"
           }`}
         >
-          <p className="text-gray-100 text-sm ">
-            Current Plan :{" "}
-            <span className="text-yellow-400">
-              {user?.plan?.planName.toUpperCase()}
-            </span>
-          </p>
-          <p className="text-gray-500 text-sm ">
-            {user?.proTrialUsed === true && " (Pro Trial Used)"}
-          </p>
+          {session && (
+            <>
+              <p className="text-gray-100 text-sm ">
+                Current Plan :{" "}
+                <span className="text-yellow-400">
+                  {user?.plan?.planName.toUpperCase()}
+                </span>
+              </p>
+              <p className="text-gray-500 text-sm ">
+                {user?.proTrialUsed === true && " (Pro Trial Used)"}
+              </p>
+            </>
+          )}
+          
           <p className="text-gray-500 text-sm mt-2">
             Need a custom plan for your enterprise?{" "}
             <button
