@@ -610,7 +610,7 @@ const WhyInvisiFeedSection = () => {
               <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <Table>
                 <TableHeader>
-                  <TableRow>
+                  <TableRow className="hover:bg-transparent">
                     <TableHead className="text-white">Feature</TableHead>
                     <TableHead className="text-center text-yellow-500">
                       InvisiFeed
@@ -622,7 +622,7 @@ const WhyInvisiFeedSection = () => {
                 </TableHeader>
                 <TableBody>
                   {featureComparison.map((row) => (
-                    <TableRow key={row.feature}>
+                    <TableRow key={row.feature} className="hover:bg-transparent">
                       <TableCell className="text-white">
                         {row.feature}
                       </TableCell>
