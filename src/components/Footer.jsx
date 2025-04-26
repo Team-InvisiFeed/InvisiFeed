@@ -14,6 +14,7 @@ import {
 import SocialMediaPopup from "./SocialMediaPopup";
 import LoadingScreen from "./LoadingScreen"; // Import the loading screen
 import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 
 function Footer() {
   const [isSocialMediaPopupOpen, setIsSocialMediaPopupOpen] = useState(false);
@@ -57,7 +58,7 @@ function Footer() {
       return;
     }
     setLoading(true);
-    router.push(route);
+  
   };
   useEffect(() => {
     return () => {
@@ -82,12 +83,13 @@ function Footer() {
               transition={{ duration: 0.3 }}
               className="space-y-4"
             >
-              <div
+              <Link
+                href="/"
                 onClick={() => handleNavigation("/")}
                 className="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent cursor-pointer"
               >
                 InvisiFeed
-              </div>
+              </Link>
               <p className="text-gray-400 text-sm leading-relaxed">
                 Connecting people with invisible threads of care and connection.
                 Empowering organizations with honest, anonymous feedback.
@@ -112,14 +114,15 @@ function Footer() {
                   { label: "Privacy Policy", route: "/privacy-policy" },
                   { label: "Terms of Service", route: "/terms-of-service" },
                 ].map((link) => (
-                  <motion.div
+                  <Link
+                    href={link.route}
                     key={link.label}
                     className="text-gray-400 hover:text-yellow-400 transition-colors duration-200 flex items-center space-x-2 group cursor-pointer"
                     onClick={() => handleNavigation(link.route)}
                   >
                     <span className="w-1 h-1 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     <span>{link.label}</span>
-                  </motion.div>
+                  </Link>
                 ))}
               </ul>
             </motion.div>
@@ -186,8 +189,9 @@ function Footer() {
               </p>
               <div className="hidden md:flex space-x-6">
                 {["/terms-of-service", "/privacy-policy"].map(
-                  (route, index) => (
-                    <motion.div
+                  (route) => (
+                    <Link
+                      href={route}
                       key={route}
                       className="text-sm text-gray-500 hover:text-yellow-400 transition-colors cursor-pointer"
                       onClick={() => handleNavigation(route)}
@@ -195,7 +199,7 @@ function Footer() {
                       {route === "/terms-of-service"
                         ? "Terms of Service"
                         : "Privacy Policy"}
-                    </motion.div>
+                    </Link>
                   )
                 )}
               </div>
