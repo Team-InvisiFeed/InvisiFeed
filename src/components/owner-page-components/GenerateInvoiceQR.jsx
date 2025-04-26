@@ -18,6 +18,7 @@ import ConfirmModal from "@/components/ConfirmModal";
 import CreateInvoiceForm from "./CreateInvoiceForm";
 import CompleteProfileDialog from "./CompleteProfileDialog";
 import axios from "axios";
+import { SubscriptionPopup } from "../SubscriptionPopup";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -38,7 +39,7 @@ export default function Home() {
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [showCouponForm, setShowCouponForm] = useState(false);
-  
+
   const [showSampleInvoices, setShowSampleInvoices] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
@@ -56,6 +57,7 @@ export default function Home() {
     useState(false);
   const [couponDeleteConfirm, setCouponDeleteConfirm] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [isSubscriptionPopupOpen, setIsSubscriptionPopupOpen] = useState(false);
 
   // Sample invoice data
   const sampleInvoices = [
@@ -255,6 +257,13 @@ export default function Home() {
     await handleUploadWithFile(file);
   };
 
+  const handleUploadInvoiceFreePlanClick = (e) => {
+    if (owner?.plan?.planName === "free") {
+      e.preventDefault(); // prevent file dialog from opening
+      setIsSubscriptionPopupOpen(true); // show popup instead
+    }
+  };
+
   const handleSendEmail = async () => {
     if (!customerEmail) {
       toast.error("Please enter customer email");
@@ -328,7 +337,7 @@ export default function Home() {
       return;
     }
 
-setSaving(true);
+    setSaving(true);
     try {
       const response = await axios.post("/api/create-invoice", {
         ...invoiceData,
@@ -380,7 +389,6 @@ setSaving(true);
           onCancel={() => setShowCreateInvoice(false)}
           open={showCreateInvoice}
           saving={saving}
-          
           onOpenChange={setShowCreateInvoice}
         />
       )}
@@ -411,12 +419,11 @@ setSaving(true);
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-yellow-400/5 rounded-full blur-3xl" />
           <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-yellow-400/5 rounded-full blur-3xl" />
           <button
-  className="absolute top-2 sm:top-4 right-2 sm:right-4 rounded-full p-2 hover:bg-yellow-400/40 transition-colors cursor-pointer duration-300"
-  onClick={handleRefreshComponent}
->
-  <RefreshCw className="h-5 w-5 text-yellow-400 cursor-pointer" />
-</button>
-
+            className="absolute top-2 sm:top-4 right-2 sm:right-4 rounded-full p-2 hover:bg-yellow-400/40 transition-colors cursor-pointer duration-300"
+            onClick={handleRefreshComponent}
+          >
+            <RefreshCw className="h-5 w-5 text-yellow-400 cursor-pointer" />
+          </button>
 
           <div className="relative z-10 w-full">
             <h1 className="text-3xl font-bold mb-2 text-center bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
@@ -524,11 +531,13 @@ setSaving(true);
                   onChange={handleFileChange}
                   className="hidden"
                   id="file-upload"
-                  disabled={initialLoading}
+                  disabled={initialLoading || owner?.plan?.planName === "free"}
                 />
+
                 {/* Custom Button */}
                 <label
                   htmlFor="file-upload"
+                  onClick={handleUploadInvoiceFreePlanClick}
                   className={`w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl cursor-pointer transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-102 ${
                     initialLoading ? "opacity-50 cursor-not-allowed" : ""
                   }`}
@@ -584,7 +593,7 @@ setSaving(true);
                         onClick={(e) => {
                           e.stopPropagation();
                           // setCouponSaved(false);
-                          setCouponDeleteConfirm(true)
+                          setCouponDeleteConfirm(true);
                           setCouponData({
                             couponCode: "",
                             description: "",
@@ -980,7 +989,11 @@ setSaving(true);
           />
         )}
 
-        
+        {/* Subscription Popup */}
+        <SubscriptionPopup
+          isOpen={isSubscriptionPopupOpen}
+          onClose={() => setIsSubscriptionPopupOpen(false)}
+        />
       </div>
     </>
   );
