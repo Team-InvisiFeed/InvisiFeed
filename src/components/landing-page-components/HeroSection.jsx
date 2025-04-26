@@ -99,7 +99,7 @@ function HeroSection() {
                 onClick={() => router.push("/register")}
               >
                 <span className="text-sm sm:text-base">
-                  Generate Your First Feedback PDF
+                  Generate Your First Smart Invoice
                 </span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </motion.button>
