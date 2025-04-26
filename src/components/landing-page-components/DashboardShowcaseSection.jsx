@@ -10,6 +10,10 @@ import {
   Star,
   ThumbsUp,
   ThumbsDown,
+  TrendingUpDown,
+  Clock,
+  Repeat,
+  Lightbulb,
 } from "lucide-react";
 import {
   BarChart as RechartsBarChart,
@@ -25,40 +29,59 @@ import {
   Legend,
   ResponsiveContainer,
   Cell,
+  Label,
 } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
+import { Progress } from "@/components/ui/progress";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const DashboardShowcaseSection = () => {
   // Mock data for charts
-  const feedbackPer100Data = [
-    { name: "Jan", value: 45 },
-    { name: "Feb", value: 52 },
-    { name: "Mar", value: 48 },
-    { name: "Apr", value: 61 },
-    { name: "May", value: 55 },
-    { name: "Jun", value: 67 },
+  const feedbackRatioData = [
+    { name: "Feedbacks", value: 75 },
+    { name: "Remaining", value: 25 },
   ];
 
-  const positiveFeedbackData = [
-    { name: "Positive", value: 78 },
-    { name: "Negative", value: 22 },
+  const positiveNegativeData = [
+    { name: "Positive", value: 85 },
+    { name: "Negative", value: 15 },
   ];
 
-  const ratingBreakdownData = [
-    { name: "5★", value: 45 },
-    { name: "4★", value: 25 },
-    { name: "3★", value: 15 },
-    { name: "2★", value: 10 },
-    { name: "1★", value: 5 },
+  const ratingData = [
+    { name: "Satisfaction", value: 4.8 },
+    { name: "Communication", value: 4.6 },
+    { name: "Quality", value: 4.7 },
+    { name: "Value", value: 4.5 },
+    { name: "Recommend", value: 4.9 },
   ];
 
-  const ratingTrendData = [
-    { name: "Jan", value: 4.2 },
-    { name: "Feb", value: 4.3 },
-    { name: "Mar", value: 4.1 },
-    { name: "Apr", value: 4.4 },
-    { name: "May", value: 4.5 },
-    { name: "Jun", value: 4.7 },
+  const performanceData = [
+    { name: "Best", value: 4.9 },
+    { name: "Worst", value: 4.2 },
+  ];
+
+  const historicalData = [
+    { date: "Jan", rating: 4.2 },
+    { date: "Feb", rating: 4.3 },
+    { date: "Mar", rating: 4.4 },
+    { date: "Apr", rating: 4.5 },
+    { date: "May", rating: 4.6 },
+    { date: "Jun", rating: 4.7 },
+  ];
+
+  const salesData = [
+    { name: "Jan", value: 150000 },
+    { name: "Feb", value: 180000 },
+    { name: "Mar", value: 220000 },
+    { name: "Apr", value: 250000 },
+    { name: "May", value: 280000 },
+    { name: "Jun", value: 300000 },
   ];
 
   const COLORS = ["#FCD34D", "#FBBF24", "#F59E0B", "#D97706", "#B45309"];
@@ -88,253 +111,420 @@ const DashboardShowcaseSection = () => {
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
-          {/* Left Column - Metrics */}
+        {/* Stats Grid */}
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto mb-8 px-4 place-items-center">
+          {/* Single Stat Card */}
+          {[
+            {
+              title: "Total Sales",
+              value: "₹2.5M",
+              desc: "Total sales amount (INR)",
+              Icon: TrendingUpDown,
+            },
+            {
+              title: "Average Rating",
+              value: "4.7",
+              desc: "Overall satisfaction",
+              Icon: Star,
+            },
+            {
+              title: "Response Time",
+              value: "2.5",
+              desc: "Avg. response time (hours)",
+              Icon: Clock,
+            },
+            {
+              title: "Revisit Frequency",
+              value: "3.2",
+              desc: "Avg. times customers revisit",
+              Icon: Repeat,
+            },
+          ].map((item, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 * (index + 1) }}
+              className="group relative w-full bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-md rounded-2xl p-6 border border-yellow-400/10 hover:border-yellow-400/30 transition-colors overflow-hidden"
+            >
+              {/* Background Hover Light */}
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+              {/* Main Content */}
+              <div className="relative flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">{item.title}</p>
+                  <h3 className="text-2xl font-bold text-white mt-1 group-hover:text-yellow-400 transition-colors duration-300">
+                    {item.value}
+                  </h3>
+                  <p className="text-gray-500 text-xs mt-1">{item.desc}</p>
+                </div>
+                <div className="p-3 bg-gradient-to-br from-yellow-400/10 to-yellow-400/5 rounded-lg group-hover:from-yellow-400/20 group-hover:to-yellow-400/10 transition-colors">
+                  <item.Icon className="h-6 w-6 text-yellow-400" />
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-8">
+          {/* Feedback Ratio Chart */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="space-y-4 sm:space-y-8"
+            className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6"
           >
-            {/* Feedback per 100 invoices */}
-            <div className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
-                  Feedback per 100 invoices
-                </h3>
-                <BarChart className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
-              </div>
-              <div className="h-48 sm:h-64 w-full overflow-hidden">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RechartsBarChart
-                    data={feedbackPer100Data}
-                    margin={{ top: 5, right: 5, left: 0, bottom: 5 }}
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
+                Feedback Ratio
+              </h3>
+              <PieChart className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
+            </div>
+            <div className="h-48 sm:h-64 w-full overflow-hidden">
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsPieChart>
+                  <Pie
+                    data={feedbackRatioData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    paddingAngle={0}
+                    dataKey="value"
+                    stroke="none"
                   >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                    <XAxis
-                      dataKey="name"
-                      stroke="#888"
-                      tick={{ fontSize: 12 }}
-                    />
-                    <YAxis stroke="#888" tick={{ fontSize: 12 }} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#0A0A0A",
-                        border: "1px solid rgba(251, 191, 36, 0.2)",
-                        borderRadius: "0.5rem",
-                      }}
-                      cursor={{ fill: "rgba(250, 204, 21, 0.15)" }}
-                    />
-                    <Bar dataKey="value" fill="#FACC15" radius={[4, 4, 0, 0]} />
-                  </RechartsBarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Positive Feedback % */}
-            <div className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
-                  Positive Feedback %
-                </h3>
-                <PieChart className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
-              </div>
-              <div className="h-48 sm:h-64 w-full overflow-hidden">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RechartsPieChart>
-                    <Pie
-                      data={positiveFeedbackData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={40}
-                      outerRadius={60}
-                      fill="#8884d8"
-                      paddingAngle={0}
-                      dataKey="value"
-                      stroke="none"
-                      label={({ name, percent }) =>
-                        `${name}: ${(percent * 100).toFixed(0)}%`
-                      }
-                    >
-                      {positiveFeedbackData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={
-                            index === 0
-                              ? "#FACC15"
-                              : index === 1
-                              ? "#FFFCFC"
-                              : "#EF4444"
-                          }
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        border: "1px solid rgba(251, 191, 36, 0.2)",
-                        borderRadius: "0.5rem",
-                      }}
-                    />
-
-                    <Legend wrapperStyle={{ fontSize: "12px" }} />
-                  </RechartsPieChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Average Rating */}
-            <div className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
-                  Average Rating
-                </h3>
-                <Star className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
-              </div>
-              <div className="flex items-center justify-center h-24 sm:h-32">
-                <div className="text-4xl sm:text-5xl font-bold text-white">
-                  4.7
-                </div>
-                <div className="ml-3 sm:ml-4 flex">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      className={`w-5 h-5 sm:w-6 sm:h-6 ${
-                        star <= 4
-                          ? "text-yellow-400 fill-yellow-400"
-                          : "text-gray-600"
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
+                    {feedbackRatioData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={index === 0 ? "#FACC15" : "#FFFFFF"}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#0A0A0A",
+                      border: "1px solid rgba(251, 191, 36, 0.2)",
+                      borderRadius: "0.5rem",
+                    }}
+                  />
+                  <Label
+                    value="75%"
+                    position="center"
+                    className="text-2xl font-bold text-yellow-400"
+                  />
+                </RechartsPieChart>
+              </ResponsiveContainer>
             </div>
           </motion.div>
 
-          {/* Right Column - Charts */}
+          {/* Positive/Negative Ratio Chart */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="space-y-4 sm:space-y-8"
+            className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6"
           >
-            {/* 5-Rating Breakdown */}
-            <div className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
-                  5-Rating Breakdown
-                </h3>
-                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
-              </div>
-              <div className="h-48 sm:h-64 w-full overflow-hidden">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RechartsBarChart
-                    data={ratingBreakdownData}
-                    layout="vertical"
-                    margin={{ top: 5, right: 5, left: 0, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                    <XAxis
-                      type="number"
-                      stroke="#888"
-                      tick={{ fontSize: 12 }}
-                    />
-                    <YAxis
-                      dataKey="name"
-                      type="category"
-                      stroke="#888"
-                      tick={{ fontSize: 12 }}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#0A0A0A",
-                        border: "1px solid rgba(251, 191, 36, 0.2)",
-                        borderRadius: "0.5rem",
-                      }}
-                      cursor={{ fill: "rgba(250, 204, 21, 0.15)" }}
-                    />
-                    <Bar dataKey="value" fill="#FACC15" radius={[0, 4, 4, 0]} />
-                  </RechartsBarChart>
-                </ResponsiveContainer>
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
+                Feedback Sentiment
+              </h3>
+              <div className="flex space-x-2">
+                <ThumbsUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
+                <ThumbsDown className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
               </div>
             </div>
-
-            {/* Rating Trend Over Time */}
-            <div className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
-                  Rating Trend Over Time
-                </h3>
-                <LineChart className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
-              </div>
-              <div className="h-48 sm:h-64 w-full overflow-hidden">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RechartsLineChart
-                    data={ratingTrendData}
-                    margin={{ top: 5, right: 5, left: 0, bottom: 5 }}
+            <div className="h-48 sm:h-64 w-full overflow-hidden">
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsPieChart>
+                  <Pie
+                    data={positiveNegativeData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    paddingAngle={0}
+                    dataKey="value"
+                    stroke="none"
                   >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                    <XAxis
-                      dataKey="name"
-                      stroke="#888"
-                      tick={{ fontSize: 12 }}
-                    />
-                    <YAxis
-                      stroke="#888"
-                      domain={[3.5, 5]}
-                      tick={{ fontSize: 12 }}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "#0A0A0A",
-                        border: "1px solid rgba(251, 191, 36, 0.2)",
-                        borderRadius: "0.5rem",
-                      }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="value"
-                      stroke="#FACC15"
-                      strokeWidth={2}
-                      dot={{ fill: "#FACC15", r: 3 }}
-                      activeDot={{ r: 5, fill: "#FACC15" }}
-                    />
-                  </RechartsLineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* AI-Powered Insights */}
-            <div className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-3 sm:mb-4">
-                <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
-                  AI-Powered Insights
-                </h3>
-                <div className="flex space-x-2">
-                  <ThumbsUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
-                  <ThumbsDown className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 sm:p-4">
-                  <h4 className="text-green-400 font-medium mb-1 sm:mb-2 text-sm">
-                    Best Performing Area
-                  </h4>
-                  <p className="text-gray-300 text-xs sm:text-sm">
-                    Customer service responsiveness
-                  </p>
-                </div>
-                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 sm:p-4">
-                  <h4 className="text-red-400 font-medium mb-1 sm:mb-2 text-sm">
-                    Area to Improve
-                  </h4>
-                  <p className="text-gray-300 text-xs sm:text-sm">
-                    Delivery time consistency
-                  </p>
-                </div>
-              </div>
+                    {positiveNegativeData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={index === 0 ? "#22C55E" : "#EF4444"}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#0A0A0A",
+                      border: "1px solid rgba(251, 191, 36, 0.2)",
+                      borderRadius: "0.5rem",
+                    }}
+                  />
+                  <Label
+                    value="85%"
+                    position="center"
+                    className="text-2xl font-bold text-yellow-400"
+                  />
+                </RechartsPieChart>
+              </ResponsiveContainer>
             </div>
           </motion.div>
         </div>
+
+        {/* Bar Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-8">
+          {/* Sales Analysis Bar Chart */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6"
+          >
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
+                Sales Analysis
+              </h3>
+              <BarChart className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
+            </div>
+            <div className="h-48 sm:h-64 w-full overflow-hidden">
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsBarChart
+                  data={salesData}
+                  margin={{ top: 5, right: 5, left: 0, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                  <XAxis dataKey="name" stroke="#888" tick={{ fontSize: 12 }} />
+                  <YAxis
+                    stroke="#888"
+                    tick={{ fontSize: 12 }}
+                    tickFormatter={(value) => `₹${value / 1000}k`}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#0A0A0A",
+                      border: "1px solid rgba(251, 191, 36, 0.2)",
+                      borderRadius: "0.5rem",
+                    }}
+                    formatter={(value) => [`₹${value}`, "Sales"]}
+                  />
+                  <Bar dataKey="value" fill="#FACC15" radius={[4, 4, 0, 0]} />
+                </RechartsBarChart>
+              </ResponsiveContainer>
+            </div>
+          </motion.div>
+
+          {/* Rating Trend Line Chart */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6"
+          >
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
+                Rating Trend
+              </h3>
+              <LineChart className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
+            </div>
+            <div className="h-48 sm:h-64 w-full overflow-hidden">
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsLineChart
+                  data={historicalData}
+                  margin={{ top: 5, right: 5, left: 0, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                  <XAxis dataKey="date" stroke="#888" tick={{ fontSize: 12 }} />
+                  <YAxis
+                    stroke="#888"
+                    domain={[3.5, 5]}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#0A0A0A",
+                      border: "1px solid rgba(251, 191, 36, 0.2)",
+                      borderRadius: "0.5rem",
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="rating"
+                    stroke="#FACC15"
+                    strokeWidth={2}
+                    dot={{ fill: "#FACC15", r: 3 }}
+                    activeDot={{ r: 5, fill: "#FACC15" }}
+                  />
+                </RechartsLineChart>
+              </ResponsiveContainer>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Performance Metrics */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6 mb-4 sm:mb-8"
+        >
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
+              Performance Metrics
+            </h3>
+            <Star className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
+          </div>
+          <div className="space-y-6">
+            {/* Best Performing */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-400">
+                  Best: Customer Service
+                </span>
+                <span className="text-sm text-yellow-400">4.9/5</span>
+              </div>
+              <Progress
+                value={98}
+                className="h-2 bg-gradient-to-r from-gray-800 to-gray-700 [&>div]:bg-gradient-to-r [&>div]:from-yellow-500 [&>div]:to-yellow-400"
+              />
+            </div>
+
+            {/* Worst Performing */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-400">
+                  Worst: Delivery Time
+                </span>
+                <span className="text-sm text-gray-100">4.2/5</span>
+              </div>
+              <Progress
+                value={84}
+                className="h-2 bg-gradient-to-r from-gray-800 to-gray-700 [&>div]:bg-gradient-to-r [&>div]:from-gray-100 [&>div]:to-gray-200"
+              />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Insights Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
+          {/* Improvements */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6"
+          >
+            <div className="flex items-center space-x-2 mb-3 sm:mb-4">
+              <Lightbulb className="h-5 w-5 text-yellow-400" />
+              <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
+                Areas for Improvement
+              </h3>
+            </div>
+            <ul className="space-y-3">
+              <li className="flex items-start space-x-2">
+                <span className="text-yellow-400">•</span>
+                <span className="text-gray-300">
+                  Optimize delivery time consistency
+                </span>
+              </li>
+              <li className="flex items-start space-x-2">
+                <span className="text-yellow-400">•</span>
+                <span className="text-gray-300">
+                  Enhance product packaging quality
+                </span>
+              </li>
+              <li className="flex items-start space-x-2">
+                <span className="text-yellow-400">•</span>
+                <span className="text-gray-300">
+                  Improve after-sales support response time
+                </span>
+              </li>
+            </ul>
+          </motion.div>
+
+          {/* Strengths */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-4 sm:p-6"
+          >
+            <div className="flex items-center space-x-2 mb-3 sm:mb-4">
+              <Star className="h-5 w-5 text-yellow-400" />
+              <h3 className="text-yellow-400 font-medium text-sm sm:text-base">
+                Key Strengths
+              </h3>
+            </div>
+            <ul className="space-y-3">
+              <li className="flex items-start space-x-2">
+                <span className="text-yellow-400">•</span>
+                <span className="text-gray-300">
+                  Excellent customer service responsiveness
+                </span>
+              </li>
+              <li className="flex items-start space-x-2">
+                <span className="text-yellow-400">•</span>
+                <span className="text-gray-300">
+                  High product quality standards
+                </span>
+              </li>
+              <li className="flex items-start space-x-2">
+                <span className="text-yellow-400">•</span>
+                <span className="text-gray-300">
+                  Strong customer loyalty and repeat business
+                </span>
+              </li>
+            </ul>
+          </motion.div>
+        </div>
+
+        {/* User Ratings Graph */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mt-8 sm:mt-12"
+        >
+          <Card className="w-full max-w-6xl mx-auto bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="relative">
+              <CardHeader className="border-b border-yellow-400/20 px-3 sm:px-6">
+                <CardTitle className="text-base sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent text-center sm:text-left">
+                  Average Ratings for Sample Organization
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-3 sm:p-6">
+                <div className="space-y-4 sm:space-y-6">
+                  {ratingData.map((rating, index) => (
+                    <div key={index} className="space-y-2">
+                      <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start gap-1 sm:gap-2">
+                        <span className="text-gray-300 text-xs sm:text-base order-1 sm:order-none text-center sm:text-left">
+                          {rating.name}
+                        </span>
+                        <span className="text-yellow-400 font-semibold text-sm sm:text-lg order-2 sm:order-none">
+                          {rating.value}/5
+                        </span>
+                      </div>
+                      <Progress
+                        value={(rating.value / 5) * 100}
+                        className="h-2 sm:h-3 bg-gradient-to-r from-gray-800 to-gray-700 [&>div]:bg-gradient-to-r [&>div]:from-yellow-500 [&>div]:to-yellow-400"
+                      />
+                    </div>
+                  ))}
+                  <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-yellow-400/20">
+                    <p className="text-gray-400 text-xs sm:text-base text-center">
+                      Based on 150 feedbacks
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </div>
+          </Card>
+        </motion.div>
       </div>
     </section>
   );
