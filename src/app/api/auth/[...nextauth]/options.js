@@ -6,6 +6,7 @@ import OwnerModel from "@/models/Owner";
 import jwt from "jsonwebtoken";
 import { deleteOldInvoicePdfs } from "@/utils/deleteOldInvoicesFromCloudinary";
 import sendVerificationEmail from "@/utils/sendVerificationEmail";
+import DeletedAccountModel from "@/models/DeletedAccount";
 
 export const authOptions = {
   providers: [
@@ -128,6 +129,13 @@ export const authOptions = {
           }
 
           // 🔹 New Google Sign-up (Create user)
+          const deletedAccount = await DeletedAccountModel.findOne({ email: user.email });
+          if (deletedAccount && deletedAccount.deletionDate && (deletedAccount.deletionDate.getTime() + 15 * 24 * 60 * 60 * 1000) > new Date().getTime()) {
+            const remainingMs = deletedAccount.deletionDate.getTime() + (15 * 24 * 60 * 60 * 1000) - new Date().getTime();
+            const remainingDays = Math.ceil(remainingMs / (24 * 60 * 60 * 1000));
+            return `/sign-in?error=ACCOUNT_DELETED&remainingDays=${remainingDays}`;
+          }
+
           const baseUsername = user.email.split("@")[0];
           let username = baseUsername;
           let counter = 1;
