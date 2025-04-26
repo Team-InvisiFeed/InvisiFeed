@@ -261,7 +261,7 @@ export default function Home() {
       });
       toast.success("Invoice uploaded successfully");
     } catch (error) {
-      .log(error);
+
       if (error.response?.status === 429) {
         setTimeLeft(error.response.data.timeLeft);
         toast.error(
