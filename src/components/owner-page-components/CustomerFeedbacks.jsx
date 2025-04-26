@@ -94,7 +94,6 @@ const CustomerFeedbacks = () => {
       });
 
       const { data } = response.data;
-      console.log(data);
       setFeedbacks(data.feedbacks);
       setTotalPages(data.totalPages);
       setHasNextPage(data.hasNextPage);
@@ -110,7 +109,6 @@ const CustomerFeedbacks = () => {
 
   useEffect(() => {
     fetchFeedbacks(currentPage);
-    console.log(feedbacks);
   }, [currentPage, organisation, sortBy]);
 
   const handlePrevPage = () => {

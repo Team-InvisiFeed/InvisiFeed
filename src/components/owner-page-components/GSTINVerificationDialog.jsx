@@ -33,7 +33,6 @@ export default function GSTINVerificationDialog({ open, onOpenChange }) {
       const response = await axios.get(
         `/api/get-gstin-details?gstinNumber=${gstinNumber}`
       );
-      console.log(response);
       const data = response.data.data;
 
       if (data.taxpayerInfo === null) {

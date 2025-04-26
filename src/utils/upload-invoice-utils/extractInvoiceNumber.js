@@ -43,7 +43,6 @@ export async function extractInvoiceNumberFromPdf(file) {
       .replace(/```json\s*|\s*```/g, '') // Remove markdown code blocks
       .replace(/^\s+|\s+$/g, ''); // Remove leading/trailing whitespace
 
-    console.log("CLEANED TEXT", cleanedText);
 
     try {
       const extractedData = JSON.parse(cleanedText);

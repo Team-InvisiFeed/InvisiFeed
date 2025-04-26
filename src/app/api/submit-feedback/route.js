@@ -9,7 +9,7 @@ export async function POST(req) {
 
   const { formData, username, invoiceNumber } = await req.json();
 
-  console.log(formData);
+
 
   try {
     const owner = await OwnerModel.findOne({ username: username });
@@ -46,7 +46,6 @@ export async function POST(req) {
       anonymousFeedback,
     } = formData;
 
-    console.log(anonymousFeedback);
 
     let feedback = null;
     // Add the new feedback to the owner's feedbacks array

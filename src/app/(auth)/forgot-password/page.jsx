@@ -83,7 +83,7 @@ function ForgotPasswordContent() {
       const response = await axios.post("/api/forgot-password", {
         email: data.email,
       });
-      console.log(response);
+
       if (response?.data?.success) {
         setStep(2);
         toast.success("Reset link sent to your email");

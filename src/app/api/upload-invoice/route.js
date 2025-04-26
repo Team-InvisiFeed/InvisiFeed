@@ -184,7 +184,6 @@ export async function POST(req) {
         () => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[crypto.randomInt(0, 36)]
       ).join("");
 
-      console.log("INVOICE COUNT", await InvoiceModel.countDocuments({}));
 
       // Modify coupon code by adding random chars at start and invoice count
       dbCouponCode = `${couponData.couponCode}${
@@ -232,7 +231,6 @@ export async function POST(req) {
     const finalPdfUrl = finalUpload.secure_url;
 
     // Add new invoice with initial AIuseCount, coupon if provided, and PDF URLs
-    console.log("DB COUPON CODE", dbCouponCode);
     const newInvoice = new InvoiceModel({
       invoiceId: invoiceData.invoiceId,
       owner: owner._id,

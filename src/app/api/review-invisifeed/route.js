@@ -9,7 +9,7 @@ export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);
     const  username  = session?.user?.username;
-    console.log("username",username);
+  
     if (!username) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },

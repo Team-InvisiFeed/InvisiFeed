@@ -261,7 +261,7 @@ export default function Home() {
       });
       toast.success("Invoice uploaded successfully");
     } catch (error) {
-      console.log(error);
+      .log(error);
       if (error.response?.status === 429) {
         setTimeLeft(error.response.data.timeLeft);
         toast.error(
@@ -281,9 +281,8 @@ export default function Home() {
   const handleUpload = async () => {
     await handleUploadWithFile(file);
   };
-
   const handleUploadInvoiceFreePlanClick = (e) => {
-    if (owner?.plan?.planName === "free") {
+    if (owner?.plan?.planName === "free" || owner?.plan?.planEndDate < new Date()) {
       e.preventDefault(); // prevent file dialog from opening
       setIsSubscriptionPopupOpen(true); // show popup instead
     }
@@ -561,9 +560,9 @@ export default function Home() {
                   onChange={handleFileChange}
                   className="hidden"
                   id="file-upload"
-                  disabled={initialLoading || owner?.plan?.planName === "free"}
+                  disabled={initialLoading || owner?.plan?.planName === "free" || owner?.plan?.planEndDate < new Date()}
                 />
-
+                
                 {/* Custom Button */}
                 <label
                   htmlFor="file-upload"

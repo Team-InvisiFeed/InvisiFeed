@@ -81,7 +81,7 @@ export default function ShowInvoicesPage({ params }) {
   };
 
   const renderFeedbackCell = (invoice) => {
-    console.log(invoice);
+
     if (!invoice.isFeedbackSubmitted) {
       return <span className="text-gray-400">Not Submitted</span>;
     }

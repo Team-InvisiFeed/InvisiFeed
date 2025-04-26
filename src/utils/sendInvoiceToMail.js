@@ -8,7 +8,6 @@ const sendInvoiceToMail = async (
   feedbackUrl
 ) => {
   const subject = `Invoice from ${companyName} - ${invoiceNumber}`;
-  console.log(feedbackUrl);
 
   // HTML email template with styling
   const htmlMessage = `

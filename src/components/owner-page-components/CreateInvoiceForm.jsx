@@ -175,7 +175,6 @@ export default function CreateInvoiceForm({
     name: "items",
   });
 
-  console.log("form data:", form.getValues());
 
   const [subtotal, setSubtotal] = useState(0);
   const [taxTotal, setTaxTotal] = useState(0);
@@ -210,7 +209,6 @@ export default function CreateInvoiceForm({
       toast.error("Please fill in all required fields");
       return;
     }
-    console.log(data);
     onSave(data);
   };
   useEffect(() => {

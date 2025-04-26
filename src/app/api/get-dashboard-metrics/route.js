@@ -41,7 +41,7 @@ const getTotalSales = (invoices) => {
   );
 
   if (!invoices || invoices.length === 0) {
-    console.log("No invoices provided");
+ 
     return 0;
   }
 
@@ -50,7 +50,7 @@ const getTotalSales = (invoices) => {
 
 const getAverageRevisitFrequencyFromInvoices = async (invoices) => {
   if (!invoices || invoices.length === 0) {
-    console.log("No invoices provided");
+   
     return 0;
   }
 
@@ -69,7 +69,7 @@ const getAverageRevisitFrequencyFromInvoices = async (invoices) => {
   );
 
   if (filteredCustomers.length === 0) {
-    console.log("No customers with revisit count > 1");
+   
     return 0;
   }
 
@@ -78,7 +78,6 @@ const getAverageRevisitFrequencyFromInvoices = async (invoices) => {
     filteredCustomers.reduce((sum, count) => sum + count, 0) /
     (filteredCustomers.length || 1); // Avoid divide by zero
 
-  console.log("Average Revisit Frequency (filtered):", averageRevisitFrequency);
 
   return Number(averageRevisitFrequency.toFixed(1));
 };
@@ -484,7 +483,6 @@ export async function GET(req) {
     let salesData = [];
 
     if (isProPlan) {
-      console.log("salesYear:",salesYear);
       
       if (salesViewType === "" && salesYear) {
 
@@ -494,12 +492,10 @@ export async function GET(req) {
           return invoiceYear === parseInt(salesYear);
         });
 
-        console.log("filteredInvoices:",filteredInvoices);
         
         // Group by month for the selected year
         salesData = groupSalesByDate(filteredInvoices, "currentYear" , salesYear);
 
-        console.log("salesData:",salesData);
       } else if (salesViewType) {
 
         salesData = groupSalesByDate(invoices, salesViewType , salesYear);
@@ -529,7 +525,6 @@ export async function GET(req) {
     const averageRevisitFrequency =
       await getAverageRevisitFrequencyFromInvoices(invoices);
 
-    console.log("Average Revisit Frequency:", averageRevisitFrequency);
 
     // Calculate metrics
     const feedbackRatio = Number(

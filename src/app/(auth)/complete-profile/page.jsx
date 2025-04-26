@@ -182,7 +182,7 @@ function Page() {
       form.setValue("organizationName", session.user.organizationName || "");
     }
   }, [session, form]);
-  console.log(session);
+
 
   // Add validation state for each field
   const [fieldErrors, setFieldErrors] = useState({

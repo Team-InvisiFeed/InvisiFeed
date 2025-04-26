@@ -80,7 +80,7 @@ function FeedbackFormContent() {
         params.append("couponCode", couponCode);
       }
 
-      console.log(params.toString());
+
 
       const { data } = await axios.get(
         `/api/check-invoice?${params.toString()}`
