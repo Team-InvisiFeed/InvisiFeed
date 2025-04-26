@@ -188,7 +188,6 @@ const PricingSection = () => {
                   "Create upto 3 Invoices daily",
                   "Feedback filters and sorting",
                   "Email support",
-                  "Coupon management",
                 ].map((feature, index) => (
                   <li key={index} className="flex items-start">
                     <Check className="w-5 h-5 text-yellow-400 mr-2 flex-shrink-0 mt-0.5" />
@@ -257,12 +256,11 @@ const PricingSection = () => {
               <ul className="space-y-3 mb-8">
                 {[
                   "Everything in Free plan",
-                  "Advanced analytics dashboard",
-                  "Monthly reports",
-                  "Customized feedback forms",
-                  "Multiple Invoice templates",
-                  "No daily limit on Invoices",
-                  "Customer query management",
+                  "Sales growth tracking",
+                  "Rating trend analysis",
+                  "Convert traditional invoices to smart invoices",
+                  "Generate upto 10 invoices daily",
+                  "Add coupons to invoices",
                 ].map((feature, index) => (
                   <li key={index} className="flex items-start">
                     <Check className="w-5 h-5 text-yellow-400 mr-2 flex-shrink-0 mt-0.5" />
