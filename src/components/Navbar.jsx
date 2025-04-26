@@ -72,32 +72,28 @@ function Navbar() {
               <motion.div
                 onClick={() => handleNavigation("/")}
                 className={`text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                
               >
                 Home
               </motion.div>
               <motion.div
                 onClick={() => handleNavigation("/purpose")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                
               >
                 Purpose
               </motion.div>
               <motion.div
                 onClick={() => handleNavigation("/guide")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                
               >
                 Guide
               </motion.div>
               <motion.div
                 onClick={() => handleNavigation("/pricing")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              
               >
                 Pricing
               </motion.div>
@@ -109,8 +105,7 @@ function Navbar() {
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+               
               >
                 Contact
               </motion.div>
@@ -131,8 +126,7 @@ function Navbar() {
                   }
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+               
               >
                 Dashboard
               </motion.div>
@@ -150,8 +144,7 @@ function Navbar() {
                   }
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                
               >
                 Generate
               </motion.div>
@@ -169,8 +162,7 @@ function Navbar() {
                   }
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              
               >
                 Ratings
               </motion.div>
@@ -190,8 +182,7 @@ function Navbar() {
                   }
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                
               >
                 Feedbacks
               </motion.div>
@@ -205,8 +196,7 @@ function Navbar() {
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+            
               >
                 Contact
               </motion.div>
@@ -216,8 +206,7 @@ function Navbar() {
               <motion.div
                 onClick={() => handleNavigation("/")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+           
               >
                 Home
               </motion.div>
@@ -226,8 +215,7 @@ function Navbar() {
                   handleNavigation("/purpose");
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+             
               >
                 Purpose
               </motion.div>
@@ -236,8 +224,7 @@ function Navbar() {
                   handleNavigation("/guide");
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+            
               >
                 Guide
               </motion.div>
@@ -246,8 +233,7 @@ function Navbar() {
               <motion.div
                 onClick={() => handleNavigation("/pricing")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+               
               >
                 Pricing
               </motion.div>
@@ -259,8 +245,7 @@ function Navbar() {
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                
               >
                 Contact
               </motion.div>
