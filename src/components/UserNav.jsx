@@ -10,26 +10,35 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { usePathname, useRouter } from "next/navigation";
-import { Loader2, UserCircle2, User, Ticket, LogOut, CheckCircle2, Receipt } from "lucide-react";
+import {
+  Loader2,
+  UserCircle2,
+  User,
+  Ticket,
+  LogOut,
+  CheckCircle2,
+  Receipt,
+} from "lucide-react";
 import GSTINVerificationDialog from "@/components/owner-page-components/GSTINVerificationDialog";
 import LoadingScreen from "./LoadingScreen";
 import { MdMoney } from "react-icons/md";
+import { SubscriptionPopup } from "./SubscriptionPopup";
+import { Lock } from "lucide-react";
 
 function UserNav({ isMobile = false }) {
   const { data: session } = useSession();
   const owner = session?.user;
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isNavigatingToSignIn, setIsNavigatingToSignIn] = useState(false);
-  
+  const [isSubscriptionPopupOpen, setIsSubscriptionPopupOpen] = useState(false);
+
   const [isGSTINDialogOpen, setIsGSTINDialogOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);  // Added state for controlling dropdown
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Added state for controlling dropdown
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const onManageProfile = () => {
     handleNavigation(`/user/${owner?.username}/update-profile`);
-    
-    
   };
 
 
@@ -54,7 +63,6 @@ function UserNav({ isMobile = false }) {
     setIsDropdownOpen(false); // Close dropdown
     router.push("/sign-in");
   };
-
 
   const handleUsernameClick = () => {
     setIsDropdownOpen(false); // Close dropdown
@@ -103,7 +111,11 @@ function UserNav({ isMobile = false }) {
     );
   }
 
+
+  
+
   return (
+    <>
     <div className="flex items-center space-x-4">
       <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
         <DropdownMenuTrigger asChild>
@@ -115,7 +127,10 @@ function UserNav({ isMobile = false }) {
             </Avatar>
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56 bg-[#0A0A0A] border border-yellow-400/10 rounded-lg shadow-lg shadow-yellow-500/10" align="end">
+        <DropdownMenuContent
+          className="w-56 bg-[#0A0A0A] border border-yellow-400/10 rounded-lg shadow-lg shadow-yellow-500/10"
+          align="end"
+        >
           <div className="flex items-center justify-start p-2">
             <div className="flex flex-col space-y-1 leading-none">
               <p
@@ -143,12 +158,24 @@ function UserNav({ isMobile = false }) {
             <span>Show Invoices</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 focus:bg-yellow-400/5 focus:text-yellow-400 cursor-pointer"
-            onClick={onManageCoupons}
+            className={`text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 focus:bg-yellow-400/5 focus:text-yellow-400 cursor-pointer ${
+              owner?.plan?.planName === "free" ? "relative" : ""
+            }`}
+            onClick={() => {
+              if (owner?.plan?.planName === "free" || owner?.plan?.planEndDate < new Date()) {
+                setIsSubscriptionPopupOpen(true);
+              } else {
+                onManageCoupons(); 
+              }
+            }}
           >
             <Ticket className="mr-2 h-4 w-4 text-yellow-400" />
             <span>Manage Coupons</span>
+            {(owner?.plan?.planName === "free" || owner?.plan?.planEndDate < new Date()) && (
+              <Lock className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            )}
           </DropdownMenuItem>
+
           {!owner?.gstinDetails?.gstinVerificationStatus && (
             <DropdownMenuItem
               className="text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 focus:bg-yellow-400/5 focus:text-yellow-400 cursor-pointer"
@@ -172,7 +199,15 @@ function UserNav({ isMobile = false }) {
         open={isGSTINDialogOpen}
         onOpenChange={setIsGSTINDialogOpen}
       />
+      
     </div>
+
+    <SubscriptionPopup
+      isOpen={isSubscriptionPopupOpen}
+      onClose={() => setIsSubscriptionPopupOpen(false)}
+    />
+    </>
+    
   );
 }
 
