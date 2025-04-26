@@ -49,13 +49,28 @@ export async function POST(req) {
       owner.uploadedInvoiceCount.lastDailyReset = now;
     }
 
+    const isProPlan = owner?.plan?.planName === "pro" && owner?.plan?.planEndDate > new Date();
+
+    if (isProPlan) {
+      if (owner.uploadedInvoiceCount.dailyUploadCount >= 10) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Daily upload limit reached. Please try again after ${hoursLeft} hours.`,
+            timeLeft: hoursLeft,
+          },
+          { status: 429 }
+        );
+      }
+    }
+
     // Check if daily limit reached
     if (owner.uploadedInvoiceCount.dailyUploadCount >= 3) {
 
       return NextResponse.json(
         {
           success: false,
-          message: `Daily upload limit reached. Please try again after ${hoursLeft} hours.`,
+          message: `Daily upload limit reached. Please try again after ${hoursLeft} hours. Upgrade to pro plan to increase daily upload limit`,
           timeLeft: hoursLeft,
         },
         { status: 429 }

@@ -119,11 +119,25 @@ export async function POST(req) {
     }
 
     // Check if daily limit reached
+    const isProPlan = owner?.plan?.planName === "pro" && owner?.plan?.planEndDate > new Date();
+    if (isProPlan) {
+      if (owner.uploadedInvoiceCount.dailyUploadCount >= 10) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Daily upload limit reached. Please try again after ${hoursLeft} hours.`,
+            timeLeft: hoursLeft,
+          },
+          { status: 429 }
+        );
+      }
+    }
+
     if (owner.uploadedInvoiceCount.dailyUploadCount >= 3) {
       return NextResponse.json(
         {
           success: false,
-          message: `Daily upload limit reached. Please try again after ${hoursLeft} hours.`,
+          message: `Daily upload limit reached. Please try again after ${hoursLeft} hours. Upgrade to pro plan to increase daily upload limit`,
           timeLeft: hoursLeft,
         },
         { status: 429 }
@@ -185,7 +199,7 @@ export async function POST(req) {
     }
 
     // Generate QR Code PDF with modified coupon code if provided
-    const {pdf , feedbackUrl} = await generateQrPdf(
+    const { pdf, feedbackUrl } = await generateQrPdf(
       invoiceData.invoiceId,
       username,
       modifiedCouponCodeforURL,
@@ -200,7 +214,7 @@ export async function POST(req) {
       };
 
       const sanitizedInvoiceNumber = sanitiseString(invoiceData.invoiceId);
-      
+
       cloudinary.v2.uploader
         .upload_stream(
           {
@@ -225,7 +239,10 @@ export async function POST(req) {
       customerDetails: {
         customerName: invoiceData.customerName,
         customerEmail: invoiceData.customerEmail,
-        amount: invoiceData.totalAmount !== "Not Found" ? parseFloat(invoiceData.totalAmount).toFixed(2) : null
+        amount:
+          invoiceData.totalAmount !== "Not Found"
+            ? parseFloat(invoiceData.totalAmount).toFixed(2)
+            : null,
       },
       mergedPdfUrl: finalPdfUrl,
       AIuseCount: 0,
@@ -254,7 +271,10 @@ export async function POST(req) {
         invoiceNumber: invoiceData.invoiceId,
         customerName: invoiceData.customerName,
         customerEmail: invoiceData.customerEmail,
-        customerAmount: invoiceData.totalAmount !== "Not Found" ? parseFloat(invoiceData.totalAmount).toFixed(2) : null,
+        customerAmount:
+          invoiceData.totalAmount !== "Not Found"
+            ? parseFloat(invoiceData.totalAmount).toFixed(2)
+            : null,
         feedbackUrl,
         dailyUploadCount: owner.uploadedInvoiceCount.dailyUploadCount,
         timeLeft: hoursLeft,
