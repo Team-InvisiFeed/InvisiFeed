@@ -385,8 +385,9 @@ const DashboardShowcaseSection = () => {
                     contentStyle={{
                       backgroundColor: "#0A0A0A",
                       border: "1px solid rgba(251, 191, 36, 0.2)",
-                      borderRadius: "0.5rem",
+                      borderRadius: "0.5rem"
                     }}
+                    cursor={{ fill: "rgba(38, 35, 24, 0.5)" }}
                     formatter={(value) => [`₹${value}`, "Sales"]}
                   />
                   <Bar dataKey="value" fill="#FACC15" radius={[4, 4, 0, 0]} />
