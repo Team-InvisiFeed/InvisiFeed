@@ -4,8 +4,10 @@ import React from "react";
 import { motion } from "framer-motion";
 import { FileText, ArrowRight, QrCode } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 const SampleInvoiceSection = () => {
   const router = useRouter();
+  const [isNavigatingToRegister,setIsNavigatingToRegister] = useState(false);
   return (
     <section className="py-24 bg-[#0A0A0A] relative">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#0A0A0A] via-[#0A0A0A] to-[#000000] opacity-50" />
@@ -25,14 +27,29 @@ const SampleInvoiceSection = () => {
             Just sign in & explore. Test it out like any curious user.            </p>
             
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={()=>router.push("/sign-in")}
-              className="group flex items-center cursor-pointer space-x-3 px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30"
-            >
-              <span className="text-lg">Try Sample Invoice</span>
-              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-            </motion.button>
+  whileHover={!isNavigatingToRegister ? { scale: 1.05 } : undefined}
+  whileTap={!isNavigatingToRegister ? { scale: 0.95 } : undefined}
+  onClick={() => {
+    setIsNavigatingToRegister(true);
+    router.push("/register");
+  }}
+  className="relative group flex items-center justify-center cursor-pointer space-x-3 px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30"
+>
+  {/* Spinner and Loading Text */}
+  {isNavigatingToRegister ? (
+    <div className="flex items-center space-x-2">
+      <div className="w-4 h-4 border-2 border-t-transparent border-black rounded-full animate-spin"></div>
+      <span className="text-lg">Loading...</span>
+    </div>
+  ) : (
+    // Default Button Content
+    <>
+      <span className="text-lg">Try Sample Invoice</span>
+      <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+    </>
+  )}
+</motion.button>
+
             
 
           </motion.div>
