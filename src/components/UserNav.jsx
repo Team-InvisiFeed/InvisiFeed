@@ -151,11 +151,22 @@ function UserNav({ isMobile = false }) {
             <span>Manage Profile</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 focus:bg-yellow-400/5 focus:text-yellow-400 cursor-pointer"
-            onClick={onManageInvoice}
+            className={`text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 focus:bg-yellow-400/5 focus:text-yellow-400 cursor-pointer ${
+              owner?.plan?.planName === "free" ? "relative" : ""
+            }`}
+            onClick={() => {
+              if (owner?.plan?.planName === "free" || owner?.plan?.planEndDate < new Date()) {
+                setIsSubscriptionPopupOpen(true);
+              } else {
+                onManageInvoice(); 
+              }
+            }}
           >
             <Receipt className="mr-2 h-4 w-4 text-yellow-400" />
             <span>Show Invoices</span>
+            {(owner?.plan?.planName === "free" || owner?.plan?.planEndDate < new Date()) && (
+              <Lock className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            )}
           </DropdownMenuItem>
           <DropdownMenuItem
             className={`text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5 focus:bg-yellow-400/5 focus:text-yellow-400 cursor-pointer ${
