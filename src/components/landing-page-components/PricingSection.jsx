@@ -7,10 +7,12 @@ import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import ConfirmModal from "../ConfirmModal";
 import LoadingScreen from "../LoadingScreen";
+import { useRouter } from "next/navigation";
 
 const PricingSection = () => {
   const { data: session, update } = useSession();
   const user = session?.user;
+  const router = useRouter();
   const [isFreeLoading, setIsFreeLoading] = useState(false);
   const [isProLoading, setIsProLoading] = useState(false);
   const [isProTrialLoading, setIsProTrialLoading] = useState(false);
@@ -55,6 +57,10 @@ const PricingSection = () => {
 
     if (plan === "pro-trial") {
       try {
+        if (!session) {
+          router.push("/sign-in");
+          return;
+        }
         setIsProTrialLoading(true);
         const response = await fetch("/api/update-plan", {
           method: "POST",
@@ -249,7 +255,11 @@ const PricingSection = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => handlePayment("free")}
+                onClick={() => {
+                  if (!session) {
+                   router.push("/sign-in")
+                  } 
+                }}
                 disabled={
                   isFreeLoading || isFreePlan || isProPlan || isProTrial
                 }
@@ -268,7 +278,11 @@ const PricingSection = () => {
                     ? "Pro Plan is Active"
                     : isProTrial
                     ? "Pro Trial is Active"
-                    : "Subscribe to Pro"}
+                    : !session
+                    ? "Get Started Free"
+                    : "Get Started Free"}
+
+                 
                 </span>
                 {!isFreeLoading && !isFreePlan && (
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -337,7 +351,7 @@ const PricingSection = () => {
                   </span>
                 )}
                 {
-                  (user?.plan?.planName === "free" && user?.proTrialUsed === false) && (
+                  ((user?.plan?.planName === "free" && user?.proTrialUsed === false) || !session) && (
                     <span onClick={() => handleConfirmModal("pro-trial")}>
                       Activate 7 day pro trial
                     </span>
