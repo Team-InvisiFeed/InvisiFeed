@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useParams } from "next/navigation";
+import {  usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
@@ -11,11 +11,14 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import LoadingScreen from "@/components/LoadingScreen";
+import { useRouter } from "next/navigation";
 
 export default function ManageCoupons() {
   const { data: session } = useSession();
   const owner = session?.user;
-  const params = useParams();
+  const pathname = usePathname();
+  const router = useRouter();
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedCoupon, setExpandedCoupon] = useState(null);
@@ -25,6 +28,7 @@ export default function ManageCoupons() {
   const [currentPage, setCurrentPage] = useState(1);
   const [deleting, setDeleting] = useState(false);
   const couponsPerPage = 10;
+
 
   useEffect(() => {
     if (owner?.username) {
@@ -52,7 +56,7 @@ export default function ManageCoupons() {
     try {
       setDeleting(true);
       const response = await axios.delete("/api/delete-coupon", {
-        data: { invoiceId: coupon.invoiceId }, 
+        data: { invoiceId: coupon.invoiceId },
       });
       if (response?.data?.success) {
         setDeleting(false);
@@ -88,6 +92,26 @@ export default function ManageCoupons() {
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
+  const handleNavigation = (route) => {
+    if (route === pathname) {
+      // Same route, no loading screen
+      return;
+    }
+    setLoading(true);
+    router.push(route);
+  };
+
+
+
+  useEffect(() => {
+    return () => {
+      setLoading(false);
+    };
+  }, [pathname]);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   if (loading) {
     return (
@@ -95,6 +119,30 @@ export default function ManageCoupons() {
         <div className="flex items-center space-x-2 text-yellow-400">
           <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-yellow-400"></div>
           <span>Loading coupons...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (
+    owner?.plan?.planName === "free" ||
+    owner?.plan?.planEndDate < new Date()
+  ) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
+        <div className="text-center space-y-6">
+          <div className="flex flex-col items-center space-y-4">
+            <span className="text-xl font-semibold text-yellow-400">
+              Upgrade to Pro to manage coupons
+            </span>
+          </div>
+
+          <button
+            className="bg-yellow-400 text-[#0A0A0A] py-2 px-6 font-semibold rounded-full shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 transition duration-300 ease-in-out cursor-pointer"
+            onClick={() => handleNavigation("/pricing")}
+          >
+            Subscribe to Pro
+          </button>
         </div>
       </div>
     );
@@ -290,7 +338,7 @@ export default function ManageCoupons() {
                 Cancel
               </button>
               <button
-                onClick={() =>  handleDeleteCoupon(couponToDelete)}
+                onClick={() => handleDeleteCoupon(couponToDelete)}
                 disabled={deleting}
                 className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors cursor-pointer"
               >
