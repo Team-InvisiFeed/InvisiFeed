@@ -179,8 +179,6 @@ const PricingSection = () => {
     setShowConfirmModal(true);
   };
 
- 
-
   const isProPlan = user?.plan?.planName === "pro";
   const isFreePlan = user?.plan?.planName === "free";
   const isProTrial = user?.plan?.planName === "pro-trial";
@@ -319,7 +317,7 @@ const PricingSection = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => handlePayment("pro")}
+               
                 disabled={isProLoading || isProPlan || isProTrial}
                 className={`w-full py-3 px-4 rounded-lg font-medium flex items-center justify-center bg-gradient-to-r from-yellow-500 to-yellow-400 text-gray-900 shadow-lg shadow-yellow-500/20 ${
                   isProLoading || isProPlan || isProTrial
@@ -327,15 +325,25 @@ const PricingSection = () => {
                     : ""
                 }`}
               >
-                <span>
-                  {isProLoading
-                    ? "Processing..."
-                    : isProPlan
-                    ? "Already Subscribed"
-                    : isProTrial
-                    ? "Pro Trial is Active"
-                    : "Subscribe to Pro"}
-                </span>
+                {user?.proTrialUsed === true && (
+                  <span  onClick={() => handlePayment("pro")}>
+                    {isProLoading
+                      ? "Processing..."
+                      : isProPlan
+                      ? "Already Subscribed"
+                      : isProTrial
+                      ? "Pro Trial is Active"
+                      : "Subscribe to Pro"}
+                  </span>
+                )}
+                {
+                  (user?.plan?.planName === "free" && user?.proTrialUsed === false) && (
+                    <span onClick={() => handleConfirmModal("pro-trial")}>
+                      Activate 7 day pro trial
+                    </span>
+                  )
+                }
+
                 {!isProLoading && !isProPlan && !isProTrial && (
                   <ArrowRight className="w-4 h-4 ml-2" />
                 )}
@@ -345,7 +353,7 @@ const PricingSection = () => {
 
           {/* Add this container to center the pro-trial info */}
         </div>
-                {console.log(user)}
+        {console.log(user)}
         {(user?.plan?.planName === "free" || user?.plan?.proTrialUsed) && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -368,11 +376,15 @@ const PricingSection = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className={`text-center ${(user?.plan?.planName === "free" || user?.plan?.proTrialUsed) ? "mt-2" : "mt-12"}`}
+          className={`text-center ${
+            user?.plan?.planName === "free" || user?.plan?.proTrialUsed
+              ? "mt-2"
+              : "mt-12"
+          }`}
         >
           <p className="text-gray-500 text-sm ">
-           Current Plan : {user?.plan?.planName}
-           {user?.plan?.proTrialUsed && (" (Pro Trial Used)")}
+            Current Plan : {user?.plan?.planName}
+            {user?.plan?.proTrialUsed && " (Pro Trial Used)"}
           </p>
           <p className="text-gray-500 text-sm mt-2">
             Need a custom plan for your enterprise?{" "}
