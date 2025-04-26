@@ -4,8 +4,9 @@ import React, { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
-import { Home, BarChart2, Zap, Star, MessageCircle, Book } from "lucide-react";
+import { Home, BarChart2, Zap, Star, MessageCircle, Book, Check, Gem } from "lucide-react";
 import LoadingScreen from "./LoadingScreen";
+import { MdMoney } from "react-icons/md";
 
 function MobileNav() {
   const { data: session } = useSession();
@@ -72,6 +73,12 @@ function MobileNav() {
             >
               <BarChart2 className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
               <span className="text-xs text-gray-300 hover:text-yellow-400">Purpose</span>
+            </div>
+            <div onClick={() => handleNavigation("/pricing")}
+              className="flex flex-col items-center space-y-1"
+            >
+              <Gem className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
+              <span className="text-xs text-gray-300 hover:text-yellow-400">Pricing</span>
             </div>
             <div onClick={() => handleNavigation("/guide")}
               className="flex flex-col items-center space-y-1">
@@ -191,6 +198,13 @@ function MobileNav() {
             >
               <BarChart2 className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
               <span className="text-xs text-gray-300 hover:text-yellow-400">Purpose</span>
+            </div>
+            <div
+              onClick={() => handleNavigation("/pricing")}
+              className="flex flex-col items-center space-y-1"
+            >
+              <Gem className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
+              <span className="text-xs text-gray-300 hover:text-yellow-400">Pricing</span>
             </div>
             <div onClick={() => handleNavigation("/guide")} className="flex flex-col items-center space-y-1">
               <Book className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
