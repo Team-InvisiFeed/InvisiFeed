@@ -16,6 +16,7 @@ import {
   Clock,
   Repeat,
   TrendingUpDown,
+  Lock,
 } from "lucide-react";
 import {
   Card,
@@ -57,6 +58,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MdMoney } from "react-icons/md";
+import { usePathname, useRouter } from "next/navigation";
+import LoadingScreen from "../LoadingScreen";
 
 // Constants
 const CHART_CONFIG = {
@@ -136,15 +139,35 @@ const Dashboard = () => {
   const { data: session } = useSession();
   const owner = session?.user;
 
+  const router = useRouter();
+
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isPricingLoading , setIsPricingLoading] = useState(false);
   const [error, setError] = useState(null);
   const [salesSelectedYear, setSalesSelectedYear] = useState("");
   const [salesViewType, setSalesViewType] = useState("currentYear");
   const [ratingsSelectedYear, setRatingsSelectedYear] = useState("");
   const [ratingsViewType, setRatingsViewType] = useState("currentYear");
   const [isMobile, setIsMobile] = useState(false);
+  const pathname = usePathname();
 
+  const handleNavigation = (route) => {
+    if (route === pathname) {
+      // Same route, no loading screen
+      return;
+    }
+    setIsPricingLoading(true);
+    router.push(route);
+  };
+
+  useEffect(() => {
+    return () => {
+      setIsPricingLoading(false); 
+    };
+  }, [pathname]);
+
+  
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 640);
@@ -186,7 +209,13 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, [owner?.username, salesSelectedYear, salesViewType, ratingsSelectedYear, ratingsViewType]);
+  }, [
+    owner?.username,
+    salesSelectedYear,
+    salesViewType,
+    ratingsSelectedYear,
+    ratingsViewType,
+  ]);
 
   useEffect(() => {
     if (owner?.username) {
@@ -272,6 +301,7 @@ const Dashboard = () => {
 
   if (loading) return <LoadingState />;
   if (error) return <ErrorState error={error} />;
+  if(isPricingLoading) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] p-2 sm:p-4">
@@ -512,6 +542,21 @@ const Dashboard = () => {
           {/* Sales Analysis Bar Chart */}
           <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden flex flex-col">
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+            {owner?.plan?.planName === "free" && (
+              <div className="absolute inset-0 flex flex-col justify-center items-center bg-black/70 text-center space-y-4 z-10 ">
+                <div className="text-yellow-400">
+                  <Lock size={32} />
+                </div>
+                <button
+                  onClick={() => handleNavigation("/pricing")}
+                  className="bg-yellow-400 text-black px-4 py-2 rounded-md text-sm font-semibold hover:bg-yellow-300 cursor-pointer"
+                >
+                  Subscribe for Sales Analysis
+                </button>
+              </div>
+            )}
+
             <div className="relative flex flex-col flex-grow">
               <CardHeader className="items-start pb-2 pt-4 px-4 sm:px-6">
                 <div className="flex flex-row sm:items-center sm:justify-between w-full gap-2 justify-between">
@@ -619,8 +664,7 @@ const Dashboard = () => {
                             tickLine={false}
                             axisLine={false}
                             tickMargin={5}
-                            tickFormatter={(value) => `₹${value / 1000}k`
-                            }
+                            tickFormatter={(value) => `₹${value / 1000}k`}
                           />
                           <ChartTooltip
                             cursor={false}
@@ -669,6 +713,19 @@ const Dashboard = () => {
           {/* Rating Trend Line Chart */}
           <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden flex flex-col">
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            {owner?.plan?.planName === "free" && (
+              <div className="absolute inset-0 flex flex-col justify-center items-center bg-black/70 text-center space-y-4 z-10">
+                <div className="text-yellow-400">
+                  <Lock size={32} />
+                </div>
+                <button
+                  onClick={() => handleNavigation("/pricing")}
+                  className="bg-yellow-400 text-black px-4 py-2 rounded-md text-sm font-semibold hover:bg-yellow-300 cursor-pointer"
+                >
+                  Subscribe for Rating Trends
+                </button>
+              </div>
+            )}
             <div className="relative flex flex-col flex-grow">
               <CardHeader className="items-start pb-2 pt-4 px-4 sm:px-6">
                 <div className="flex flex-row sm:items-center sm:justify-between w-full gap-2 justify-between">
