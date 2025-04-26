@@ -194,7 +194,7 @@ const Dashboard = () => {
     try {
       const params = new URLSearchParams();
       // Add both sales and ratings parameters
-      params.append("salesYear", salesSelectedYear);
+      params.append("salesYear", salesSelectedYear ? salesSelectedYear : new Date().getFullYear());
       params.append("salesViewType", salesViewType);
       params.append("ratingsYear", ratingsSelectedYear);
       params.append("ratingsViewType", ratingsViewType);
@@ -611,7 +611,7 @@ const Dashboard = () => {
                         <SelectValue placeholder="Year" />
                       </SelectTrigger>
                       <SelectContent className="bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 max-h-48 overflow-y-auto">
-                        {metrics?.availableYears?.map((year) => (
+                        {metrics?.availableYearsForSales?.map((year) => (
                           <SelectItem
                             key={year}
                             value={year.toString()}
@@ -766,7 +766,7 @@ const Dashboard = () => {
                         <SelectValue placeholder="Year" />
                       </SelectTrigger>
                       <SelectContent className="bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 max-h-48 overflow-y-auto">
-                        {metrics?.availableYears?.map((year) => (
+                        {metrics?.availableYearsForFeedbacks?.map((year) => (
                           <SelectItem
                             key={year}
                             value={year.toString()}

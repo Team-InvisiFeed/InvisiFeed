@@ -322,52 +322,84 @@ const calculateAverageResponseTime = (invoiceWithFeedbackSubmitted) => {
 };
 
 // Helper function to group sales by date
-function groupSalesByDate(invoices, viewType) {
+function groupSalesByDate(invoices, viewType , salesYear) {
   const grouped = {};
   const currentDate = new Date();
+  const currentMonth = currentDate.getMonth();
+  const currentDay = currentDate.getDate();
 
-  // Initialize based on view type
-  if (viewType === "currentMonth") {
-    const daysInMonth = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth() + 1,
-      0
-    ).getDate();
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth(),
-        day
-      );
-      const dateKey = date.toLocaleDateString("en-US", {
-        day: "numeric",
-        month: "short",
-      });
-      grouped[dateKey] = { date: dateKey, sales: 0 };
-    }
-  } else if (viewType === "currentWeek") {
+  // Filter invoices based on view type
+  if (viewType === "currentWeek") {
+    // Get start of current week (Sunday)
     const startOfWeek = new Date(currentDate);
     startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    // Get end of current week (Saturday)
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    // Filter invoices for current week
+    invoices = invoices.filter((invoice) => {
+      const invoiceDate = new Date(invoice.createdAt);
+      return invoiceDate >= startOfWeek && invoiceDate <= endOfWeek;
+    });
+
+    // Initialize days of current week
     for (let i = 0; i < 7; i++) {
       const date = new Date(startOfWeek);
       date.setDate(startOfWeek.getDate() + i);
       const dateKey = date.toLocaleDateString("en-US", { weekday: "short" });
       grouped[dateKey] = { date: dateKey, sales: 0 };
     }
+  } else if (viewType === "currentMonth") {
+
+    const currentYear = currentDate.getFullYear();
+
+    // Get start of current month
+    const startOfMonth = new Date(currentYear, currentMonth, 1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    // Get end of current month
+    const endOfMonth = new Date(currentYear, currentMonth + 1, 0);
+    endOfMonth.setHours(23, 59, 59, 999);
+
+    // Filter invoices for current month
+    invoices = invoices.filter((invoice) => {
+      const invoiceDate = new Date(invoice.createdAt);
+      return invoiceDate >= startOfMonth && invoiceDate <= endOfMonth;
+    });
+
+    // Initialize days of current month
+    const daysInMonth = endOfMonth.getDate();
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(currentYear, currentMonth, day);
+      const dateKey = date.toLocaleDateString("en-US", {
+        day: "numeric",
+        month: "short",
+      });
+      grouped[dateKey] = { date: dateKey, sales: 0 };
+    }
   } else if (viewType === "currentYear") {
+    // Get start of current year
+    const startOfYear = new Date(salesYear, 0, 1);
+    startOfYear.setHours(0, 0, 0, 0);
+
+    // Get end of current year
+    const endOfYear = new Date(salesYear, 11, 31);
+    endOfYear.setHours(23, 59, 59, 999);
+
+    // Filter invoices for current year
+    invoices = invoices.filter((invoice) => {
+      const invoiceDate = new Date(invoice.createdAt);
+      return invoiceDate >= startOfYear && invoiceDate <= endOfYear;
+    });
+
+    // Initialize months of current year
     const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
     months.forEach((month) => {
       grouped[month] = { date: month, sales: 0 };
@@ -401,18 +433,8 @@ function groupSalesByDate(invoices, viewType) {
       return new Date(a.date) - new Date(b.date);
     } else {
       const monthOrder = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
       ];
       return monthOrder.indexOf(a.date) - monthOrder.indexOf(b.date);
     }
@@ -454,7 +476,6 @@ export async function GET(req) {
     const totalInvoices = invoices.length;
 
     // Get sales data based on sales view type
-
     const isProPlan =
       (owner?.plan?.planName === "pro" ||
         owner?.plan?.planName === "pro-trial") &&
@@ -463,16 +484,35 @@ export async function GET(req) {
     let salesData = [];
 
     if (isProPlan) {
-      if (salesYear) {
+      console.log("salesYear:",salesYear);
+      
+      if (salesViewType === "" && salesYear) {
+
+        // Filter invoices for the selected year
         const filteredInvoices = invoices.filter((invoice) => {
           const invoiceYear = new Date(invoice.createdAt).getFullYear();
           return invoiceYear === parseInt(salesYear);
         });
-        salesData = groupSalesByDate(filteredInvoices, "currentYear");
+
+        console.log("filteredInvoices:",filteredInvoices);
+        
+        // Group by month for the selected year
+        salesData = groupSalesByDate(filteredInvoices, "currentYear" , salesYear);
+
+        console.log("salesData:",salesData);
       } else if (salesViewType) {
-        salesData = groupSalesByDate(invoices, salesViewType);
+
+        salesData = groupSalesByDate(invoices, salesViewType , salesYear);
       } else {
-        salesData = groupSalesByDate(invoices, "currentYear");
+
+        
+        // Default to current year if no selection
+        const currentYear = new Date().getFullYear();
+        const filteredInvoices = invoices.filter((invoice) => {
+          const invoiceYear = new Date(invoice.createdAt).getFullYear();
+          return invoiceYear === currentYear;
+        });
+        salesData = groupSalesByDate(filteredInvoices, "currentYear");
       }
     }
 
@@ -550,10 +590,20 @@ export async function GET(req) {
       }
     }
 
-    // Get available years for the dropdown
-    let availableYears = []
+    // Get available years for the Sales dropdown
+    let availableYearsForSales = []
     if(isProPlan){
-       availableYears = [
+       availableYearsForSales = [
+        ...new Set(
+          invoices.map((invoice) => new Date(invoice.createdAt).getFullYear())
+        ),
+      ].sort((a, b) => b - a);
+    }
+
+    // Get available years for the Feedbacks or Ratings dropdown
+    let availableYearsForFeedbacks = []
+    if(isProPlan){
+       availableYearsForFeedbacks = [
         ...new Set(
           feedbacks.map((feedback) => new Date(feedback.createdAt).getFullYear())
         ),
@@ -583,7 +633,8 @@ export async function GET(req) {
           averageRatings,
           negativePercentage,
           historicalRatings : isProPlan ? historicalRatings : [],
-          availableYears : isProPlan ? availableYears : [],
+          availableYearsForSales : isProPlan ? availableYearsForSales : [],
+          availableYearsForFeedbacks : isProPlan ? availableYearsForFeedbacks : [],
           averageResponseTime,
           salesData : isProPlan ? salesData : [],
         },
