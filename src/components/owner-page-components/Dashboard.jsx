@@ -139,10 +139,10 @@ const Dashboard = () => {
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedYear, setSelectedYear] = useState(
-    new Date().getFullYear().toString()
-  );
-  const [viewType, setViewType] = useState("currentYear");
+  const [salesSelectedYear, setSalesSelectedYear] = useState("");
+  const [salesViewType, setSalesViewType] = useState("currentYear");
+  const [ratingsSelectedYear, setRatingsSelectedYear] = useState("");
+  const [ratingsViewType, setRatingsViewType] = useState("currentYear");
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -170,8 +170,11 @@ const Dashboard = () => {
   const fetchMetrics = useCallback(async () => {
     try {
       const params = new URLSearchParams();
-      params.append("year", selectedYear);
-      params.append("viewType", viewType);
+      // Add both sales and ratings parameters
+      params.append("salesYear", salesSelectedYear);
+      params.append("salesViewType", salesViewType);
+      params.append("ratingsYear", ratingsSelectedYear);
+      params.append("ratingsViewType", ratingsViewType);
 
       const response = await axios.get(
         `/api/get-dashboard-metrics?${params.toString()}`
@@ -183,7 +186,7 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, [owner?.username, selectedYear, viewType]);
+  }, [owner?.username, salesSelectedYear, salesViewType, ratingsSelectedYear, ratingsViewType]);
 
   useEffect(() => {
     if (owner?.username) {
@@ -521,12 +524,11 @@ const Dashboard = () => {
                     </CardDescription>
                   </div>
                   <div className="flex flex-row items-center gap-2">
-                    {/* Select components remain unchanged */}
                     <Select
-                      value={viewType}
+                      value={salesViewType}
                       onValueChange={(value) => {
-                        setViewType(value);
-                        setSelectedYear("");
+                        setSalesViewType(value);
+                        setSalesSelectedYear("");
                       }}
                     >
                       <SelectTrigger className="w-[100px] sm:w-[140px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 focus:ring-yellow-400">
@@ -554,10 +556,10 @@ const Dashboard = () => {
                       </SelectContent>
                     </Select>
                     <Select
-                      value={selectedYear}
+                      value={salesSelectedYear}
                       onValueChange={(value) => {
-                        setSelectedYear(value);
-                        setViewType("");
+                        setSalesSelectedYear(value);
+                        setSalesViewType("");
                       }}
                     >
                       <SelectTrigger className="w-[100px] sm:w-[120px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 focus:ring-yellow-400">
@@ -588,70 +590,64 @@ const Dashboard = () => {
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart
                           data={salesData}
-                          // layout="horizontal" is default, removed layout prop
                           margin={{
-                            top: 25, // Increased top margin for labels
+                            top: 25,
                             right: 5,
-                            left: 5, // Adjusted left margin
+                            left: 5,
                             bottom: 5,
                           }}
                           barCategoryGap="20%"
                         >
                           <CartesianGrid
-                            vertical={false} // Show horizontal grid lines
-                            stroke="#374151" // gray-700
+                            vertical={false}
+                            stroke="#374151"
                             strokeDasharray="3 3"
                           />
                           <XAxis
-                            dataKey="name" // Category axis (e.g., Month)
+                            dataKey="name"
                             type="category"
                             tickLine={false}
-                            tickMargin={8} // Space between tick and text
+                            tickMargin={8}
                             axisLine={false}
-                            stroke="#9CA3AF" // gray-400
+                            stroke="#9CA3AF"
                             fontSize={isMobile ? 10 : 12}
                           />
                           <YAxis
-                            type="number" // Value axis
-                            stroke="#9CA3AF" // gray-400
+                            type="number"
+                            stroke="#9CA3AF"
                             fontSize={isMobile ? 10 : 12}
                             tickLine={false}
                             axisLine={false}
                             tickMargin={5}
-                            // domain={[0, 'dataMax + 1000']} // Optional: Adjust domain slightly
-                            tickFormatter={
-                              (value) => `₹${value / 1000}k` // Example: Format ticks as thousands
+                            tickFormatter={(value) => `₹${value / 1000}k`
                             }
                           />
                           <ChartTooltip
                             cursor={false}
                             content={
                               <ChartTooltipContent indicator="dot" hideLabel />
-                            } // Use 'dot' indicator, hide default label
+                            }
                             formatter={(value, name, props) => [
-                              // Custom tooltip formatter
-                              `₹${value.toLocaleString()}`, // Formatted value
-                              props.payload.name, // Use the category name as the label
+                              `₹${value.toLocaleString()}`,
+                              props.payload.name,
                             ]}
                             labelClassName="font-bold text-sm"
-                            wrapperClassName="[&_.recharts-tooltip-item]:!text-yellow-400" // Style tooltip item text
+                            wrapperClassName="[&_.recharts-tooltip-item]:!text-yellow-400"
                             contentStyle={{
-                              // Style tooltip box
-                              backgroundColor: "rgba(10, 10, 10, 0.8)", // bg-[#0A0A0A]/80
-                              borderColor: "rgba(250, 204, 21, 0.2)", // border-yellow-400/20
-                              color: "#FDE047", // text-yellow-300 (adjust as needed)
+                              backgroundColor: "rgba(10, 10, 10, 0.8)",
+                              borderColor: "rgba(250, 204, 21, 0.2)",
+                              color: "#FDE047",
                             }}
                           />
                           <Bar
                             dataKey="value"
-                            // layout prop removed
-                            fill="#FACC15" // yellow-400
-                            radius={[4, 4, 0, 0]} // Rounded top corners
-                            maxBarSize={isMobile ? 30 : 40} // Adjust bar size
+                            fill="#FACC15"
+                            radius={[4, 4, 0, 0]}
+                            maxBarSize={isMobile ? 30 : 40}
                           >
                             <LabelList
                               dataKey="value"
-                              position="top" // Position value label above the bar
+                              position="top"
                               offset={8}
                               className="fill-yellow-400 font-bold text-[10px] sm:text-xs"
                               formatter={(value) =>
@@ -660,7 +656,6 @@ const Dashboard = () => {
                                   : `₹${value.toLocaleString()}`
                               }
                             />
-                            {/* Removed the LabelList for 'name' as XAxis ticks handle this */}
                           </Bar>
                         </BarChart>
                       </ResponsiveContainer>
@@ -673,33 +668,24 @@ const Dashboard = () => {
 
           {/* Rating Trend Line Chart */}
           <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden flex flex-col">
-            {" "}
-            {/* Added flex flex-col */}
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative flex flex-col flex-grow">
-              {" "}
-              {/* Added flex-grow */}
-              {/* Adjusted padding */}
               <CardHeader className="items-start pb-2 pt-4 px-4 sm:px-6">
-                {/* Kept original flex layout for header elements */}
                 <div className="flex flex-row sm:items-center sm:justify-between w-full gap-2 justify-between">
                   <div className="flex flex-col items-start">
                     <CardTitle className="text-yellow-400 text-sm sm:text-base">
                       Rating Trend
                     </CardTitle>
                     <CardDescription className="text-xs text-gray-400 mt-1">
-                      {" "}
-                      {/* Added text color and margin */}
                       Overall rating over time
                     </CardDescription>
                   </div>
-                  {/* Kept original selectors */}
                   <div className="flex flex-row items-center gap-2">
                     <Select
-                      value={viewType}
+                      value={ratingsViewType}
                       onValueChange={(value) => {
-                        setViewType(value);
-                        setSelectedYear("");
+                        setRatingsViewType(value);
+                        setRatingsSelectedYear("");
                       }}
                     >
                       <SelectTrigger className="w-[100px] sm:w-[140px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 focus:ring-yellow-400">
@@ -727,17 +713,16 @@ const Dashboard = () => {
                       </SelectContent>
                     </Select>
                     <Select
-                      value={selectedYear}
+                      value={ratingsSelectedYear}
                       onValueChange={(value) => {
-                        setSelectedYear(value);
-                        setViewType("");
+                        setRatingsSelectedYear(value);
+                        setRatingsViewType("");
                       }}
                     >
                       <SelectTrigger className="w-[100px] sm:w-[120px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 focus:ring-yellow-400">
                         <SelectValue placeholder="Year" />
                       </SelectTrigger>
                       <SelectContent className="bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 max-h-48 overflow-y-auto">
-                        {/* Use optional chaining in case metrics or availableYears is undefined */}
                         {metrics?.availableYears?.map((year) => (
                           <SelectItem
                             key={year}
@@ -752,13 +737,8 @@ const Dashboard = () => {
                   </div>
                 </div>
               </CardHeader>
-              {/* Adjusted padding, flex-1 */}
               <CardContent className="flex-1 px-1 pb-3 sm:px-2 sm:pb-4">
-                {" "}
-                {/* Reduced horizontal padding */}
-                {/* Container for chart - REMOVED overflow-x-auto */}
                 <div className="h-[200px] sm:h-[300px] w-full">
-                  {/* REMOVED min-w-* from inner div */}
                   <div className="h-full w-full">
                     <ChartContainer
                       config={CHART_CONFIG}
@@ -767,32 +747,30 @@ const Dashboard = () => {
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart
                           data={historicalData}
-                          // Adjusted margins slightly, kept original logic for left based on isMobile
                           margin={{
-                            top: 15, // Reduced top
-                            right: 15, // Reduced right
-                            left: isMobile ? 15 : 15, // Adjusted left slightly based on original logic
-                            bottom: 50, // Kept bottom space for rotated labels
+                            top: 15,
+                            right: 15,
+                            left: isMobile ? 15 : 15,
+                            bottom: 50,
                           }}
                         >
                           <CartesianGrid
                             vertical={false}
                             stroke="#374151"
                             strokeDasharray="3 3"
-                          />{" "}
-                          {/* Optional: dashed grid */}
+                          />
                           <XAxis
                             dataKey="date"
                             stroke="#9CA3AF"
                             tickLine={false}
-                            tickMargin={isMobile ? 7 : 10} // Mobile pe kam margin
+                            tickMargin={isMobile ? 7 : 10}
                             axisLine={false}
-                            interval={0} // Har label dikhane ke liye
-                            angle={isMobile ? -75 : -45} // Mobile pe kam tilt
+                            interval={0}
+                            angle={isMobile ? -75 : -45}
                             textAnchor="end"
                             tick={{
                               fill: "#9CA3AF",
-                              fontSize: isMobile ? 8 : 10, // Mobile pe chhoti font size
+                              fontSize: isMobile ? 8 : 10,
                             }}
                           />
                           <YAxis
@@ -800,15 +778,13 @@ const Dashboard = () => {
                             domain={[0, 5]}
                             tickLine={false}
                             axisLine={false}
-                            // Keep original logic for display/width - this might still cause jumps
-                            // but required by "no logic change" constraint.
                             tick={{
                               fill: "#9CA3AF",
                               fontSize: 10,
                               display: isMobile ? "none" : "block",
                             }}
-                            width={isMobile ? 0 : 25} // Slightly reduced non-mobile width
-                            tickMargin={5} // Added margin
+                            width={isMobile ? 0 : 25}
+                            tickMargin={5}
                           />
                           <ChartTooltip
                             cursor={false}
@@ -819,7 +795,6 @@ const Dashboard = () => {
                             dataKey="rating"
                             stroke="#FACC15"
                             strokeWidth={2}
-                            // Adjusted dot style slightly
                             dot={{
                               fill: "#FACC15",
                               r: 2,

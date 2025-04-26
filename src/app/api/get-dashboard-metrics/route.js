@@ -390,8 +390,10 @@ export async function GET(req) {
 
     const username = session?.user?.username;
     const URLParams = req.nextUrl.searchParams;
-    const year = URLParams.get("year");
-    const viewType = URLParams.get("viewType");
+    const salesYear = URLParams.get("salesYear");
+    const salesViewType = URLParams.get("salesViewType");
+    const ratingsYear = URLParams.get("ratingsYear");
+    const ratingsViewType = URLParams.get("ratingsViewType");
 
     const owner = await OwnerModel.findOne({ username });
 
@@ -408,16 +410,16 @@ export async function GET(req) {
     const totalFeedbacks = feedbacks.length;
     const totalInvoices = invoices.length;
 
-    // Get sales data based on view type
+    // Get sales data based on sales view type
     let salesData = [];
-    if (year) {
+    if (salesYear) {
       const filteredInvoices = invoices.filter(invoice => {
         const invoiceYear = new Date(invoice.createdAt).getFullYear();
-        return invoiceYear === parseInt(year);
+        return invoiceYear === parseInt(salesYear);
       });
       salesData = groupSalesByDate(filteredInvoices, 'currentYear');
-    } else if (viewType) {
-      salesData = groupSalesByDate(invoices, viewType);
+    } else if (salesViewType) {
+      salesData = groupSalesByDate(invoices, salesViewType);
     } else {
       salesData = groupSalesByDate(invoices, 'currentYear');
     }
@@ -456,20 +458,20 @@ export async function GET(req) {
       ((negativeFeedbacks / totalFeedbacks) * 100 || 0).toFixed(2)
     );
 
-    // Get historical data based on view type
+    // Get historical data based on ratings view type
     let historicalRatings = [];
     let filteredFeedbacks = [...feedbacks];
 
     // Handle historical year data
-    if (year) {
+    if (ratingsYear) {
       filteredFeedbacks = feedbacks.filter((feedback) => {
         const feedbackYear = new Date(feedback.createdAt).getFullYear();
-        return feedbackYear === parseInt(year);
+        return feedbackYear === parseInt(ratingsYear);
       });
       historicalRatings = groupByMonth(filteredFeedbacks);
-    } else if (viewType) {
+    } else if (ratingsViewType) {
       // Handle current time period data
-      switch (viewType) {
+      switch (ratingsViewType) {
         case "currentMonth":
           filteredFeedbacks = getCurrentMonthFeedbacks(feedbacks);
           historicalRatings = groupByDate(filteredFeedbacks);
