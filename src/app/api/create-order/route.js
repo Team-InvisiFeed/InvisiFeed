@@ -31,7 +31,9 @@ export async function POST(req) {
       );
     }
 
-    const { amount, currency = "INR" } = await req.json();
+    // const { amount, currency = "INR" } = await req.json();
+    const amount = process.env.SUBSCRIPTION_AMOUNT;
+    const currency = "INR";
 
     const options = {
       amount: amount * 100, // Convert to paise
@@ -41,10 +43,14 @@ export async function POST(req) {
 
     const order = await razorpay.orders.create(options);
 
-    return NextResponse.json({
-      success: true,
-      order,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        order,
+        message: "Order created successfully",
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error creating order:", error);
     return NextResponse.json(
