@@ -33,6 +33,10 @@ export async function POST(req) {
         { status: 400 }
       );
     }
+
+    if(deletedAccount && deletedAccount.deletionDate && deletedAccount.deletionDate.getTime() + 15 * 24 * 60 * 60 * 1000 < new Date().getTime()){
+      await DeletedAccountModel.findByIdAndDelete(deletedAccount._id);
+    }
     
 
     const existingUserVerifiedByUsername = await OwnerModel.findOne({

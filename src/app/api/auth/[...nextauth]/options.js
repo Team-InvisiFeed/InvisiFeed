@@ -136,6 +136,10 @@ export const authOptions = {
             return `/sign-in?error=ACCOUNT_DELETED&remainingDays=${remainingDays}`;
           }
 
+          if(deletedAccount && deletedAccount.deletionDate && deletedAccount.deletionDate.getTime() + 15 * 24 * 60 * 60 * 1000 < new Date().getTime()){
+            await DeletedAccountModel.findByIdAndDelete(deletedAccount._id);
+          }
+
           const baseUsername = user.email.split("@")[0];
           let username = baseUsername;
           let counter = 1;
