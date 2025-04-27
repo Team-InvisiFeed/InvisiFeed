@@ -166,7 +166,7 @@ export async function generateQrPdf(
                 </Text>
   
                 <Text style={styles.invoiceDate}>Email: {owner?.email}</Text>
-                {owner?.gstinDetails && (
+                {owner?.gstinDetails?.gstinHolderName && (
                   <Text style={styles.invoiceDate}>
                     GSTIN holder name: {owner?.gstinDetails?.gstinHolderName}
                   </Text>
