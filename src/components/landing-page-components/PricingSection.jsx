@@ -208,10 +208,10 @@ const PricingSection = () => {
                 disabled={
                   isFreeLoading || isFreePlan || isProPlan || isProTrial
                 }
-                className={`w-full py-3 px-4 rounded-lg font-medium flex items-center justify-center bg-transparent border-2 border-yellow-400/20 text-yellow-400 hover:border-yellow-400/40 ${
-                  isFreeLoading || isFreePlan
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
+                className={`w-full py-3 px-4 rounded-lg font-medium flex items-center justify-center bg-transparent border-2  border-yellow-400/20 text-yellow-400 hover:border-yellow-400/40 ${
+                  isFreeLoading || isFreePlan || isProPlan || isProTrial
+                    ? "opacity-50 cursor-default"
+                    : "cursor-pointer"
                 }`}
               >
                 <span>
@@ -288,8 +288,8 @@ const PricingSection = () => {
                 }}
                 className={`w-full py-3 px-4 rounded-lg font-medium flex items-center justify-center bg-gradient-to-r from-yellow-500 to-yellow-400 text-gray-900 shadow-lg shadow-yellow-500/20 ${
                   isProLoading || isProPlan || isProTrial
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
+                    ? "opacity-50 cursor-default"
+                    : "cursor-pointer"
                 }`}
               >
                 {user?.proTrialUsed === true ? (
