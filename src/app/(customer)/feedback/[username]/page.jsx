@@ -53,7 +53,6 @@ function FeedbackFormContent() {
 
   const [organizationName, setOrganizationName] = useState("");
 
-
   const [loadingFeedback, setLoadingFeedback] = useState(false);
   const [loadingSuggestion, setLoadingSuggestion] = useState(false);
   const [invalidInvoice, setInvalidInvoice] = useState(null);
@@ -79,8 +78,6 @@ function FeedbackFormContent() {
       if (couponCode) {
         params.append("couponCode", couponCode);
       }
-
-
 
       const { data } = await axios.get(
         `/api/check-invoice?${params.toString()}`
@@ -130,6 +127,25 @@ function FeedbackFormContent() {
     checkInvoiceAndUser();
   }, [username, invoiceNumber, couponCode]);
 
+  const feedbackCharacterCount = formData.feedbackContent.length;
+  const suggestionCharacterCount = formData.suggestionContent.length;
+
+  const maxCharCount = 500;
+
+  const handleFeedbackChange = (e) => {
+    const newContent = e.target.value;
+    if (newContent.length <= maxCharCount) {
+      handleChange("feedbackContent", newContent);
+    }
+  };
+
+  const handleSuggestionChange = (e) => {
+    const newContent = e.target.value;
+    if (newContent.length <= maxCharCount) {
+      handleChange("suggestionContent", newContent);
+    }
+  };
+
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
@@ -149,15 +165,13 @@ function FeedbackFormContent() {
         if (result.status == 201) {
           toast.success("Feedback submitted successfully");
           setFeedbackSubmittedSuccess(true);
-          
         } else {
           toast.error("Failed to submit feedback. Please try again.");
         }
       }
     } catch (error) {
       toast.error("Failed to submit feedback. Please try again.");
-
-    }finally{
+    } finally {
       setIsLoading(false);
     }
   };
@@ -557,15 +571,18 @@ function FeedbackFormContent() {
                 transition={{ duration: 0.5, delay: 0.6 }}
                 className="relative"
               >
-                <Label className="block mb-2 sm:mb-3 text-base sm:text-lg font-medium text-gray-200">
-                  Additional Feedback
-                </Label>
+                <div className="flex justify-between items-center mb-2 sm:mb-3">
+                  <Label className="text-base sm:text-lg font-medium text-gray-200">
+                    Additional Feedback
+                  </Label>
+                  <span className="text-xs text-gray-400">
+                    {feedbackCharacterCount}/{maxCharCount} characters
+                  </span>
+                </div>
                 <Textarea
                   placeholder="Share your thoughts here..."
                   value={formData.feedbackContent}
-                  onChange={(e) =>
-                    handleChange("feedbackContent", e.target.value)
-                  }
+                  onChange={handleFeedbackChange}
                   className="min-h-[100px] sm:min-h-[120px] bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20 text-sm sm:text-base"
                 />
                 <div className="flex items-center justify-between mt-2">
@@ -600,15 +617,18 @@ function FeedbackFormContent() {
                 transition={{ duration: 0.5, delay: 0.7 }}
                 className="relative"
               >
-                <Label className="block mb-2 sm:mb-3 text-base sm:text-lg font-medium text-gray-200">
-                  Any Suggestions?
-                </Label>
+                <div className="flex justify-between items-center mb-2 sm:mb-3">
+                  <Label className="text-base sm:text-lg font-medium text-gray-200">
+                    Any Suggestions?
+                  </Label>
+                  <span className="text-xs text-gray-400">
+                    {suggestionCharacterCount}/{maxCharCount} characters
+                  </span>
+                </div>
                 <Textarea
                   placeholder="Let us know how we can improve..."
                   value={formData.suggestionContent}
-                  onChange={(e) =>
-                    handleChange("suggestionContent", e.target.value)
-                  }
+                  onChange={handleSuggestionChange}
                   className="min-h-[100px] sm:min-h-[120px] bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20 text-sm sm:text-base"
                 />
                 <div className="flex items-center justify-between mt-2">
@@ -645,13 +665,12 @@ function FeedbackFormContent() {
                   onChange={(e) =>
                     handleChange("anonymousFeedback", e.target.checked)
                   }
-                  className="w-4 h-4 text-yellow-400"
+                  className="w-4 h-4 text-yellow-400 accent-yellow-400"
                 />
                 <Label htmlFor="anonymousFeedback" className="text-gray-200">
-                  Submit anonymously  
+                  Submit anonymously
                 </Label>
               </div>
-
 
               {/* Submit Button */}
               <motion.div
@@ -659,21 +678,21 @@ function FeedbackFormContent() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.8 }}
               >
-                {
-                  isLoading ? (<Button
+                {isLoading ? (
+                  <Button
                     type="submit"
                     className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold py-4 sm:py-6 rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 text-sm sm:text-base disabled"
                   >
-                   Submitting...
-                  </Button>) : ( <Button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold py-4 sm:py-6 rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 text-sm sm:text-base cursor-pointer"
-                >
-                  Submit Feedback
-                </Button>)
-                }
-                
-               
+                    Submitting...
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold py-4 sm:py-6 rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 text-sm sm:text-base cursor-pointer"
+                  >
+                    Submit Feedback
+                  </Button>
+                )}
               </motion.div>
             </form>
           </CardContent>
