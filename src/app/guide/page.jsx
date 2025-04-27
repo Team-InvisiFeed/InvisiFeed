@@ -48,6 +48,8 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { BsEmojiAngryFill, BsEmojiSmileFill, BsEmojiNeutralFill, BsEmojiFrownFill, BsEmojiHeartEyesFill,BsEmojiSunglassesFill } from "react-icons/bs";
+
 
 const steps = [
   {
@@ -71,7 +73,18 @@ const steps = [
         details: [
           "Enter your business details",
           "Verify your GSTIN(if applicable)",
+          "GSTIN Details make your invoice look more genuine",
           "Hands on guide to create your first invoice",
+        ],
+      },
+      {
+        title: "Choose the right plan",
+        description: "Choose the right plan for your business",
+        details: [
+          "Free plan is available for new users",
+          "Pro plan is available for businesses looking for advanced features",
+          "You can see the features of each plan on the pricing page",
+          "Choose the right plan for your business to get the most out of InvisiFeed",
         ],
       },
     ],
@@ -106,6 +119,15 @@ const steps = [
           "You can also share the invoice with a link or directly send it to your clients",
         ],
       },
+      {
+        title: "View Invoices",
+        description: "View all your past invoices",
+        details: [
+          "You can view details of all your invoices on the Show Invoices page",
+          "Customer Name, Invoice Number, Invoice Date, Invoice Amount, Feedback Status",
+          "We are working on features to let you download your past invoices as PDF",
+        ],
+      },
     ],
   },
   {
@@ -125,6 +147,17 @@ const steps = [
         ],
       },
       {
+        title: "Anonymous Feedback",
+        description:
+          "Customer can submit their feedback anonymously or non-anonymously",
+        details: [
+          "Both anonymous and non-anonymous feedback are collected",
+          "If customer wants to submit their feedback anonymously, they can do so by clicking on the anonymous checkbox in the feedback form",
+          "Customers do not need to enter their personal details to submit feedback",
+          "For non-anonymous feedback, customer details are collected from the invoice details automatically",
+        ],
+      },
+      {
         title: "Coupon System",
         description: "Using coupons to encourage feedback",
         details: [
@@ -137,13 +170,13 @@ const steps = [
     ],
   },
   {
-    title: "Feedback Analysis",
+    title: "Business Analytics",
     icon: LineChart,
     description: "Learn how to analyze and use the feedback data",
     content: [
       {
         title: "Dashboard Overview",
-        description: "Understanding your feedback dashboard",
+        description: "Understanding your business analytics dashboard",
         details: [
           "Feedback collection rate",
           "Overall Ratings of your business",
@@ -164,6 +197,16 @@ const steps = [
           "Quick actions to improve your business",
         ],
       },
+      {
+        title: "Sales Analytics",
+        description: "Deep dive into sales data",
+        details: [
+          "Total sales made by your business",
+          "Sales trends over time",
+          "Sales summary and analysis (coming soon)",
+          "Quick actions to improve your sales (coming soon)",
+        ],
+      },
     ],
   },
   {
@@ -175,18 +218,30 @@ const steps = [
         title: "AI Insights",
         description: "Leverage AI for better understanding",
         details: [
-          "Automated sentiment analysis (Pro plan only)",
-          "Key improvement areas (Pro plan only)",
-          "Success pattern recognition (Pro plan only)",
+          "Automated sentiment analysis",
+          "Key improvement areas",
+          "Success pattern recognition (coming soon)",
         ],
       },
       {
         title: "Performance Tracking",
         description: "Monitor your progress and growth",
         details: [
-          "Historical performance comparison (Pro plan only)",
-          "Goal setting and tracking (Pro plan only)",
-          "Custom reporting (Pro plan only)",
+          "Historical performance comparison",
+          "Goal setting and tracking (coming soon)",
+          "Custom reporting (coming soon)",
+        ],
+      },
+      {
+        title: "Upcoming Features",
+        description: "We are working on these features",
+        details: [
+          "Customizable invoice template",
+          "Customizable feedback form",
+          "Notification system for new feedback",
+          "AI powered sales prediction",
+          "Public portfolio of your business",
+
         ],
       },
     ],
@@ -194,11 +249,11 @@ const steps = [
 ];
 
 const emojiOptions = [
-  { value: 1, emoji: "😡", label: "Very Dissatisfied" },
-  { value: 2, emoji: "😞", label: "Dissatisfied" },
-  { value: 3, emoji: "😐", label: "Neutral" },
-  { value: 4, emoji: "😊", label: "Satisfied" },
-  { value: 5, emoji: "😍", label: "Very Satisfied" },
+  { value: 1, emoji: <BsEmojiAngryFill />, label: "Very Dissatisfied" },
+  { value: 2, emoji: <BsEmojiFrownFill />, label: "Dissatisfied" },
+  { value: 3, emoji: <BsEmojiNeutralFill />, label: "Neutral" },
+  { value: 4, emoji: <BsEmojiSmileFill />, label: "Satisfied" },
+  { value: 5, emoji: <BsEmojiHeartEyesFill />, label: "Very Satisfied" },
 ];
 
 const FeedbackFormPreview = () => {
@@ -243,9 +298,9 @@ const FeedbackFormPreview = () => {
                 key={option.value}
                 type="button"
                 onClick={() => handleChange(key, option.value)}
-                className={`text-2xl transition-all duration-200 flex-shrink-0 ${
+                className={`text-2xl text-white sm:text-3xl p-2 flex-shrink-0 ${
                   formData[key] === option.value
-                    ? "bg-yellow-400/5 rounded-full p-1 border border-yellow-400/10"
+                    ? "text-yellow-400"
                     : "opacity-80 hover:opacity-100"
                 }`}
               >
@@ -451,8 +506,8 @@ const GuideSection = () => {
                               key={detailIndex}
                               className="flex items-start space-x-2 text-gray-300"
                             >
-                              <ChevronRight className="w-4 h-4 text-yellow-500 mt-1" />
-                              <span className="text-sm sm:text-base">
+                              <ChevronRight className="w-4 h-4 text-yellow-500 flex-shrink-0" />
+                              <span className="text-xs sm:text-sm">
                                 {detail}
                               </span>
                             </li>
