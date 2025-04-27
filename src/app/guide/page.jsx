@@ -543,7 +543,7 @@ const GuideSection = () => {
                     <div>
                       <button
                         onClick={() => setShowFeedbackForm(true)}
-                        className="text-white font-medium hover:text-yellow-500 transition-colors"
+                        className="text-white font-medium hover:text-yellow-500 transition-colors cursor-pointer"
                       >
                         Show Feedback Form
                       </button>
@@ -557,7 +557,7 @@ const GuideSection = () => {
                     <div>
                       <button
                         onClick={() => setShowSmartInvoice(true)}
-                        className="text-white font-medium hover:text-yellow-500 transition-colors"
+                        className="text-white font-medium hover:text-yellow-500 transition-colors cursor-pointer"
                       >
                         Show Smart Invoice
                       </button>
@@ -572,7 +572,7 @@ const GuideSection = () => {
                     <div>
                       <button
                         onClick={() => setShowQRPDF(true)}
-                        className="text-white font-medium hover:text-yellow-500 transition-colors"
+                        className="text-white font-medium hover:text-yellow-500 transition-colors cursor-pointer"
                       >
                         Show Invoice + QR PDF
                       </button>
@@ -627,9 +627,14 @@ const GuideSection = () => {
           </DialogHeader>
           <div className="relative w-full h-[80vh] overflow-auto">
             <img
-              src="/QR_Sample.png"
+              src="/UploadedInvFirstPage.png"
               alt="Sample QR PDF"
-              className="w-full h-auto object-contain rounded-lg shadow-lg"
+              className="w-full h-auto object-contain rounded-t-lg shadow-lg"
+            />
+            <img
+              src="/UploadedInvSecPage.png"
+              alt="Sample QR PDF"
+              className="w-full h-auto object-contain rounded-b-lg shadow-lg"
             />
           </div>
         </DialogContent>
