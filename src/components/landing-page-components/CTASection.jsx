@@ -32,58 +32,58 @@ const CTASection = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <motion.button
-                whileHover={
-                  !isNavigatingToRegister1 ? { scale: 1.05 } : undefined
-                }
-                whileTap={
-                  !isNavigatingToRegister1 ? { scale: 0.95 } : undefined
-                }
-                onClick={() => {
-                  setIsNavigatingToRegister1(true);
-                  router.push("/register");
-                }}
-                className="relative group flex items-center justify-center cursor-pointer space-x-3 px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30"
-              >
-                {/* Spinner and Loading Text */}
-                {isNavigatingToRegister1 ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-t-transparent border-black rounded-full animate-spin"></div>
-                    <span className="text-lg">Loading...</span>
-                  </div>
-                ) : (
-                  // Default Button Content
-                  <>
-                    <span className="text-lg">Get Started Free</span>
-                    <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-                  </>
-                )}
-              </motion.button>
+              {/* Button for Get Started Free */}
+              <Link href="/register" passHref>
+                <motion.div
+                  whileHover={
+                    !isNavigatingToRegister1 ? { scale: 1.05 } : undefined
+                  }
+                  whileTap={
+                    !isNavigatingToRegister1 ? { scale: 0.95 } : undefined
+                  }
+                  onClick={() => setIsNavigatingToRegister1(true)}
+                  className="relative group flex items-center justify-center cursor-pointer space-x-3 px-8 py-4 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30"
+                >
+                  {/* Spinner and Loading Text */}
+                  {isNavigatingToRegister1 ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-t-transparent border-black rounded-full animate-spin"></div>
+                      <span className="text-lg">Loading...</span>
+                    </div>
+                  ) : (
+                    // Default Button Content
+                    <>
+                      <span className="text-lg">Get Started Free</span>
+                      <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                    </>
+                  )}
+                </motion.div>
+              </Link>
 
-              <motion.button
-                whileHover={
-                  !isNavigatingToRegister2 ? { scale: 1.05 } : undefined
-                }
-                whileTap={
-                  !isNavigatingToRegister2 ? { scale: 0.95 } : undefined
-                }
-                className="relative group flex items-center justify-center cursor-pointer space-x-3 px-8 py-4 bg-transparent border-2 border-yellow-400/20 hover:border-yellow-400/40 text-yellow-400 font-semibold rounded-xl transition-all duration-300"
-                onClick={() => {
-                  setIsNavigatingToRegister2(true);
-                  router.push("/sign-in");
-                }}
-              >
-                {/* Spinner and Loading Text */}
-                {isNavigatingToRegister2 ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-t-transparent border-yellow-400 rounded-full animate-spin"></div>
-                    <span className="text-lg">Loading...</span>
-                  </div>
-                ) : (
-                  // Default Button Content
-                  <span className="text-lg">Sign In</span>
-                )}
-              </motion.button>
+              {/* Button for Sign In */}
+              <Link href="/sign-in" passHref>
+                <motion.div
+                  whileHover={
+                    !isNavigatingToRegister2 ? { scale: 1.05 } : undefined
+                  }
+                  whileTap={
+                    !isNavigatingToRegister2 ? { scale: 0.95 } : undefined
+                  }
+                  onClick={() => setIsNavigatingToRegister2(true)}
+                  className="relative group flex items-center justify-center cursor-pointer space-x-3 px-8 py-4 bg-transparent border-2 border-yellow-400/20 hover:border-yellow-400/40 text-yellow-400 font-semibold rounded-xl transition-all duration-300"
+                >
+                  {/* Spinner and Loading Text */}
+                  {isNavigatingToRegister2 ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-t-transparent border-yellow-400 rounded-full animate-spin"></div>
+                      <span className="text-lg">Loading...</span>
+                    </div>
+                  ) : (
+                    // Default Button Content
+                    <span className="text-lg">Sign In</span>
+                  )}
+                </motion.div>
+              </Link>
             </div>
           </div>
         </motion.div>
