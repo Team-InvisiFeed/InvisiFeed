@@ -65,6 +65,7 @@ export default function Home() {
   const [couponDeleteConfirm, setCouponDeleteConfirm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [isSubscriptionPopupOpen, setIsSubscriptionPopupOpen] = useState(false);
+  const [fileLoading, setFileLoading] = useState(false);
 
   // Sample invoice data
   const sampleInvoices = [
@@ -229,7 +230,7 @@ export default function Home() {
       return;
     }
 
-    setLoading(true);
+    setFileLoading(true);
     const formData = new FormData();
     formData.append("file", fileToUpload);
     if (couponSaved) {
@@ -276,7 +277,7 @@ export default function Home() {
         );
       }
     } finally {
-      setLoading(false);
+      setFileLoading(false);
     }
   };
 
@@ -645,7 +646,7 @@ export default function Home() {
                     <motion.button
                       onClick={handleUpload}
                       disabled={
-                        loading ||
+                        fileLoading ||
                         !file ||
                         dailyUploadCount >= dailyLimit ||
                         initialLoading
@@ -660,7 +661,7 @@ export default function Home() {
                           dailyUploadCount < dailyLimit && !initialLoading ? 0.98 : 1,
                       }}
                     >
-                      {loading || initialLoading ? (
+                      {fileLoading || initialLoading ? (
                         <div className="flex items-center justify-center space-x-2 ">
                           <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
                           <span>
