@@ -13,9 +13,7 @@ export async function POST(req) {
 
     const deletedAccount = await DeletedAccountModel.findOne({ email });
 
-    console.log(deletedAccount);
-    console.log("deletiondate : ",deletedAccount?.deletionDate);
-    console.log("deletiondate+15din : ",deletedAccount?.deletionDate + 15 * 24 * 60 * 60 * 1000);
+
 
     if (
       deletedAccount &&
