@@ -301,7 +301,7 @@ const WhyInvisiFeedSection = () => {
                   isNavigatingToRegister
                     ? "opacity-50 disabled"
                     : "cursor-pointer"
-                }  from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105`}
+                }  from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30`}
                 onClick={() => {
                   setIsNavigatingToRegister(true);
                   router.push("/register");
@@ -744,7 +744,7 @@ const WhyInvisiFeedSection = () => {
                   isNavigatingToRegister
                     ? "opacity-50 disabled"
                     : "cursor-pointer"
-                }  from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105`}
+                }  from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30`}
                 onClick={() => {
                   setIsNavigatingToRegister(true);
                   router.push("/register");
