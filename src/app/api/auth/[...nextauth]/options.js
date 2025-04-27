@@ -186,14 +186,13 @@ export const authOptions = {
         }
       }
 
-      console.log("signIn callback ka user : ", user);
 
       return true;
     },
 
     async jwt({ token, user, account, profile, session, trigger }) {
       if (user && account) {
-        console.log("jwt callback ka user : ", user);
+     
         // Initial sign in
         token.id = user.id;
         token.provider = account.provider;
@@ -251,7 +250,7 @@ export const authOptions = {
     },
 
     async session({ session, token, trigger }) {
-      console.log("session callback ka token : ", token);
+
       if (token) {
         session.user.id = token.id;
         session.user.email = token.email;
@@ -263,7 +262,7 @@ export const authOptions = {
         session.user.address = token.address;
         session.user.plan = token.plan;
         session.user.proTrialUsed = token.proTrialUsed;
-        console.log("session callback ka session : ", session);
+      
       }
       return session;
     },
