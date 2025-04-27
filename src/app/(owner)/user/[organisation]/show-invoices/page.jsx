@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import {
@@ -31,11 +31,12 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight, Search, Star } from "lucide-react";
 import LoadingScreen from "@/components/LoadingScreen";
+import Link from "next/link";
 
 export default function ShowInvoicesPage({ params }) {
   const { data: session } = useSession();
   const owner = session?.user;
-  const router = useRouter();
+
   const pathname = usePathname();
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -106,7 +107,7 @@ export default function ShowInvoicesPage({ params }) {
       return;
     }
     setLoading(true);
-    router.push(route);
+
   };
 
   useEffect(() => {
@@ -131,13 +132,13 @@ export default function ShowInvoicesPage({ params }) {
               Upgrade to Pro to View Invoices
             </span>
           </div>
-
+          <Link href="/pricing" onClick={() => handleNavigation("/pricing")}>
           <button
             className="bg-yellow-400 text-[#0A0A0A] py-2 px-6 font-semibold rounded-full shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 transition duration-300 ease-in-out cursor-pointer"
-            onClick={() => handleNavigation("/pricing")}
           >
             Subscribe to Pro
           </button>
+          </Link>
         </div>
       </div>
     );

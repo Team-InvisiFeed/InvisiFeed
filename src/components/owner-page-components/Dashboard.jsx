@@ -60,6 +60,7 @@ import {
 import { MdMoney } from "react-icons/md";
 import { usePathname, useRouter } from "next/navigation";
 import LoadingScreen from "../LoadingScreen";
+import Link from "next/link";
 
 // Constants
 const CHART_CONFIG = {
@@ -158,7 +159,7 @@ const Dashboard = () => {
       return;
     }
     setIsPricingLoading(true);
-    router.push(route);
+    
   };
 
   useEffect(() => {
@@ -548,12 +549,13 @@ const Dashboard = () => {
                 <div className="text-yellow-400">
                   <Lock size={32} />
                 </div>
+                <Link href="/pricing" onClick={() => handleNavigation("/pricing")}>
                 <button
-                  onClick={() => handleNavigation("/pricing")}
                   className="bg-yellow-400 text-black px-4 py-2 rounded-md text-sm font-semibold hover:bg-yellow-300 cursor-pointer"
                 >
                   Subscribe for Sales Analysis
                 </button>
+                </Link>
               </div>
             )}
 
@@ -704,12 +706,13 @@ const Dashboard = () => {
                 <div className="text-yellow-400">
                   <Lock size={32} />
                 </div>
+                <Link href="/pricing" onClick={() => handleNavigation("/pricing")}>
                 <button
-                  onClick={() => handleNavigation("/pricing")}
                   className="bg-yellow-400 text-black px-4 py-2 rounded-md text-sm font-semibold hover:bg-yellow-300 cursor-pointer"
                 >
                   Subscribe for Rating Trends
                 </button>
+                </Link>
               </div>
             )}
             <div className="relative flex flex-col flex-grow">

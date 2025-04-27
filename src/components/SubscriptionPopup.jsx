@@ -4,6 +4,7 @@ import { X, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter, usePathname } from "next/navigation";
 import LoadingScreen from "./LoadingScreen";
+import Link from "next/link";
 
 export const SubscriptionPopup = ({ isOpen, onClose }) => {
   const router = useRouter();
@@ -17,7 +18,7 @@ export const SubscriptionPopup = ({ isOpen, onClose }) => {
     }
     setLoading(true);
     onClose();
-    router.push(route);
+    
   };
 
   useEffect(() => {
@@ -64,12 +65,15 @@ export const SubscriptionPopup = ({ isOpen, onClose }) => {
               </p>
 
               <div className="pt-4">
+                <Link href="/pricing" onClick={() => handleNavigation("/pricing")}>
                 <Button
                   className="w-full bg-yellow-400 text-black font-semibold py-2 rounded-full shadow-md hover:bg-yellow-500/80 focus:ring-2 focus:ring-yellow-300 transition duration-300 cursor-pointer"
-                  onClick={() => handleNavigation("/pricing")}
+                  
                 >
                   View Pricing Plans
                 </Button>
+                </Link>
+                
               </div>
             </div>
           </motion.div>

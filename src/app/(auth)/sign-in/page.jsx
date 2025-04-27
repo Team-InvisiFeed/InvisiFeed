@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form"; // React Hook Form for handling forms
 import { Form } from "@/components/ui/form"; // Custom Form component
 import Link from "next/link"; // For client-side navigation in Next.js
 import React, { useState, Suspense, useEffect } from "react"; // React hooks for state and lifecycle
-import { useRouter, useSearchParams } from "next/navigation"; // Next.js router for navigation
+import { usePathname, useRouter, useSearchParams } from "next/navigation"; // Next.js router for navigation
 import {
   FormControl,
   FormField,
@@ -21,9 +21,11 @@ import { Loader2, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import MobileLogo from "@/components/MobileLogo";
+import LoadingScreen from "@/components/LoadingScreen";
 
 function SignInContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [homeLoading, setHomeLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isNavigatingToRegister, setIsNavigatingToRegister] = useState(false);
   const searchParams = useSearchParams();
@@ -32,6 +34,7 @@ function SignInContent() {
   const { data: session } = useSession();
   const username = session?.user?.username;
   const router = useRouter();
+const pathname = usePathname();
 
   // Setting up React Hook Form with Zod validation schema
   const form = useForm({
@@ -41,6 +44,20 @@ function SignInContent() {
       password: "",
     },
   });
+
+  const handleNavigation = (route) => {
+    if (route === pathname) {
+      // Same route, no loading screen
+      return;
+    }
+    setHomeLoading(true);
+  };
+
+  useEffect(() => {
+    return () => {
+      setHomeLoading(false);
+    };
+  }, [pathname]);
 
   // Handle form submission
   const onSubmit = async (data) => {
@@ -82,12 +99,13 @@ function SignInContent() {
         {/* Left Section with Gradient */}
         <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#000000] p-8 flex-col justify-center items-center text-white">
           <div className="max-w-md space-y-4">
-            <h1
+            <Link
               className="text-4xl font-extrabold tracking-tight cursor-pointer"
-              onClick={() => router.push("/")}
+              href="/"
+              onClick={() => handleNavigation("/")}
             >
               InvisiFeed
-            </h1>
+            </Link>
             <p className="text-lg text-gray-200">
               Welcome back! Sign in to continue your journey
             </p>
@@ -145,12 +163,13 @@ function SignInContent() {
         {/* Left Section with Gradient */}
         <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#000000] p-8 flex-col justify-center items-center text-white">
           <div className="max-w-md space-y-4">
-            <h1
+            <Link
               className="text-4xl font-extrabold tracking-tight cursor-pointer"
-              onClick={() => router.push("/")}
+              href="/"
+              onClick={() => handleNavigation("/")}
             >
               InvisiFeed
-            </h1>
+            </Link>
             <p className="text-lg text-gray-200">
               Welcome back! Sign in to continue your journey
             </p>
@@ -221,17 +240,23 @@ function SignInContent() {
     }
   };
 
+ 
+
+    if(homeLoading) {
+      return <LoadingScreen />;
+    }
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left Section with Gradient */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#000000] p-8 flex-col justify-center items-center text-white">
         <div className="max-w-md space-y-4">
-          <h1
+          <Link
             className="text-4xl font-extrabold tracking-tight cursor-pointer"
-            onClick={() => router.push("/")}
+            href="/"
+            onClick={() => handleNavigation("/")}
           >
             InvisiFeed
-          </h1>
+          </Link>
           <p className="text-lg text-gray-200">
             Welcome back! Sign in to continue your journey
           </p>

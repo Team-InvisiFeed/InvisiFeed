@@ -19,13 +19,15 @@ import CreateInvoiceForm from "./CreateInvoiceForm";
 import CompleteProfileDialog from "./CompleteProfileDialog";
 import axios from "axios";
 import { SubscriptionPopup } from "../SubscriptionPopup";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import LoadingScreen from "../LoadingScreen";
+import Link from "next/link";
+
 
 export default function Home() {
   const { data: session } = useSession();
   const owner = session?.user;
-  const router = useRouter();
+
   const pathname = usePathname();
 
   const [file, setFile] = useState(null);
@@ -168,7 +170,7 @@ export default function Home() {
         return;
       }
       setLoading(true);
-      router.push(route);
+      
     };
     
   
@@ -495,7 +497,9 @@ export default function Home() {
                   </p>
                   {
                     (owner?.plan?.planName === "free" || owner?.plan?.planEndDate < new Date() )? (
-                      <button className="text-yellow-400 text-sm mt-3 cursor-pointer p-3 rounded-full border border-yellow-400/20 bg-gradient-to-br hover:from-yellow-400/20 hover:to-yellow-400/10" onClick={() => handleNavigation("/pricing")}>Please upgrade your plan to upload more invoices.</button>
+                      <Link href="/pricing" onClick={() => handleNavigation("/pricing")}>
+                      <button className="text-yellow-400 text-sm mt-3 cursor-pointer p-3 rounded-full border border-yellow-400/20 bg-gradient-to-br hover:from-yellow-400/20 hover:to-yellow-400/10" >Please upgrade your plan to upload more invoices.</button>
+                      </Link>
                     ) : null
                   }
                 </div>

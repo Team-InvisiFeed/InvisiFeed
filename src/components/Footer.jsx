@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import SocialMediaPopup from "./SocialMediaPopup";
 import LoadingScreen from "./LoadingScreen"; // Import the loading screen
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 function Footer() {
@@ -47,8 +47,6 @@ function Footer() {
       },
     },
   ];
-
-  const router = useRouter();
 
   const pathname = usePathname();
 

@@ -12,13 +12,15 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { useParams, useRouter } from "next/navigation";
-import React, { useRef, useState } from "react";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import MobileLogo from "@/components/MobileLogo";
+import LoadingScreen from "@/components/LoadingScreen";
+import Link from "next/link";
 
 // Zod schema for validation
 const verifySchema = z.object({
@@ -31,6 +33,10 @@ const VerifyAccount = () => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
+  const [homeLoading, setHomeLoading] = useState(false);
+  const pathname = usePathname();
+
+
 
   const form = useForm({
     resolver: zodResolver(verifySchema),
@@ -98,12 +104,34 @@ const VerifyAccount = () => {
     }
   };
 
+  const handleNavigation = (route) => {
+    if (route === pathname) {
+      // Same route, no loading screen
+      return;
+    }
+    setHomeLoading(true);
+  };
+
+  useEffect(() => {
+    return () => {
+      setHomeLoading(false);
+    };
+  }, [pathname]);
+
+  if (homeLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left Section with Gradient */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#000000] p-8 flex-col justify-center items-center text-white">
         <div className="max-w-md space-y-4">
-          <h1 className="text-4xl font-extrabold tracking-tight">InvisiFeed</h1>
+          <Link href="/" onClick={() => handleNavigation("/")}>
+            <h1 className="text-4xl font-extrabold tracking-tight cursor-pointer">
+              InvisiFeed
+            </h1>
+          </Link>
           <p className="text-lg text-gray-200">
             Verify your account to get started
           </p>

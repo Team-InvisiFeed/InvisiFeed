@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   Loader2,
   UserCircle2,
@@ -36,18 +36,20 @@ function UserNav({ isMobile = false }) {
   const [isGSTINDialogOpen, setIsGSTINDialogOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Added state for controlling dropdown
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+
 
   const onManageProfile = () => {
     handleNavigation(`/user/${owner?.username}/update-profile`);
   };
 
   const onManageInvoice = () => {
+
     handleNavigation(`/user/${owner?.username}/show-invoices`);
   };
 
   const onManageCoupons = () => {
     handleNavigation(`/user/${owner?.username}/manage-coupons`);
+
   };
 
   const handleSignOut = async () => {
@@ -57,12 +59,12 @@ function UserNav({ isMobile = false }) {
     await signOut({ redirect: true, callbackUrl: "/sign-in" });
   };
 
-  const handleGetStarted = () => {
-    setIsNavigatingToSignIn(true);
+  // const handleGetStarted = () => {
+  //   setIsNavigatingToSignIn(true);
 
-    setIsDropdownOpen(false); // Close dropdown
-    router.push("/sign-in");
-  };
+  //   setIsDropdownOpen(false); // Close dropdown
+    
+  // };
 
   const handleUsernameClick = () => {
     setIsDropdownOpen(false); // Close dropdown
@@ -81,6 +83,7 @@ function UserNav({ isMobile = false }) {
 
   useEffect(() => {
     return () => {
+      setIsSubscriptionPopupOpen(false);
       setLoading(false);
     };
   }, [pathname]);
@@ -91,22 +94,21 @@ function UserNav({ isMobile = false }) {
 
   if (!owner) {
     return (
+      <Link href="/sign-in" onClick={(e) => {
+        handleNavigation("/sign-in");
+       }}>
       <Button
-        onClick={handleGetStarted}
+        
         disabled={isNavigatingToSignIn}
         className={`${
           isMobile ? "" : "hidden md:flex"
         } bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium shadow-lg shadow-yellow-500/20 cursor-pointer min-w-[120px]`}
       >
-        {isNavigatingToSignIn ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Loading...
-          </>
-        ) : (
-          "Get Started"
-        )}
+        
+          Get Started
+        
       </Button>
+      </Link>
     );
   }
 
@@ -152,7 +154,8 @@ function UserNav({ isMobile = false }) {
 
             <Link
               href={`/user/${owner?.username}/show-invoices`}
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 if (
                   owner?.plan?.planName === "free" ||
                   owner?.plan?.planEndDate < new Date()
@@ -179,7 +182,8 @@ function UserNav({ isMobile = false }) {
 
             <Link
               href={`/user/${owner?.username}/manage-coupons`}
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 if (
                   owner?.plan?.planName === "free" ||
                   owner?.plan?.planEndDate < new Date()

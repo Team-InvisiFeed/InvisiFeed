@@ -12,13 +12,12 @@ import axios from "axios";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import LoadingScreen from "@/components/LoadingScreen";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function ManageCoupons() {
   const { data: session } = useSession();
   const owner = session?.user;
   const pathname = usePathname();
-  const router = useRouter();
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedCoupon, setExpandedCoupon] = useState(null);
@@ -98,7 +97,7 @@ export default function ManageCoupons() {
       return;
     }
     setLoading(true);
-    router.push(route);
+    
   };
 
 
@@ -136,13 +135,14 @@ export default function ManageCoupons() {
               Upgrade to Pro to manage coupons
             </span>
           </div>
-
+          <Link href="/pricing" onClick={() => handleNavigation("/pricing")}>
           <button
             className="bg-yellow-400 text-[#0A0A0A] py-2 px-6 font-semibold rounded-full shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 transition duration-300 ease-in-out cursor-pointer"
-            onClick={() => handleNavigation("/pricing")}
+            
           >
             Subscribe to Pro
           </button>
+          </Link>
         </div>
       </div>
     );
