@@ -633,7 +633,7 @@ export default function Home() {
                             description: "",
                             expiryDays: "30",
                           });
-                          toast.success("Coupon deleted successfully");
+                          
                         }}
                       />
                     </button>
@@ -704,34 +704,34 @@ export default function Home() {
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative">
-                  <h2 className="text-lg font-semibold mb-2 text-yellow-400">
+                  <h2 className="text-lg font-bold  text-yellow-400">
                     Extracted Invoice Number
                   </h2>
-                  <p className="text-2xl font-bold text-white">
+                  <p className="text-md font-semibold mb-2 text-white">
                     {invoiceNumber}
                   </p>
                 </div>
                 <div className="relative">
-                  <h2 className="text-lg font-semibold mb-2 text-yellow-400">
+                  <h2 className="text-lg font-bold  text-yellow-400">
                     Extracted Customer Name
                   </h2>
-                  <p className="text-2xl font-bold text-white">
+                  <p className="text-md font-semibold mb-2 text-white">
                     {customerName}
                   </p>
                 </div>
                 <div className="relative">
-                  <h2 className="text-lg font-semibold mb-2 text-yellow-400">
+                  <h2 className="text-lg font-bold  text-yellow-400">
                     Extracted Customer Email
                   </h2>
-                  <p className="text-2xl font-bold text-white">
+                  <p className="text-md font-semibold mb-2 text-white">
                     {extractedCustomerEmail}
                   </p>
                 </div>
                 <div className="relative">
-                  <h2 className="text-lg font-semibold mb-2 text-yellow-400">
+                  <h2 className="text-lg font-bold  text-yellow-400">
                     Extracted Customer Amount
                   </h2>
-                  <p className="text-2xl font-bold text-white">
+                  <p className="text-md font-semibold mb-2 text-white">
                     {customerAmount}
                   </p>
                 </div>
@@ -790,7 +790,7 @@ export default function Home() {
                   <div className="w-full">
                     <input
                       type="email"
-                      placeholder="Enter Customer Email"
+                      placeholder="Enter Customer Email" 
                       value={customerEmail}
                       onChange={(e) => setCustomerEmail(e.target.value)}
                       className="w-full px-4 py-3 bg-[#0A0A0A]/50 border border-yellow-400/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/30 transition-all duration-300"
@@ -1016,6 +1016,7 @@ export default function Home() {
               // Handle delete logic here
               setCouponSaved(false);
               setCouponDeleteConfirm(false);
+              toast.success("Coupon deleted successfully");
             }}
             onCancel={() => {
               setCouponDeleteConfirm(false);
