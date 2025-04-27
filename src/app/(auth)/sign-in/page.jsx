@@ -56,15 +56,18 @@ function SignInContent() {
       if (result.error === "CredentialsSignin") {
         toast.error("Incorrect username or password");
         setIsSubmitting(false);
+        return;
       } else if (result.error.startsWith("UNVERIFIED_USER:")) {
         // Extract username from error message
         const username = result.error.split(":")[1];
         // Redirect to verification page
         router.push(`/verify/${username}`);
         setIsSubmitting(false);
+        return;
       } else {
         toast.error(result.error);
         setIsSubmitting(false);
+        return;
       }
     }
 
