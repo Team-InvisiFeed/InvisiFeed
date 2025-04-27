@@ -20,13 +20,16 @@ import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
 import confetti from "canvas-confetti";
+import { BsEmojiAngryFill, BsEmojiSmileFill, BsEmojiNeutralFill, BsEmojiFrownFill, BsEmojiHeartEyesFill,BsEmojiSunglassesFill } from "react-icons/bs";
+import { FaFaceGrinStars } from "react-icons/fa6";
+
 
 const emojiOptions = [
-  { value: 1, emoji: "😡", label: "Very Dissatisfied" },
-  { value: 2, emoji: "😞", label: "Dissatisfied" },
-  { value: 3, emoji: "😐", label: "Neutral" },
-  { value: 4, emoji: "😊", label: "Satisfied" },
-  { value: 5, emoji: "😍", label: "Very Satisfied" },
+  { value: 1, emoji: <BsEmojiAngryFill />, label: "Very Dissatisfied" },
+  { value: 2, emoji: <BsEmojiFrownFill />, label: "Dissatisfied" },
+  { value: 3, emoji: <BsEmojiNeutralFill />, label: "Neutral" },
+  { value: 4, emoji: <BsEmojiSmileFill />, label: "Satisfied" },
+  { value: 5, emoji: <BsEmojiHeartEyesFill />, label: "Very Satisfied" },
 ];
 
 function FeedbackFormContent() {
@@ -548,9 +551,9 @@ function FeedbackFormContent() {
                         key={option.value}
                         type="button"
                         onClick={() => handleChange(key, option.value)}
-                        className={`text-2xl sm:text-3xl transition-all duration-200 flex-shrink-0 ${
+                        className={`text-2xl text-white sm:text-3xl p-2 flex-shrink-0 ${
                           formData[key] === option.value
-                            ? "bg-yellow-400/5 rounded-full p-1 border border-yellow-400/10"
+                            ? "text-yellow-400 "
                             : "opacity-80 hover:opacity-100"
                         }`}
                       >

@@ -176,8 +176,9 @@ const PricingSection = () => {
                   <span className="text-4xl font-bold text-yellow-400">₹0</span>
                 </div>
                 <p className="text-gray-400">
-                  Perfect for freelancers and businesses just getting started
-                </p>
+                Ideal for new freelancers and businesses — kickstart your journey for free.
+
+</p>
               </div>
 
               <ul className="space-y-3 mb-8">
@@ -244,13 +245,14 @@ const PricingSection = () => {
                 <h3 className="text-2xl font-bold text-white mb-2">Pro</h3>
                 <div className="flex items-baseline mb-4">
                   <span className="text-4xl font-bold text-yellow-400">
-                    ₹299
+                    ₹99
                   </span>
                   <span className="text-gray-400 ml-2">/month</span>
                 </div>
                 <p className="text-gray-400">
-                  Ideal for growing businesses and service providers
-                </p>
+                Perfect for growing businesses and service providers — at less than the price of a cold coffee.
+
+</p>
               </div>
 
               <ul className="space-y-3 mb-8">

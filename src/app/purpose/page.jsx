@@ -321,7 +321,7 @@ const WhyInvisiFeedSection = () => {
               </Button>
               <Button
                 variant="outline"
-                className="border-yellow-500 text-yellow-500 hover:bg-yellow-500/50 cursor-pointer  rounded-xl transition-all duration-300"
+                className=" text-black hover:bg-gray-100/90 cursor-pointer  rounded-xl transition-all duration-300"
                 onClick={() => {
                   window.scrollTo({
                     top: document.getElementById("features").offsetTop,

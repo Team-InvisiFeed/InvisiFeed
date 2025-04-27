@@ -14,7 +14,7 @@ const steps = [
   {
     title: "Create or upload invoice",
     description:
-      "Create a new invoice or upload an existing one",
+      "Create a new invoice or upload an existing one to convert it into a Smart Invoice",
     icon: Upload,
     delay: 0.2,
   },
@@ -28,7 +28,7 @@ const steps = [
   {
     title: "Send to customer",
     description:
-      "Send the PDF to your customer - they scan and submit feedback anonymously",
+      "Send the PDF to your customer - they scan and submit feedback anonymously or non-anonymously",
     icon: Send,
     delay: 0.4,
   },

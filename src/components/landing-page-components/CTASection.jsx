@@ -24,11 +24,11 @@ const CTASection = () => {
 
           <div className="relative">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Ready to Transform Your Organization?
+              Ready to Transform Your Business?
             </h2>
             <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-8">
-              Join thousands of organizations that trust InvisiFeed for
-              authentic, anonymous feedback and data-driven insights.
+              Be among the first to experience smart invoice generation,
+              authentic feedback, and actionable insights with InvisiFeed.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

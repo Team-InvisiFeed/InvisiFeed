@@ -11,17 +11,17 @@ const faqs = [
   {
     question: "What kind of invoices are supported?",
     answer:
-      "InvisiFeed supports all valid invoices in PDF format. Our system is designed to work with standard invoice layouts and can extract invoice numbers automatically.",
+      "InvisiFeed supports all valid invoices in PDF format (size upto 3MB). Our system is designed to work with standard invoice layouts and can extract invoice numbers automatically.",
   },
   {
     question: "Can customers submit feedback without email/login?",
     answer:
-      "Yes, absolutely! One of the key benefits of InvisiFeed is that customers can submit feedback anonymously without creating an account or providing their email address. They simply scan the QR code on the invoice and provide their feedback.",
+      "Yes, absolutely! One of the key benefits of InvisiFeed is that customers can submit feedback anonymously without creating an account or providing their email address. They simply scan the QR code on the invoice and provide their feedback. Also , they can submit feedback non-anonymously if they want to.",
   },
   {
     question: "Is feedback completely anonymous?",
     answer:
-      "Yes, feedback is completely anonymous. We don't collect or store any personal information from your customers when they submit feedback. This encourages honest and candid responses.",
+      "Yes, feedback is completely anonymous. We don't collect or store any personal information from your customers when they submit feedback. This encourages honest and candid responses. If they wish to submit feedback non-anonymously , we will fetch customer details from respective invoice and will show it to the business owner dashboard.",
   },
   {
     question: "Are coupons required?",
@@ -31,17 +31,12 @@ const faqs = [
   {
     question: "How secure is my data?",
     answer:
-      "We take security very seriously. All data is encrypted using industry-standard protocols, and we don't permanently store your invoices. Your data is owned and controlled by you, and we adhere to GDPR regulations to ensure your information is protected.",
+      "We take security very seriously. All credentials are encrypted using industry-standard protocols, and we don't permanently store your invoices. Your data is owned and controlled by you, and we adhere to DPDPA regulations to ensure your information is protected.",
   },
   {
-    question: "How does the AI-generated feedback form work?",
+    question: "How does the feedback form work?",
     answer:
-      "Our AI analyzes your business type and industry to generate relevant feedback questions. The form adapts to your specific service offerings, ensuring you get the most valuable insights from your customers.",
-  },
-  {
-    question: "Can I customize the feedback form?",
-    answer:
-      "Yes, you can customize the AI-generated feedback form to include specific questions or areas you want to focus on. This allows you to gather targeted feedback on aspects of your service that matter most to you.",
+      "The feedback form consists of different types of rating scales such as Satisfaction, Recommendation, Quality, Price , customer service, and text fields such as comments and suggestions. The feedback form is suitable for all types of businesses.",
   },
   {
     question: "How do I access the feedback analytics?",
