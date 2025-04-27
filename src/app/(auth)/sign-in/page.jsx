@@ -25,16 +25,19 @@ import LoadingScreen from "@/components/LoadingScreen";
 
 function SignInContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [homeLoading, setHomeLoading] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
   const [isNavigatingToRegister, setIsNavigatingToRegister] = useState(false);
+
+  const [loading, setLoading] = useState(false);
   const searchParams = useSearchParams();
   const [isNavigatingToForgotPassword, setIsNavigatingToForgotPassword] =
     useState(false);
+  const [credentialLogin, setCredentialLogin] = useState(false);
   const { data: session } = useSession();
   const username = session?.user?.username;
   const router = useRouter();
-const pathname = usePathname();
+  const pathname = usePathname();
 
   // Setting up React Hook Form with Zod validation schema
   const form = useForm({
@@ -50,12 +53,12 @@ const pathname = usePathname();
       // Same route, no loading screen
       return;
     }
-    setHomeLoading(true);
+    setLoading(true);
   };
 
   useEffect(() => {
     return () => {
-      setHomeLoading(false);
+      setLoading(false);
     };
   }, [pathname]);
 
@@ -92,7 +95,7 @@ const pathname = usePathname();
   };
 
   const error = searchParams.get("error");
-  
+
   if (error === "DIFFERENT_SIGNIN_METHOD") {
     return (
       <div className="flex h-screen overflow-hidden">
@@ -144,16 +147,28 @@ const pathname = usePathname();
               </p>
             </div>
 
-            <Button
-              onClick={() => router.push("/sign-in")}
-              className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium cursor-pointer h-9 shadow-lg shadow-yellow-500/20"
+            <Link
+              onClick={() => setCredentialLogin(true)}
+              href="/sign-in"
+              className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold text-sm sm:text-base text-center rounded-lg shadow-md shadow-yellow-500/20 hover:shadow-yellow-500/30 transition-all duration-300 flex items-center justify-center"
             >
-              Sign in with credentials
-            </Button>
+              {credentialLogin ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin text-black" />
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                "Sign in with Credentials"
+              )}
+            </Link>
           </motion.div>
         </div>
       </div>
     );
+  }
+
+  if (loading) {
+    return <LoadingScreen />;
   }
 
   if (error === "ACCOUNT_DELETED") {
@@ -203,16 +218,18 @@ const pathname = usePathname();
                 Account Deleted
               </h1>
               <p className="text-gray-400">
-                Your account has been deleted. Please try again after {remainingDays} days.
+                Your account has been deleted. Please try again after{" "}
+                {remainingDays} days.
               </p>
             </div>
 
-            <Button
-              onClick={() => router.push("/register")}
-              className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium cursor-pointer h-9 shadow-lg shadow-yellow-500/20"
+            <Link
+              onClick={() => handleNavigation("/register")}
+              href="/register"
+              className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold text-sm sm:text-base text-center rounded-lg shadow-md shadow-yellow-500/20 hover:shadow-yellow-500/30 transition-all duration-300"
             >
-              Create a new account
-            </Button>
+              Create a New Account
+            </Link>
           </motion.div>
         </div>
       </div>
@@ -240,11 +257,10 @@ const pathname = usePathname();
     }
   };
 
- 
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
-    if(homeLoading) {
-      return <LoadingScreen />;
-    }
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left Section with Gradient */}
