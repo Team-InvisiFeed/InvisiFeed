@@ -922,9 +922,9 @@ export default function CreateInvoiceForm({
                         Add-ons
                       </h3>
                       <div className="space-y-4">
-                        {owner?.plan?.planName === "pro" ||
+                        {(owner?.plan?.planName === "pro" ||
                           owner?.plan?.planName === "pro-trial" ||
-                          (owner?.plan?.planEndDate > new Date() && (
+                          (owner?.plan?.planEndDate > new Date())) && (
                             <>
                               <FormField
                                 control={form.control}
@@ -1022,16 +1022,23 @@ export default function CreateInvoiceForm({
                                 </Card>
                               )}
                             </>
-                          ))}
+                          )}
 
-                        <Link
-                          className="text-gray-100 cursor-pointer hover:text-yellow-500 text-sm"
-                          href="/pricing"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Upgrade to Pro for coupon feature.
-                        </Link>
+                          {
+                            owner?.plan?.planName === "free" && owner?.plan?.planEndDate < new Date() && (
+                              
+                              <Link
+                              className="text-gray-100 cursor-pointer hover:text-yellow-500 text-sm"
+                              href="/pricing"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Upgrade to Pro for coupon feature.
+                            </Link>
+                              
+                            )
+                          }
+                       
                       </div>
                     </CardContent>
                   </Card>
