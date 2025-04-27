@@ -52,6 +52,7 @@ function UpdateProfilePage() {
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const router = useRouter();
 
   const form = useForm({
@@ -217,9 +218,11 @@ function UpdateProfilePage() {
   };
 
   const handleDeleteAccount = async () => {
+    setIsDeletingAccount(true);
     const { data } = await axios.delete("/api/delete-account");
     if (data.success) {
       toast.success(data.message);
+      setIsDeletingAccount(false);
       signOut();
     }
   };
@@ -579,7 +582,14 @@ function UpdateProfilePage() {
                     onClick={handleDeleteAccount}
                     className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-400/20 px-4 py-2 rounded-md transition-all duration-200 cursor-pointer"
                   >
-                    Delete Account
+                    {isDeletingAccount ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        Deleting Account...
+                      </>
+                    ) : (
+                      "Delete Account"
+                    )}
                   </Button>
                 </div>
               </div>
