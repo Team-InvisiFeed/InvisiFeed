@@ -347,7 +347,7 @@ const WhyInvisiFeedSection = () => {
             className="max-w-4xl mx-auto text-center mb-16"
           >
             <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-yellow-600">
-              The Power of Anonymous Feedback
+              The Power of Feedback
             </h2>
             <p className="text-xl text-gray-300">
               Research shows the critical importance of feedback in business
