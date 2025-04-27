@@ -3,7 +3,6 @@ import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/dbConnect";
 import OwnerModel from "@/models/Owner";
-import jwt from "jsonwebtoken";
 import { deleteOldInvoicePdfs } from "@/utils/deleteOldInvoicesFromCloudinary";
 import sendVerificationEmail from "@/utils/sendVerificationEmail";
 import DeletedAccountModel from "@/models/DeletedAccount";
@@ -65,15 +64,6 @@ export const authOptions = {
           // Delete old invoice PDFs (older than 15 minutes)
           await deleteOldInvoicePdfs(user.username);
 
-          // Generate tokens
-          const accessToken = generateAccessToken(user);
-          const refreshToken = generateRefreshToken(user);
-
-          const decodedAccessToken = jwt.decode(accessToken);
-          const decodedRefreshToken = jwt.decode(refreshToken);
-
-          // Store refresh token in database
-          user.refreshToken = refreshToken;
           user.gstinDetails = {
             gstinVerificationStatus: false,
             gstinNumber: "",
@@ -83,10 +73,6 @@ export const authOptions = {
 
           return {
             ...user.toObject(),
-            accessToken,
-            refreshToken,
-            accessTokenExpiry: decodedAccessToken.exp * 1000, // 20 seconds
-            refreshTokenExpiry: decodedRefreshToken.exp * 1000, // 60 seconds
           };
         } catch (err) {
           throw new Error(err.message);
@@ -124,19 +110,37 @@ export const authOptions = {
             user.plan = existingUser.plan;
             user.proTrialUsed = existingUser.proTrialUsed;
 
+            console.log("google user : ", user);
 
             return true;
           }
 
           // 🔹 New Google Sign-up (Create user)
-          const deletedAccount = await DeletedAccountModel.findOne({ email: user.email });
-          if (deletedAccount && deletedAccount.deletionDate && (deletedAccount.deletionDate.getTime() + 15 * 24 * 60 * 60 * 1000) > new Date().getTime()) {
-            const remainingMs = deletedAccount.deletionDate.getTime() + (15 * 24 * 60 * 60 * 1000) - new Date().getTime();
-            const remainingDays = Math.ceil(remainingMs / (24 * 60 * 60 * 1000));
+          const deletedAccount = await DeletedAccountModel.findOne({
+            email: user.email,
+          });
+          if (
+            deletedAccount &&
+            deletedAccount.deletionDate &&
+            deletedAccount.deletionDate.getTime() + 15 * 24 * 60 * 60 * 1000 >
+              new Date().getTime()
+          ) {
+            const remainingMs =
+              deletedAccount.deletionDate.getTime() +
+              15 * 24 * 60 * 60 * 1000 -
+              new Date().getTime();
+            const remainingDays = Math.ceil(
+              remainingMs / (24 * 60 * 60 * 1000)
+            );
             return `/sign-in?error=ACCOUNT_DELETED&remainingDays=${remainingDays}`;
           }
 
-          if(deletedAccount && deletedAccount.deletionDate && deletedAccount.deletionDate.getTime() + 15 * 24 * 60 * 60 * 1000 < new Date().getTime()){
+          if (
+            deletedAccount &&
+            deletedAccount.deletionDate &&
+            deletedAccount.deletionDate.getTime() + 15 * 24 * 60 * 60 * 1000 <
+              new Date().getTime()
+          ) {
             await DeletedAccountModel.findByIdAndDelete(deletedAccount._id);
           }
 
@@ -209,18 +213,16 @@ export const authOptions = {
 
         if (account.provider === "google") {
           token.email = profile.email;
-        } else {
-          // Existing credentials logic
-          token.accessToken = user.accessToken;
-          token.refreshToken = user.refreshToken;
-          token.accessTokenExpiry = user.accessTokenExpiry;
-          token.refreshTokenExpiry = user.refreshTokenExpiry;
 
+          console.log("google token : ", token);
         }
       }
 
       // Check if plan has expired and update if needed
-      if (token.plan?.planName === "pro" || token.plan?.planName === "pro-trial") {
+      if (
+        token.plan?.planName === "pro" ||
+        token.plan?.planName === "pro-trial"
+      ) {
         const now = new Date();
         if (new Date(token.plan.planEndDate) < now) {
           try {
@@ -268,12 +270,10 @@ export const authOptions = {
         session.user.plan = token.plan;
         session.user.proTrialUsed = token.proTrialUsed;
 
-        if (token.provider !== "google") {
-          session.accessToken = token.accessToken;
-          session.refreshToken = token.refreshToken;
-          session.accessTokenExpiry = token.accessTokenExpiry;
-          session.refreshTokenExpiry = token.refreshTokenExpiry;
-        }
+        console.log(
+          "session expire in : ",
+          (new Date(session.expires) - new Date()) / 1000
+        );
       }
       return session;
     },
@@ -309,20 +309,6 @@ export const authOptions = {
     },
   },
 
-  events: {
-    async signOut({ token }) {
-      try {
-        await dbConnect();
-        // Delete refresh token from database
-        await OwnerModel.findByIdAndUpdate(token._id, {
-          refreshToken: null,
-        });
-      } catch (error) {
-        console.error("Error deleting refresh token:", error);
-      }
-    },
-  },
-
   pages: {
     signIn: "/sign-in",
     error: "/sign-in", // Add error page redirect
@@ -330,36 +316,9 @@ export const authOptions = {
 
   session: {
     strategy: "jwt",
+    maxAge: parseInt(process.env.SESSION_MAX_AGE),
+    updateAge: parseInt(process.env.SESSION_UPDATE_AGE),
   },
 
   secret: process.env.NEXTAUTH_SECRET,
 };
-
-// Helper functions to generate tokens
-function generateAccessToken(user) {
-  return jwt.sign(
-    {
-      _id: user._id,
-      email: user.email,
-      username: user.username,
-      isVerified: user.isVerified,
-      organizationName: user.organizationName,
-    },
-    process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
-  );
-}
-
-function generateRefreshToken(user) {
-  return jwt.sign(
-    {
-      _id: user._id,
-      email: user.email,
-      username: user.username,
-      isVerified: user.isVerified,
-      organizationName: user.organizationName,
-    },
-    process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
-  );
-}

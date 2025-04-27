@@ -93,11 +93,6 @@ const OwnerSchema = new Schema({
     default: "pending",
   },
 
-  refreshToken: {
-    type: String,
-    default: null,
-  },
-
   resetToken: {
     type: String,
     default: null,
