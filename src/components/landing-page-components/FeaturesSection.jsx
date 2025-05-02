@@ -8,6 +8,8 @@ import {
   Lock,
   Bell,
   TrendingUp,
+  FileText,
+  Gift,
 } from "lucide-react";
 import {
   Card,
@@ -20,37 +22,37 @@ import {
 const features = [
   {
     title: "Anonymous Feedback",
-    description: "Collect honest feedback without compromising privacy",
+    description: "Collect honest feedback without compromising privacy of your customers",
     icon: Shield,
     delay: 0.1,
   },
   {
     title: "Real-time Analytics",
-    description: "Get instant insights with detailed analytics and reports",
+    description: "Get instant insights with detailed analytics of sales, feedback, and customer satisfaction",
     icon: BarChart,
     delay: 0.2,
   },
   {
-    title: "Team Engagement",
-    description: "Foster better communication and team collaboration",
-    icon: Users,
+    title: "Smart Invoice Generation",
+    description: "Generate Smart Invoices for your customers with QR code/link to feedback form",
+    icon: FileText,
     delay: 0.3,
   },
   {
     title: "Secure Platform",
-    description: "Enterprise-grade security for your data",
+    description: "Enterprise-grade security for your data and credentials",
     icon: Lock,
     delay: 0.4,
   },
   {
-    title: "Smart Notifications",
-    description: "Stay updated with intelligent notification system",
-    icon: Bell,
+    title: "Create Coupons",
+    description: "Create coupons for your customers to incentivize them to provide feedback",
+    icon: Gift,
     delay: 0.5,
   },
   {
     title: "Performance Tracking",
-    description: "Monitor and improve organizational performance",
+    description: "Monitor and improve organizational performance with feedback analytics",
     icon: TrendingUp,
     delay: 0.6,
   },
@@ -92,7 +94,7 @@ const FeaturesSection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: feature.delay }}
               >
-                <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
+                <Card className="bg-gradient-to-br h-full from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="relative">
                     <CardHeader>

@@ -8,7 +8,8 @@ import {
   FileCheck, 
   EyeOff, 
   Database, 
-  CheckCircle 
+  CheckCircle, 
+  Building2
 } from "lucide-react";
 
 const securityFeatures = [
@@ -25,15 +26,15 @@ const securityFeatures = [
     delay: 0.2,
   },
   {
-    title: "GDPR Compliant",
-    description: "Our platform adheres to GDPR regulations to ensure your data is protected.",
+    title: "DPDPA Compliant",
+    description: "Our platform adheres to DPDPA regulations to ensure your data is protected.",
     icon: FileCheck,
     delay: 0.3,
   },
   {
-    title: "End-to-End Encryption",
-    description: "All data is encrypted using industry-standard protocols for maximum security.",
-    icon: Shield,
+    title: "GSTIN Verification",
+    description: "We verify your GSTIN to ensure that you are a registered business.",
+    icon: Building2,
     delay: 0.4,
   },
   {
@@ -44,7 +45,7 @@ const securityFeatures = [
   },
   {
     title: "Verified Security",
-    description: "Our security measures are regularly audited and verified by third-party experts.",
+    description: "Our security measures are regularly audited and verified by developers.",
     icon: CheckCircle,
     delay: 0.6,
   },

@@ -20,13 +20,16 @@ import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
 import confetti from "canvas-confetti";
+import { BsEmojiAngryFill, BsEmojiSmileFill, BsEmojiNeutralFill, BsEmojiFrownFill, BsEmojiHeartEyesFill,BsEmojiSunglassesFill } from "react-icons/bs";
+import { FaFaceGrinStars } from "react-icons/fa6";
+
 
 const emojiOptions = [
-  { value: 1, emoji: "😡", label: "Very Dissatisfied" },
-  { value: 2, emoji: "😞", label: "Dissatisfied" },
-  { value: 3, emoji: "😐", label: "Neutral" },
-  { value: 4, emoji: "😊", label: "Satisfied" },
-  { value: 5, emoji: "😍", label: "Very Satisfied" },
+  { value: 1, emoji: <BsEmojiAngryFill />, label: "Very Dissatisfied" },
+  { value: 2, emoji: <BsEmojiFrownFill />, label: "Dissatisfied" },
+  { value: 3, emoji: <BsEmojiNeutralFill />, label: "Neutral" },
+  { value: 4, emoji: <BsEmojiSmileFill />, label: "Satisfied" },
+  { value: 5, emoji: <BsEmojiHeartEyesFill />, label: "Very Satisfied" },
 ];
 
 function FeedbackFormContent() {
@@ -48,6 +51,7 @@ function FeedbackFormContent() {
     overAllRating: 3,
     feedbackContent: "",
     suggestionContent: "",
+    anonymousFeedback: false,
   });
 
   const [organizationName, setOrganizationName] = useState("");
@@ -62,6 +66,7 @@ function FeedbackFormContent() {
   const [feedbackSubmittedSuccess, setFeedbackSubmittedSuccess] =
     useState(false);
   const [couponInfo, setCouponInfo] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (key, value) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -71,15 +76,15 @@ function FeedbackFormContent() {
     try {
       // Properly encode parameters
       const params = new URLSearchParams();
-      params.append('username', username);
-      params.append('invoiceNumber', invoiceNumber);
+      params.append("username", username);
+      params.append("invoiceNumber", invoiceNumber);
       if (couponCode) {
-        params.append('couponCode', couponCode);
+        params.append("couponCode", couponCode);
       }
 
-      console.log(params.toString());
-
-      const { data } = await axios.get(`/api/check-invoice?${params.toString()}`);
+      const { data } = await axios.get(
+        `/api/check-invoice?${params.toString()}`
+      );
 
       setInvalidInvoice(false);
       setFeedbackAlreadySubmitted(false);
@@ -102,7 +107,10 @@ function FeedbackFormContent() {
         }
       }
     } catch (error) {
-      console.error('Invoice check error:', error.response?.data.message || error);
+      console.error(
+        "Invoice check error:",
+        error.response?.data.message || error
+      );
       if (error.response && error.response.status === 404) {
         if (error.response.data.message === "Feedback already submitted") {
           setFeedbackAlreadySubmitted(true);
@@ -111,7 +119,9 @@ function FeedbackFormContent() {
         }
       } else {
         console.error("An unexpected error occurred:", error.message);
-        toast.error(error.response?.data?.message || "Failed to verify invoice");
+        toast.error(
+          error.response?.data?.message || "Failed to verify invoice"
+        );
       }
     }
   };
@@ -120,9 +130,29 @@ function FeedbackFormContent() {
     checkInvoiceAndUser();
   }, [username, invoiceNumber, couponCode]);
 
+  const feedbackCharacterCount = formData.feedbackContent.length;
+  const suggestionCharacterCount = formData.suggestionContent.length;
+
+  const maxCharCount = 500;
+
+  const handleFeedbackChange = (e) => {
+    const newContent = e.target.value;
+    if (newContent.length <= maxCharCount) {
+      handleChange("feedbackContent", newContent);
+    }
+  };
+
+  const handleSuggestionChange = (e) => {
+    const newContent = e.target.value;
+    if (newContent.length <= maxCharCount) {
+      handleChange("suggestionContent", newContent);
+    }
+  };
+
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
+      setIsLoading(true);
       const response = await axios.post("/api/submit-feedback", {
         formData,
         username: decodedUsername,
@@ -134,6 +164,7 @@ function FeedbackFormContent() {
           username: decodedUsername,
           invoiceNumber: decodedInvoiceNumber,
         });
+        setIsLoading(false);
         if (result.status == 201) {
           toast.success("Feedback submitted successfully");
           setFeedbackSubmittedSuccess(true);
@@ -143,6 +174,8 @@ function FeedbackFormContent() {
       }
     } catch (error) {
       toast.error("Failed to submit feedback. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -486,7 +519,7 @@ function FeedbackFormContent() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Card className="w-full max-w-2xl mx-auto bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/20">
+        <Card className="w-full max-w-2xl mx-auto bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/20 ">
           <CardHeader className="border-b border-yellow-400/20 px-4 sm:px-6">
             <CardTitle className="text-xl sm:text-2xl font-bold text-yellow-400">
               Service Feedback for {organizationName}
@@ -518,9 +551,9 @@ function FeedbackFormContent() {
                         key={option.value}
                         type="button"
                         onClick={() => handleChange(key, option.value)}
-                        className={`text-2xl sm:text-3xl transition-all duration-200 flex-shrink-0 ${
+                        className={`text-2xl text-white sm:text-3xl p-2 flex-shrink-0 ${
                           formData[key] === option.value
-                            ? "bg-yellow-400/5 rounded-full p-1 border border-yellow-400/10"
+                            ? "text-yellow-400 "
                             : "opacity-80 hover:opacity-100"
                         }`}
                       >
@@ -541,15 +574,18 @@ function FeedbackFormContent() {
                 transition={{ duration: 0.5, delay: 0.6 }}
                 className="relative"
               >
-                <Label className="block mb-2 sm:mb-3 text-base sm:text-lg font-medium text-gray-200">
-                  Additional Feedback
-                </Label>
+                <div className="flex justify-between items-center mb-2 sm:mb-3">
+                  <Label className="text-base sm:text-lg font-medium text-gray-200">
+                    Additional Feedback
+                  </Label>
+                  <span className="text-xs text-gray-400">
+                    {feedbackCharacterCount}/{maxCharCount} characters
+                  </span>
+                </div>
                 <Textarea
                   placeholder="Share your thoughts here..."
                   value={formData.feedbackContent}
-                  onChange={(e) =>
-                    handleChange("feedbackContent", e.target.value)
-                  }
+                  onChange={handleFeedbackChange}
                   className="min-h-[100px] sm:min-h-[120px] bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20 text-sm sm:text-base"
                 />
                 <div className="flex items-center justify-between mt-2">
@@ -584,15 +620,18 @@ function FeedbackFormContent() {
                 transition={{ duration: 0.5, delay: 0.7 }}
                 className="relative"
               >
-                <Label className="block mb-2 sm:mb-3 text-base sm:text-lg font-medium text-gray-200">
-                  Any Suggestions?
-                </Label>
+                <div className="flex justify-between items-center mb-2 sm:mb-3">
+                  <Label className="text-base sm:text-lg font-medium text-gray-200">
+                    Any Suggestions?
+                  </Label>
+                  <span className="text-xs text-gray-400">
+                    {suggestionCharacterCount}/{maxCharCount} characters
+                  </span>
+                </div>
                 <Textarea
                   placeholder="Let us know how we can improve..."
                   value={formData.suggestionContent}
-                  onChange={(e) =>
-                    handleChange("suggestionContent", e.target.value)
-                  }
+                  onChange={handleSuggestionChange}
                   className="min-h-[100px] sm:min-h-[120px] bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20 text-sm sm:text-base"
                 />
                 <div className="flex items-center justify-between mt-2">
@@ -620,22 +659,71 @@ function FeedbackFormContent() {
                 </div>
               </motion.div>
 
+              {/* Checkbox for anonymous feedback */}
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="anonymousFeedback"
+                  checked={formData.anonymousFeedback}
+                  onChange={(e) =>
+                    handleChange("anonymousFeedback", e.target.checked)
+                  }
+                  className="w-4 h-4 text-yellow-400 accent-yellow-400"
+                />
+                <Label htmlFor="anonymousFeedback" className="text-gray-200">
+                  Submit anonymously
+                </Label>
+              </div>
+
               {/* Submit Button */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.8 }}
               >
-                <Button
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold py-4 sm:py-6 rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 text-sm sm:text-base"
-                >
-                  Submit Feedback
-                </Button>
+                {isLoading ? (
+                  <Button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold py-4 sm:py-6 rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 text-sm sm:text-base disabled"
+                  >
+                    Submitting...
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold py-4 sm:py-6 rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 text-sm sm:text-base cursor-pointer"
+                  >
+                    Submit Feedback
+                  </Button>
+                )}
               </motion.div>
             </form>
           </CardContent>
         </Card>
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.9 }}
+        className="mt-8 sm:mt-10 text-center p-4 sm:p-6 rounded-lg border border-yellow-400/20 
+             bg-gradient-to-br   hover:from-yellow-400/20  transition-all duration-300 max-w-2xl mx-auto"
+      >
+        <p className="text-sm sm:text-base text-gray-200 font-medium">
+          Are you a service provider? Want to gather anonymous feedback and gain
+          valuable insights from your customers?
+        </p>
+        <p className="text-sm sm:text-base text-yellow-400 font-semibold mt-2">
+          Explore{" "}
+          <a
+            href="https://invisifeed.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-yellow-300"
+          >
+            InvisiFeed
+          </a>{" "}
+          now and transform the way you understand your audience!
+        </p>
       </motion.div>
     </div>
   );

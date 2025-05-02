@@ -13,6 +13,10 @@ import {
   Lightbulb,
   Star,
   Calendar,
+  Clock,
+  Repeat,
+  TrendingUpDown,
+  Lock,
 } from "lucide-react";
 import {
   Card,
@@ -53,6 +57,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { MdMoney } from "react-icons/md";
+import { usePathname, useRouter } from "next/navigation";
+import LoadingScreen from "../LoadingScreen";
+import Link from "next/link";
 
 // Constants
 const CHART_CONFIG = {
@@ -132,15 +140,35 @@ const Dashboard = () => {
   const { data: session } = useSession();
   const owner = session?.user;
 
+  const router = useRouter();
+
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isPricingLoading , setIsPricingLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [selectedYear, setSelectedYear] = useState(
-    new Date().getFullYear().toString()
-  );
-  const [viewType, setViewType] = useState("currentYear");
+  const [salesSelectedYear, setSalesSelectedYear] = useState("");
+  const [salesViewType, setSalesViewType] = useState("currentYear");
+  const [ratingsSelectedYear, setRatingsSelectedYear] = useState("");
+  const [ratingsViewType, setRatingsViewType] = useState("currentYear");
   const [isMobile, setIsMobile] = useState(false);
+  const pathname = usePathname();
 
+  const handleNavigation = (route) => {
+    if (route === pathname) {
+      // Same route, no loading screen
+      return;
+    }
+    setIsPricingLoading(true);
+    
+  };
+
+  useEffect(() => {
+    return () => {
+      setIsPricingLoading(false); 
+    };
+  }, [pathname]);
+
+  
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 640);
@@ -156,11 +184,21 @@ const Dashboard = () => {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  const formatNumber = (number) => {
+    if (number >= 1e7) return (number / 1e7).toFixed(2) + " Cr"; // Crores
+    if (number >= 1e5) return (number / 1e5).toFixed(2) + " Lakh"; // Lakhs
+    if (number >= 1e3) return (number / 1e3).toFixed(2) + " K"; // Thousands
+    return number.toFixed(2); // Default decimal format
+  };
+
   const fetchMetrics = useCallback(async () => {
     try {
       const params = new URLSearchParams();
-      params.append("year", selectedYear);
-      params.append("viewType", viewType);
+      // Add both sales and ratings parameters
+      params.append("salesYear", salesSelectedYear ? salesSelectedYear : new Date().getFullYear());
+      params.append("salesViewType", salesViewType);
+      params.append("ratingsYear", ratingsSelectedYear);
+      params.append("ratingsViewType", ratingsViewType);
 
       const response = await axios.get(
         `/api/get-dashboard-metrics?${params.toString()}`
@@ -172,7 +210,13 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  }, [owner?.username, selectedYear, viewType]);
+  }, [
+    owner?.username,
+    salesSelectedYear,
+    salesViewType,
+    ratingsSelectedYear,
+    ratingsViewType,
+  ]);
 
   useEffect(() => {
     if (owner?.username) {
@@ -247,8 +291,18 @@ const Dashboard = () => {
     return metrics.historicalRatings;
   }, [metrics]);
 
+  const salesData = useMemo(() => {
+    if (!metrics?.salesData) return [];
+    return metrics.salesData.map((item) => ({
+      name: item.date,
+      value: item.sales,
+      fill: CHART_CONFIG.feedbackRatio.color,
+    }));
+  }, [metrics]);
+
   if (loading) return <LoadingState />;
   if (error) return <ErrorState error={error} />;
+  if(isPricingLoading) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] p-2 sm:p-4">
@@ -267,10 +321,10 @@ const Dashboard = () => {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-4 sm:mb-8">
           <StatCard
-            title="Feedback Ratio"
-            value={`${metrics.feedbackRatio}%`}
-            subtitle="Feedbacks per 100 invoices"
-            icon={FileText}
+            title="Total Sales"
+            value={formatNumber(metrics.totalSales)}
+            subtitle="Total sales amount (INR) "
+            icon={TrendingUpDown}
             delay={0.1}
           />
           <StatCard
@@ -281,17 +335,18 @@ const Dashboard = () => {
             delay={0.2}
           />
           <StatCard
-            title="Total Feedbacks"
-            value={metrics.totalFeedbacks}
-            subtitle="Total received"
-            icon={Users}
+            title="Average Response Time"
+            value={metrics.averageResponseTime.toFixed(1)}
+            subtitle="Avg. response time (in hours)"
+            icon={Clock}
             delay={0.3}
           />
+
           <StatCard
-            title="Positive Feedback %"
-            value={`${metrics.positivePercentage.toFixed(1)}%`}
-            subtitle="Positive feedbacks"
-            icon={Activity}
+            title="Average Revisit Frequency"
+            value={`${metrics.averageRevisitFrequency} times`}
+            subtitle="Avg. times customers revisit"
+            icon={Repeat}
             delay={0.4}
           />
         </div>
@@ -484,72 +539,155 @@ const Dashboard = () => {
         </div>
 
         {/* Bar Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6 mb-4 sm:mb-8 custom-popup-2">
-          {/* Service Ratings */}
-          <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity custom-popup-2" />
-            <div className="relative">
-              <CardHeader className="items-center pb-2">
-                <CardTitle className="text-yellow-400 text-sm sm:text-base">
-                  Service Ratings
-                </CardTitle>
-                <CardDescription className="text-xs">
-                  Average ratings across aspects
-                </CardDescription>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-8">
+          {/* Sales Analysis Bar Chart */}
+          <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden flex flex-col">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+            {owner?.plan?.planName === "free" && (
+              <div className="absolute inset-0 flex flex-col justify-center items-center bg-black/70 text-center space-y-4 z-10 ">
+                <div className="text-yellow-400">
+                  <Lock size={32} />
+                </div>
+                <Link href="/pricing" onClick={() => handleNavigation("/pricing")}>
+                <button
+                  className="bg-yellow-400 text-black px-4 py-2 rounded-md text-sm font-semibold hover:bg-yellow-300 cursor-pointer"
+                >
+                  Subscribe for Sales Analysis
+                </button>
+                </Link>
+              </div>
+            )}
+
+            <div className="relative flex flex-col flex-grow">
+              <CardHeader className="items-start pb-2 pt-4 px-4 sm:px-6">
+                <div className="flex flex-row sm:items-center sm:justify-between w-full gap-2 justify-between">
+                  <div className="flex flex-col items-start">
+                    <CardTitle className="text-yellow-400 text-sm sm:text-base">
+                      Sales Analysis
+                    </CardTitle>
+                    <CardDescription className="text-xs text-gray-400 mt-1">
+                      Sales performance over time
+                    </CardDescription>
+                  </div>
+                  <div className="flex flex-row items-center gap-2">
+                    <Select
+                      value={salesViewType}
+                      onValueChange={(value) => {
+                        setSalesViewType(value);
+                        setSalesSelectedYear("");
+                      }}
+                    >
+                      <SelectTrigger className="w-[100px] sm:w-[140px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 focus:ring-yellow-400">
+                        <SelectValue placeholder="Select Time" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#0A0A0A] border-yellow-400/20 text-yellow-400">
+                        <SelectItem
+                          value="currentMonth"
+                          className="text-yellow-400 focus:bg-yellow-400/10 focus:text-yellow-300 text-xs sm:text-sm"
+                        >
+                          Current Month
+                        </SelectItem>
+                        <SelectItem
+                          value="currentWeek"
+                          className="text-yellow-400 focus:bg-yellow-400/10 focus:text-yellow-300 text-xs sm:text-sm"
+                        >
+                          Current Week
+                        </SelectItem>
+                        <SelectItem
+                          value="currentYear"
+                          className="text-yellow-400 focus:bg-yellow-400/10 focus:text-yellow-300 text-xs sm:text-sm"
+                        >
+                          Current Year
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={salesSelectedYear}
+                      onValueChange={(value) => {
+                        setSalesSelectedYear(value);
+                        setSalesViewType("");
+                      }}
+                    >
+                      <SelectTrigger className="w-[100px] sm:w-[120px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 focus:ring-yellow-400">
+                        <SelectValue placeholder="Year" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 max-h-48 overflow-y-auto">
+                        {metrics?.availableYearsForSales?.map((year) => (
+                          <SelectItem
+                            key={year}
+                            value={year.toString()}
+                            className="text-yellow-400 focus:bg-yellow-400/10 focus:text-yellow-300 text-xs sm:text-sm"
+                          >
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </CardHeader>
-              <CardContent className="flex-1 pb-2">
-                <div className="h-[200px] sm:h-[300px] w-full overflow-x-auto custom-popup-2">
+              <CardContent className="flex-1 px-1 pb-3 sm:px-2 sm:pb-4">
+                <div className="h-[200px] sm:h-[300px] w-full">
                   <div className="h-full w-full">
-                    <ChartContainer config={CHART_CONFIG} className="h-full">
+                    <ChartContainer
+                      config={CHART_CONFIG}
+                      className="h-full w-full"
+                    >
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart
-                          data={ratingData}
-                          layout="vertical"
+                          data={salesData}
                           margin={{
-                            top: 10,
-                            right: isMobile ? 50 : 0,
-                            left: isMobile ? 10 : 0,
-                            bottom: 10,
+                            top: 25,
+                            right: 5,
+                            left: 5,
+                            bottom: 5,
                           }}
+                          barCategoryGap="20%"
                         >
-                          <CartesianGrid horizontal={false} stroke="#374151" />
-                          <YAxis
+                          <CartesianGrid
+                            vertical={false}
+                            stroke="#374151"
+                            strokeDasharray="3 3"
+                          />
+                          <XAxis
                             dataKey="name"
                             type="category"
                             tickLine={false}
-                            tickMargin={10}
+                            tickMargin={8}
                             axisLine={false}
-                            width={isMobile ? 0 : 10}
-                            tick={{ display: "none" }}
+                            stroke="#9CA3AF"
+                            fontSize={isMobile ? 10 : 12}
                           />
-                          <XAxis type="number" domain={[0, 5]} hide />
+                          <YAxis
+                            type="number"
+                            stroke="#9CA3AF"
+                            fontSize={isMobile ? 10 : 12}
+                            tickLine={false}
+                            axisLine={false}
+                            tickMargin={5}
+                            tickFormatter={(value) => `₹${value / 1000}k`}
+                          />
                           <ChartTooltip
                             cursor={false}
-                            content={<ChartTooltipContent indicator="line" />}
+                            content={
+                              <ChartTooltipContent indicator="dot" />
+                            }
+                            formatter={(value, name, props) => [
+                              `₹${value }`,
+                              
+                            ]}
+                            labelClassName="font-bold text-sm"
+                            wrapperClassName="[&_.recharts-tooltip-item]:!text-yellow-400"
+                           className="bg-[#fff] border-yellow-400/20  "
                           />
                           <Bar
                             dataKey="value"
-                            layout="vertical"
                             fill="#FACC15"
-                            radius={4}
+                            radius={[4, 4, 0, 0]}
+                            maxBarSize={isMobile ? 30 : 40}
                           >
-                            <LabelList
-                              dataKey="name"
-                              position="insideLeft"
-                              offset={8}
-                              className={`fill-[#515151] font-medium ${
-                                isMobile ? "block" : "hidden sm:block"
-                              }`}
-                              fontSize={10}
-                            />
-                            <LabelList
-                              dataKey="value"
-                              position="right"
-                              offset={8}
-                              className="fill-yellow-400 font-bold"
-                              fontSize={12}
-                              formatter={(value) => value === 0 ? null : `${value.toFixed(1)}`}
-                            />
+                            
                           </Bar>
                         </BarChart>
                       </ResponsiveContainer>
@@ -560,132 +698,169 @@ const Dashboard = () => {
             </div>
           </Card>
 
-          {/* Rating Trend Chart */}
-          <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden custom-popup-2">
-  <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-  <div className="relative">
-    <CardHeader className="items-start pb-2">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-2">
-        <div className="flex flex-col items-start">
-          <CardTitle className="text-yellow-400 text-sm sm:text-base">Rating Trend</CardTitle>
-          <CardDescription className="text-xs">Overall rating over time</CardDescription>
-        </div>
-        <div className="flex flex-row items-center gap-2">
-          <Select
-            value={viewType}
-            onValueChange={(value) => {
-              setViewType(value);
-              setSelectedYear(""); // Clear year selection when changing view type
-            }}
-          >
-            <SelectTrigger className="w-[120px] sm:w-[140px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400">
-              <SelectValue placeholder="Select Time" />
-            </SelectTrigger>
-            <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
-              <SelectItem
-                value="currentMonth"
-                className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
-              >
-                Current Month
-              </SelectItem>
-              <SelectItem
-                value="currentWeek"
-                className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
-              >
-                Current Week
-              </SelectItem>
-              <SelectItem
-                value="currentYear"
-                className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
-              >
-                Current Year
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <Select
-            value={selectedYear}
-            onValueChange={(value) => {
-              setSelectedYear(value);
-              setViewType(""); // Clear view type when selecting a year
-            }}
-          >
-            <SelectTrigger className="w-[100px] sm:w-[120px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400">
-              <SelectValue placeholder="Year" />
-            </SelectTrigger>
-            <SelectContent className="bg-[#0A0A0A] border-yellow-400/20">
-              {metrics?.availableYears?.map((year) => (
-                <SelectItem
-                  key={year}
-                  value={year.toString()}
-                  className="text-yellow-400 hover:bg-yellow-400/10 text-xs sm:text-sm"
+          {/* Rating Trend Line Chart */}
+          <Card className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden flex flex-col">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            {owner?.plan?.planName === "free" && (
+              <div className="absolute inset-0 flex flex-col justify-center items-center bg-black/70 text-center space-y-4 z-10">
+                <div className="text-yellow-400">
+                  <Lock size={32} />
+                </div>
+                <Link href="/pricing" onClick={() => handleNavigation("/pricing")}>
+                <button
+                  className="bg-yellow-400 text-black px-4 py-2 rounded-md text-sm font-semibold hover:bg-yellow-300 cursor-pointer"
                 >
-                  {year}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-    </CardHeader>
-    <CardContent className="flex-1 scrollbar-hidden-container overflow-y-hidden"> {/* Y-axis hidden */}
-      <div className="h-[200px] sm:h-[300px] w-full overflow-x-auto custom-popup-2">
-        <div className="min-w-[300px] sm:min-w-[400px] h-full">
-          <ChartContainer config={CHART_CONFIG} className="h-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={historicalData}
-                margin={{
-                  top: 20,
-                  right: 20,
-                  left: isMobile ? 10 : 20,
-                  bottom: 60,
-                }}
-              >
-                <CartesianGrid vertical={false} stroke="#374151" />
-                <XAxis
-                  dataKey="date"
-                  stroke="#9CA3AF"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  interval={0}
-                  angle={-45}
-                  textAnchor="end"
-                  height={2}
-                  tick={{ fill: "#9CA3AF", fontSize: 8 }}
-                />
-                <YAxis
-                  stroke="#9CA3AF"
-                  domain={[0, 5]}
-                  tickLine={false}
-                  axisLine={false}
-                  tick={{
-                    fill: "#9CA3AF",
-                    fontSize: 10,
-                    display: isMobile ? "none" : "block",
-                  }}
-                  width={isMobile ? 0 : 30}
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="rating"
-                  stroke="#FACC15"
-                  strokeWidth={2}
-                  dot={{ fill: "#FACC15", r: 3 }}
-                ></Line>
-              </LineChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        </div>
-      </div>
-    </CardContent>
-  </div>
-</Card>
-
+                  Subscribe for Rating Trends
+                </button>
+                </Link>
+              </div>
+            )}
+            <div className="relative flex flex-col flex-grow">
+              <CardHeader className="items-start pb-2 pt-4 px-4 sm:px-6">
+                <div className="flex flex-row sm:items-center sm:justify-between w-full gap-2 justify-between">
+                  <div className="flex flex-col items-start">
+                    <CardTitle className="text-yellow-400 text-sm sm:text-base">
+                      Rating Trend
+                    </CardTitle>
+                    <CardDescription className="text-xs text-gray-400 mt-1">
+                      Overall rating over time
+                    </CardDescription>
+                  </div>
+                  <div className="flex flex-row items-center gap-2">
+                    <Select
+                      value={ratingsViewType}
+                      onValueChange={(value) => {
+                        setRatingsViewType(value);
+                        setRatingsSelectedYear("");
+                      }}
+                    >
+                      <SelectTrigger className="w-[100px] sm:w-[140px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 focus:ring-yellow-400">
+                        <SelectValue placeholder="Select Time" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#0A0A0A] border-yellow-400/20 text-yellow-400">
+                        <SelectItem
+                          value="currentMonth"
+                          className="text-yellow-400 focus:bg-yellow-400/10 focus:text-yellow-300 text-xs sm:text-sm"
+                        >
+                          Current Month
+                        </SelectItem>
+                        <SelectItem
+                          value="currentWeek"
+                          className="text-yellow-400 focus:bg-yellow-400/10 focus:text-yellow-300 text-xs sm:text-sm"
+                        >
+                          Current Week
+                        </SelectItem>
+                        <SelectItem
+                          value="currentYear"
+                          className="text-yellow-400 focus:bg-yellow-400/10 focus:text-yellow-300 text-xs sm:text-sm"
+                        >
+                          Current Year
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={ratingsSelectedYear}
+                      onValueChange={(value) => {
+                        setRatingsSelectedYear(value);
+                        setRatingsViewType("");
+                      }}
+                    >
+                      <SelectTrigger className="w-[100px] sm:w-[120px] text-xs sm:text-sm bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 focus:ring-yellow-400">
+                        <SelectValue placeholder="Year" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#0A0A0A] border-yellow-400/20 text-yellow-400 max-h-48 overflow-y-auto">
+                        {metrics?.availableYearsForFeedbacks?.map((year) => (
+                          <SelectItem
+                            key={year}
+                            value={year.toString()}
+                            className="text-yellow-400 focus:bg-yellow-400/10 focus:text-yellow-300 text-xs sm:text-sm"
+                          >
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="flex-1 px-1 pb-3 sm:px-2 sm:pb-4">
+                <div className="h-[200px] sm:h-[300px] w-full">
+                  <div className="h-full w-full">
+                    <ChartContainer
+                      config={CHART_CONFIG}
+                      className="h-full w-full"
+                    >
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart
+                          data={historicalData}
+                          margin={{
+                            top: 15,
+                            right: 15,
+                            left: isMobile ? 15 : 15,
+                            bottom: 50,
+                          }}
+                        >
+                          <CartesianGrid
+                            vertical={false}
+                            stroke="#374151"
+                            strokeDasharray="3 3"
+                          />
+                          <XAxis
+                            dataKey="date"
+                            stroke="#9CA3AF"
+                            tickLine={false}
+                            tickMargin={isMobile ? 7 : 10}
+                            axisLine={false}
+                            interval={0}
+                            angle={isMobile ? -75 : -45}
+                            textAnchor="end"
+                            tick={{
+                              fill: "#9CA3AF",
+                              fontSize: isMobile ? 8 : 10,
+                            }}
+                          />
+                          <YAxis
+                            stroke="#9CA3AF"
+                            domain={[0, 5]}
+                            tickLine={false}
+                            axisLine={false}
+                            tick={{
+                              fill: "#9CA3AF",
+                              fontSize: 10,
+                              display: isMobile ? "none" : "block",
+                            }}
+                            width={isMobile ? 0 : 25}
+                            tickMargin={5}
+                          />
+                          <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel />}
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="rating"
+                            stroke="#FACC15"
+                            strokeWidth={2}
+                            dot={{
+                              fill: "#FACC15",
+                              r: 2,
+                              strokeWidth: 1,
+                              stroke: "#0A0A0A",
+                            }}
+                            activeDot={{
+                              r: 4,
+                              strokeWidth: 1,
+                              stroke: "#FFFFFF",
+                            }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </ChartContainer>
+                  </div>
+                </div>
+              </CardContent>
+            </div>
+          </Card>
         </div>
 
         {/* Performance Metrics */}

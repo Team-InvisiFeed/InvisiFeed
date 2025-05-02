@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useParams } from "next/navigation";
+import {  usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
@@ -11,11 +11,13 @@ import { useSession } from "next-auth/react";
 import axios from "axios";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import LoadingScreen from "@/components/LoadingScreen";
+import Link from "next/link";
 
 export default function ManageCoupons() {
   const { data: session } = useSession();
   const owner = session?.user;
-  const params = useParams();
+  const pathname = usePathname();
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedCoupon, setExpandedCoupon] = useState(null);
@@ -23,7 +25,9 @@ export default function ManageCoupons() {
   const [couponToDelete, setCouponToDelete] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [deleting, setDeleting] = useState(false);
   const couponsPerPage = 10;
+
 
   useEffect(() => {
     if (owner?.username) {
@@ -49,17 +53,22 @@ export default function ManageCoupons() {
 
   const handleDeleteCoupon = async (coupon) => {
     try {
+      setDeleting(true);
       const response = await axios.delete("/api/delete-coupon", {
-        data: { invoiceId: coupon.invoiceId }, 
+        data: { invoiceId: coupon.invoiceId },
       });
       if (response?.data?.success) {
+        setDeleting(false);
         toast("Coupon marked as used successfully");
         setCoupons(coupons.filter((c) => c.invoiceId !== coupon.invoiceId));
         setShowDeleteDialog(false);
       }
     } catch (error) {
       toast(error?.response?.data?.message);
+      setDeleting(false);
       console.error("Error deleting coupon:", error);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -82,6 +91,26 @@ export default function ManageCoupons() {
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
+  const handleNavigation = (route) => {
+    if (route === pathname) {
+      // Same route, no loading screen
+      return;
+    }
+    setLoading(true);
+    
+  };
+
+
+
+  useEffect(() => {
+    return () => {
+      setLoading(false);
+    };
+  }, [pathname]);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   if (loading) {
     return (
@@ -89,6 +118,31 @@ export default function ManageCoupons() {
         <div className="flex items-center space-x-2 text-yellow-400">
           <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-yellow-400"></div>
           <span>Loading coupons...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (
+    owner?.plan?.planName === "free" ||
+    owner?.plan?.planEndDate < new Date()
+  ) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
+        <div className="text-center space-y-6">
+          <div className="flex flex-col items-center space-y-4">
+            <span className="text-xl font-semibold text-yellow-400">
+              Upgrade to Pro to manage coupons
+            </span>
+          </div>
+          <Link href="/pricing" onClick={() => handleNavigation("/pricing")}>
+          <button
+            className="bg-yellow-400 text-[#0A0A0A] py-2 px-6 font-semibold rounded-full shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 transition duration-300 ease-in-out cursor-pointer"
+            
+          >
+            Subscribe to Pro
+          </button>
+          </Link>
         </div>
       </div>
     );
@@ -175,7 +229,7 @@ export default function ManageCoupons() {
                                   setCouponToDelete(coupon);
                                   setShowDeleteDialog(true);
                                 }}
-                                className="text-red-400 hover:text-red-300 transition-colors"
+                                className="text-red-400 hover:text-red-300 transition-colors cursor-pointer"
                               >
                                 <MdDelete className="w-5 h-5" />
                               </button>
@@ -239,7 +293,7 @@ export default function ManageCoupons() {
                           <button
                             key={page}
                             onClick={() => handlePageChange(page)}
-                            className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                            className={`px-3 py-1 rounded-md text-sm font-medium transition-colors cursor-pointer ${
                               currentPage === page
                                 ? "bg-yellow-400/20 text-yellow-400 border border-yellow-400/30"
                                 : "text-gray-300 hover:text-yellow-400"
@@ -252,7 +306,7 @@ export default function ManageCoupons() {
                       <button
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className="px-3 py-1 rounded-md text-sm font-medium text-gray-300 hover:text-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="px-3 py-1 rounded-md text-sm font-medium text-gray-300 hover:text-yellow-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                       >
                         Next
                       </button>
@@ -279,15 +333,16 @@ export default function ManageCoupons() {
             <div className="flex justify-end space-x-4">
               <button
                 onClick={() => setShowDeleteDialog(false)}
-                className="px-4 py-2 text-gray-400 hover:text-gray-300 transition-colors"
+                className="px-4 py-2 text-gray-400 hover:text-gray-300 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDeleteCoupon(couponToDelete)}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                disabled={deleting}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors cursor-pointer"
               >
-                Delete
+                {deleting ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>

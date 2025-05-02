@@ -166,7 +166,7 @@ export async function generateQrPdf(
                 </Text>
   
                 <Text style={styles.invoiceDate}>Email: {owner?.email}</Text>
-                {owner?.gstinDetails && (
+                {owner?.gstinDetails?.gstinHolderName && (
                   <Text style={styles.invoiceDate}>
                     GSTIN holder name: {owner?.gstinDetails?.gstinHolderName}
                   </Text>
@@ -184,7 +184,7 @@ export async function generateQrPdf(
                 Scan this QR code to share your valuable feedback
               </Text>
               <Text style={[styles.infoText, styles.textCenter]}>
-                Your insights help us deliver exceptional service
+               Your feedback stays anonymous!
               </Text>
               <Text style={[styles.infoText, styles.textCenter]}>
                 Thank you for choosing InvisiFeed!
@@ -244,7 +244,7 @@ export async function generateQrPdf(
       for await (const chunk of stream) {
         chunks.push(chunk);
       }
-      return Buffer.concat(chunks);
+      return {pdf: Buffer.concat(chunks), feedbackUrl: qrData};
     } catch (error) {
       console.error("Error generating QR PDF:", error);
       throw error;

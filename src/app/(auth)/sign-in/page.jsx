@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form"; // React Hook Form for handling forms
 import { Form } from "@/components/ui/form"; // Custom Form component
 import Link from "next/link"; // For client-side navigation in Next.js
 import React, { useState, Suspense, useEffect } from "react"; // React hooks for state and lifecycle
-import { useRouter, useSearchParams } from "next/navigation"; // Next.js router for navigation
+import { usePathname, useRouter, useSearchParams } from "next/navigation"; // Next.js router for navigation
 import {
   FormControl,
   FormField,
@@ -21,32 +21,23 @@ import { Loader2, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import MobileLogo from "@/components/MobileLogo";
+import LoadingScreen from "@/components/LoadingScreen";
 
 function SignInContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
   const [isNavigatingToRegister, setIsNavigatingToRegister] = useState(false);
-  const searchParams = useSearchParams();
 
+  const [loading, setLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const [isNavigatingToForgotPassword, setIsNavigatingToForgotPassword] =
+    useState(false);
+  const [credentialLogin, setCredentialLogin] = useState(false);
   const { data: session } = useSession();
   const username = session?.user?.username;
   const router = useRouter();
-
-  // Check for token expiration
-  useEffect(() => {
-    if (session?.accessToken) {
-      const checkTokenExpiry = () => {
-        const now = Date.now();
-        if (now > session.refreshTokenExpiry) {
-          signOut({ redirect: true, callbackUrl: "/sign-in" });
-        }
-      };
-
-      // Check every second
-      const interval = setInterval(checkTokenExpiry, 1000);
-      return () => clearInterval(interval);
-    }
-  }, [session]);
+  const pathname = usePathname();
 
   // Setting up React Hook Form with Zod validation schema
   const form = useForm({
@@ -56,6 +47,20 @@ function SignInContent() {
       password: "",
     },
   });
+
+  const handleNavigation = (route) => {
+    if (route === pathname) {
+      // Same route, no loading screen
+      return;
+    }
+    setLoading(true);
+  };
+
+  useEffect(() => {
+    return () => {
+      setLoading(false);
+    };
+  }, [pathname]);
 
   // Handle form submission
   const onSubmit = async (data) => {
@@ -71,15 +76,18 @@ function SignInContent() {
       if (result.error === "CredentialsSignin") {
         toast.error("Incorrect username or password");
         setIsSubmitting(false);
+        return;
       } else if (result.error.startsWith("UNVERIFIED_USER:")) {
         // Extract username from error message
         const username = result.error.split(":")[1];
         // Redirect to verification page
         router.push(`/verify/${username}`);
         setIsSubmitting(false);
+        return;
       } else {
         toast.error(result.error);
         setIsSubmitting(false);
+        return;
       }
     }
 
@@ -87,18 +95,20 @@ function SignInContent() {
   };
 
   const error = searchParams.get("error");
+
   if (error === "DIFFERENT_SIGNIN_METHOD") {
     return (
       <div className="flex h-screen overflow-hidden">
         {/* Left Section with Gradient */}
         <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#000000] p-8 flex-col justify-center items-center text-white">
           <div className="max-w-md space-y-4">
-            <h1
+            <Link
               className="text-4xl font-extrabold tracking-tight cursor-pointer"
-              onClick={() => router.push("/")}
+              href="/"
+              onClick={() => handleNavigation("/")}
             >
               InvisiFeed
-            </h1>
+            </Link>
             <p className="text-lg text-gray-200">
               Welcome back! Sign in to continue your journey
             </p>
@@ -137,17 +147,95 @@ function SignInContent() {
               </p>
             </div>
 
-            <Button
-              onClick={() => router.push("/sign-in")}
-              className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium cursor-pointer h-9 shadow-lg shadow-yellow-500/20"
+            <Link
+              onClick={() => setCredentialLogin(true)}
+              href="/sign-in"
+              className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold text-sm sm:text-base text-center rounded-lg shadow-md shadow-yellow-500/20 hover:shadow-yellow-500/30 transition-all duration-300 flex items-center justify-center"
             >
-              Sign in with credentials
-            </Button>
+              {credentialLogin ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin text-black" />
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                "Sign in with Credentials"
+              )}
+            </Link>
           </motion.div>
         </div>
       </div>
     );
   }
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  if (error === "ACCOUNT_DELETED") {
+    const remainingDays = searchParams.get("remainingDays");
+    return (
+      <div className="flex h-screen overflow-hidden">
+        {/* Left Section with Gradient */}
+        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#000000] p-8 flex-col justify-center items-center text-white">
+          <div className="max-w-md space-y-4">
+            <Link
+              className="text-4xl font-extrabold tracking-tight cursor-pointer"
+              href="/"
+              onClick={() => handleNavigation("/")}
+            >
+              InvisiFeed
+            </Link>
+            <p className="text-lg text-gray-200">
+              Welcome back! Sign in to continue your journey
+            </p>
+            <div className="space-y-3 mt-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                <p>Secure and anonymous feedback system</p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                <p>Real-time insights and analytics</p>
+              </div>
+              <div className="flex items-center space-x-3">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                <p>Build a culture of trust and transparency</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Section with Error Message */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-[#0A0A0A]">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="w-full max-w-md space-y-6 text-center"
+          >
+            <div className="space-y-2">
+              <h1 className="text-2xl font-bold tracking-tight text-white">
+                Account Deleted
+              </h1>
+              <p className="text-gray-400">
+                Your account has been deleted. Please try again after{" "}
+                {remainingDays} days.
+              </p>
+            </div>
+
+            <Link
+              onClick={() => handleNavigation("/register")}
+              href="/register"
+              className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold text-sm sm:text-base text-center rounded-lg shadow-md shadow-yellow-500/20 hover:shadow-yellow-500/30 transition-all duration-300"
+            >
+              Create a New Account
+            </Link>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
   // Update Google sign in handler
   const handleGoogleSignIn = async (e) => {
     e.preventDefault(); // Prevent form submission
@@ -169,17 +257,22 @@ function SignInContent() {
     }
   };
 
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left Section with Gradient */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#000000] p-8 flex-col justify-center items-center text-white">
         <div className="max-w-md space-y-4">
-          <h1
+          <Link
             className="text-4xl font-extrabold tracking-tight cursor-pointer"
-            onClick={() => router.push("/")}
+            href="/"
+            onClick={() => handleNavigation("/")}
           >
             InvisiFeed
-          </h1>
+          </Link>
           <p className="text-lg text-gray-200">
             Welcome back! Sign in to continue your journey
           </p>
@@ -275,12 +368,18 @@ function SignInContent() {
                 />
 
                 <div className="flex items-center justify-between">
-                  <Link
-                    href="/forgot-password"
-                    className="text-sm text-yellow-400 hover:text-yellow-300"
+                  <button
+                    onClick={() => {
+                      setIsNavigatingToForgotPassword(true);
+                      router.push("/forgot-password");
+                    }}
+                    className={`text-sm cursor-pointer text-yellow-400 hover:text-yellow-300`}
+                    disabled={isNavigatingToForgotPassword} // Disable button during loading
                   >
-                    Forgot password?
-                  </Link>
+                    {isNavigatingToForgotPassword
+                      ? "Loading..."
+                      : "Forgot password?"}
+                  </button>
                 </div>
 
                 <Button

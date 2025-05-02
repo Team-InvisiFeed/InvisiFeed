@@ -33,7 +33,6 @@ export default function GSTINVerificationDialog({ open, onOpenChange }) {
       const response = await axios.get(
         `/api/get-gstin-details?gstinNumber=${gstinNumber}`
       );
-      console.log(response);
       const data = response.data.data;
 
       if (data.taxpayerInfo === null) {
@@ -94,7 +93,7 @@ export default function GSTINVerificationDialog({ open, onOpenChange }) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[425px] bg-[#0A0A0A] border border-yellow-400/10">
+      <DialogContent className="max-w-[90vw] bg-[#0A0A0A] border border-yellow-400/10">
         <DialogHeader>
           <DialogTitle className="text-white">Verify GSTIN</DialogTitle>
         </DialogHeader>
@@ -122,7 +121,7 @@ export default function GSTINVerificationDialog({ open, onOpenChange }) {
               and{" "}
               <Link
                 href="/privacy-policy"
-                className="underline text-red-300s hover:text-red-400"
+                className="underline text-red-300 hover:text-red-400"
                 target="_blank"
               >
                 Privacy Policy

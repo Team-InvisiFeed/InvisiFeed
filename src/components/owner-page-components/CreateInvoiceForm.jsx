@@ -1,5 +1,5 @@
 "use client";
-import { useEffect,  useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Plus, Minus, Save, X, Trash } from "lucide-react";
 import { toast } from "sonner";
@@ -19,7 +19,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -31,7 +30,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import GSTINVerificationDialog from "./GSTINVerificationDialog";
-
+import Link from "next/link";
 
 // Form Schema
 const formSchema = z.object({
@@ -72,7 +71,10 @@ const formSchema = z.object({
   // Payment Info
   bankDetails: z.string().optional(),
   paymentMethod: z.string(),
-  paymentInstructions: z.string().max(200, "Payment instructions must not exceed 200 characters").optional(),
+  paymentInstructions: z
+    .string()
+    .max(200, "Payment instructions must not exceed 200 characters")
+    .optional(),
 
   // Notes
   notes: z.string().max(200, "Notes must not exceed 200 characters").optional(),
@@ -94,10 +96,28 @@ export default function CreateInvoiceForm({
   onCancel,
   open,
   onOpenChange,
+  saving,
 }) {
   const { data: session } = useSession();
   const owner = session?.user;
   const [showVerifyGstinDialog, setShowVerifyGstinDialog] = useState(false);
+  const [charCount, setCharCount] = useState(129);
+  const maxLength = 200;
+  const [notesCharCount, setNotesCharCount] = useState(147);
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    if (value.length <= maxLength) {
+      setCharCount(value.length);
+    }
+  };
+
+  const handleNotesChange = (e) => {
+    const value = e.target.value;
+    if (value.length <= maxLength) {
+      setNotesCharCount(value.length);
+    }
+  };
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -155,8 +175,6 @@ export default function CreateInvoiceForm({
     name: "items",
   });
 
-  console.log("form data:", form.getValues());
-
   const [subtotal, setSubtotal] = useState(0);
   const [taxTotal, setTaxTotal] = useState(0);
   const [discountTotal, setDiscountTotal] = useState(0);
@@ -189,7 +207,6 @@ export default function CreateInvoiceForm({
       toast.error("Please fill in all required fields");
       return;
     }
-    console.log(data);
     onSave(data);
   };
   useEffect(() => {
@@ -210,18 +227,18 @@ export default function CreateInvoiceForm({
     <>
       <AnimatePresence>
         {open && (
-         <motion.div
-         initial={{ opacity: 0, y: 20 }}
-         animate={{ opacity: 1, y: 0 }}
-         exit={{ opacity: 0, y: 20 }}
-         className="fixed custom-popup inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:mt-0"
-       >
-         <motion.div
-           initial={{ scale: 0.9, opacity: 0 }}
-           animate={{ scale: 1, opacity: 1 }}
-           exit={{ scale: 0.9, opacity: 0 }}
-           className="bg-[#0A0A0A] absolute bottom-24 md:bottom-12 top-12  rounded-sm sm:max-w-2xl md:w-full w-[95vw] max-h-[80vh]  overflow-y-auto max-w-xl md:max-w-4xl mx-auto sm:mx-4 border border-yellow-400/20 md:mb-0"
-         >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed custom-popup inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-2 md:mt-0"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-[#0A0A0A] absolute bottom-24 md:bottom-12 top-12  rounded-sm sm:max-w-2xl md:w-full w-[95vw] max-h-[80vh]  overflow-y-auto max-w-xl md:max-w-4xl mx-auto sm:mx-4 border border-yellow-400/20 md:mb-0"
+            >
               <button
                 onClick={onCancel}
                 className="absolute right-2 top-2 p-2 rounded-full hover:bg-yellow-400/10 transition-colors cursor-pointer"
@@ -229,10 +246,7 @@ export default function CreateInvoiceForm({
                 <X className="h-5 w-5 text-yellow-400" />
               </button>
               <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="mb-3 "
-                >
+                <form onSubmit={form.handleSubmit(onSubmit)} className="mb-3 ">
                   {/* Business Details */}
                   <Card className="bg-[#0A0A0A]  border-none w-full">
                     <CardContent className="pt-6">
@@ -300,37 +314,42 @@ export default function CreateInvoiceForm({
                           )}
                         />
 
-                        {owner?.gstinDetails?.gstinVerificationStatus===true ? (
+                        {owner?.gstinDetails?.gstinVerificationStatus ===
+                        true ? (
                           <FormField
-                          control={form.control}
-                          name="gstin"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-300">
-                                GSTIN / Tax ID
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  {...field}
-                                  readOnly={true}
-                                  className="bg-[#0A0A0A] text-white border-yellow-400/20"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                            control={form.control}
+                            name="gstin"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-gray-300">
+                                  GSTIN / Tax ID
+                                </FormLabel>
+                                <FormControl>
+                                  <Input
+                                    {...field}
+                                    readOnly={true}
+                                    className="bg-[#0A0A0A] text-white border-yellow-400/20"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
                         ) : (
-                        <div className="flex gap-1   flex-col">
-                        <span className="text-gray-300 text-sm font-semibold "> 
-                          GSTIN / Tax ID 
-                        </span>
-                        <Button type="button"
-                          onClick={() => setShowVerifyGstinDialog(true)}
-                          className="bg-transparent text-gray-300 justify-start border border-yellow-400/20 hover:bg-yellow-400/10 ">Verify GSTIN</Button>
-                        </div>
+                          <div className="flex gap-1   flex-col">
+                            <span className="text-gray-300 text-sm font-semibold ">
+                              GSTIN / Tax ID
+                            </span>
+                            <Button
+                              type="button"
+                              onClick={() => setShowVerifyGstinDialog(true)}
+                              className="bg-transparent text-gray-300 justify-start border border-yellow-400/20 hover:bg-yellow-400/10 "
+                            >
+                              Verify GSTIN
+                            </Button>
+                          </div>
                         )}
-                        
+
                         {owner?.gstinDetails?.gstinVerificationStatus ===
                           true && (
                           <FormField
@@ -842,9 +861,18 @@ export default function CreateInvoiceForm({
                               <FormControl>
                                 <Textarea
                                   {...field}
+                                  onChange={(e) => {
+                                    field.onChange(e); // Keep the original form's onChange
+                                    handleChange(e); // Track character count
+                                  }}
                                   className="bg-[#0A0A0A] text-white border-yellow-400/20"
+                                  maxLength={maxLength} // This limits the input to 200 characters
                                 />
                               </FormControl>
+                              <div className="text-sm text-gray-400 mt-1">
+                                {charCount}/{maxLength}
+                              </div>{" "}
+                              {/* Character count display */}
                               <FormMessage />
                             </FormItem>
                           )}
@@ -867,10 +895,19 @@ export default function CreateInvoiceForm({
                             <FormControl>
                               <Textarea
                                 {...field}
+                                onChange={(e) => {
+                                  field.onChange(e); // Keep the original form's onChange
+                                  handleNotesChange(e); // Track character count
+                                }}
+                                maxLength={maxLength}
                                 className="bg-[#0A0A0A] text-white border-yellow-400/20"
                                 placeholder="Add any additional notes for your client..."
                               />
                             </FormControl>
+                            <div className="text-sm text-gray-400 mt-1">
+                              {notesCharCount}/{maxLength}
+                            </div>{" "}
+                            {/* Character count display */}
                             <FormMessage />
                           </FormItem>
                         )}
@@ -885,118 +922,123 @@ export default function CreateInvoiceForm({
                         Add-ons
                       </h3>
                       <div className="space-y-4">
-                        <FormField
-                          control={form.control}
-                          name="includeFeedbackForm"
-                          render={({ field }) => (
-                            <FormItem className="flex items-center space-x-2">
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                  className="border-yellow-400/20 data-[state=checked]:bg-yellow-400 data-[state=checked]:text-gray-900"
-                                />
-                              </FormControl>
-                              <FormLabel className="text-gray-300">
-                                Include Feedback Form in Invoice PDF
-                              </FormLabel>
-                            </FormItem>
+                        {(owner?.plan?.planName === "pro" ||
+                          owner?.plan?.planName === "pro-trial" ||
+                          (owner?.plan?.planEndDate > new Date())) && (
+                            <>
+                              <FormField
+                                control={form.control}
+                                name="addCoupon"
+                                render={({ field }) => (
+                                  <FormItem className="flex items-center space-x-2">
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                        className="border-yellow-400/20 data-[state=checked]:bg-yellow-400 data-[state=checked]:text-gray-900"
+                                      />
+                                    </FormControl>
+                                    <FormLabel className="text-gray-300">
+                                      Add Coupon for Customer
+                                    </FormLabel>
+                                  </FormItem>
+                                )}
+                              />
+                              {form.watch("addCoupon") && (
+                                <Card className="bg-[#0A0A0A] border-yellow-400/20">
+                                  <CardContent className="pt-6">
+                                    <div className="space-y-4">
+                                      <FormField
+                                        control={form.control}
+                                        name="coupon.code"
+                                        render={({ field }) => (
+                                          <FormItem>
+                                            <FormLabel className="text-gray-300">
+                                              Coupon Code
+                                            </FormLabel>
+                                            <FormControl>
+                                              <Input
+                                                {...field}
+                                                className="bg-[#0A0A0A] text-white border-yellow-400/20"
+                                                onChange={(e) =>
+                                                  field.onChange(
+                                                    e.target.value.toUpperCase()
+                                                  )
+                                                }
+                                                placeholder="Enter coupon code"
+                                              />
+                                            </FormControl>
+                                            <FormMessage />
+                                            <p className="text-xs text-gray-400 mt-1">
+                                              This coupon code will go under
+                                              slight modification for security
+                                              purposes
+                                            </p>
+                                          </FormItem>
+                                        )}
+                                      />
+                                      <FormField
+                                        control={form.control}
+                                        name="coupon.description"
+                                        render={({ field }) => (
+                                          <FormItem>
+                                            <FormLabel className="text-gray-300">
+                                              Description
+                                            </FormLabel>
+                                            <FormControl>
+                                              <Textarea
+                                                {...field}
+                                                className="bg-[#0A0A0A] text-white border-yellow-400/20"
+                                                placeholder="Enter coupon description"
+                                                rows="3"
+                                              />
+                                            </FormControl>
+                                            <FormMessage />
+                                          </FormItem>
+                                        )}
+                                      />
+                                      <FormField
+                                        control={form.control}
+                                        name="coupon.expiryDays"
+                                        render={({ field }) => (
+                                          <FormItem>
+                                            <FormLabel className="text-gray-300">
+                                              Expiry (in days)
+                                            </FormLabel>
+                                            <FormControl>
+                                              <Input
+                                                {...field}
+                                                type="number"
+                                                min="1"
+                                                className="bg-[#0A0A0A] text-white border-yellow-400/20"
+                                              />
+                                            </FormControl>
+                                            <FormMessage />
+                                          </FormItem>
+                                        )}
+                                      />
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              )}
+                            </>
                           )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="addCoupon"
-                          render={({ field }) => (
-                            <FormItem className="flex items-center space-x-2">
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                  className="border-yellow-400/20 data-[state=checked]:bg-yellow-400 data-[state=checked]:text-gray-900"
-                                />
-                              </FormControl>
-                              <FormLabel className="text-gray-300">
-                                Add Coupon for Customer
-                              </FormLabel>
-                            </FormItem>
-                          )}
-                        />
-                        {form.watch("addCoupon") && (
-                          <Card className="bg-[#0A0A0A] border-yellow-400/20">
-                            <CardContent className="pt-6">
-                              <div className="space-y-4">
-                                <FormField
-                                  control={form.control}
-                                  name="coupon.code"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel className="text-gray-300">
-                                        Coupon Code
-                                      </FormLabel>
-                                      <FormControl>
-                                        <Input
-                                          {...field}
-                                          className="bg-[#0A0A0A] text-white border-yellow-400/20"
-                                          onChange={(e) =>
-                                            field.onChange(
-                                              e.target.value.toUpperCase()
-                                            )
-                                          }
-                                          placeholder="Enter coupon code"
-                                        />
-                                      </FormControl>
-                                      <FormMessage />
-                                      <p className="text-xs text-gray-400 mt-1">
-                                        This coupon code will go under slight
-                                        modification for security purposes
-                                      </p>
-                                    </FormItem>
-                                  )}
-                                />
-                                <FormField
-                                  control={form.control}
-                                  name="coupon.description"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel className="text-gray-300">
-                                        Description
-                                      </FormLabel>
-                                      <FormControl>
-                                        <Textarea
-                                          {...field}
-                                          className="bg-[#0A0A0A] text-white border-yellow-400/20"
-                                          placeholder="Enter coupon description"
-                                          rows="3"
-                                        />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                                <FormField
-                                  control={form.control}
-                                  name="coupon.expiryDays"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel className="text-gray-300">
-                                        Expiry (in days)
-                                      </FormLabel>
-                                      <FormControl>
-                                        <Input
-                                          {...field}
-                                          type="number"
-                                          min="1"
-                                          className="bg-[#0A0A0A] text-white border-yellow-400/20"
-                                        />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                              </div>
-                            </CardContent>
-                          </Card>
-                        )}
+
+                          {
+                            owner?.plan?.planName === "free" && owner?.plan?.planEndDate < new Date() && (
+                              
+                              <Link
+                              className="text-gray-100 cursor-pointer hover:text-yellow-500 text-sm"
+                              href="/pricing"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Upgrade to Pro for coupon feature.
+                            </Link>
+                              
+                            )
+                          }
+                       
                       </div>
                     </CardContent>
                   </Card>
@@ -1037,13 +1079,14 @@ export default function CreateInvoiceForm({
                     </Button>
                     <Button
                       type="submit"
-                      className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 cursor-pointer mr-4"
+                      className={`bg-yellow-400 text-gray-900 hover:bg-yellow-500 ${
+                        saving ? "cursor-not-allowed" : "cursor-pointer"
+                      } mr-4`}
                     >
                       <Save className="w-4 h-4 mr-2" />
-                      Save Invoice
+                      {saving ? "Saving..." : "Save Invoice"}
                     </Button>
                   </div>
-   
                 </form>
               </Form>
 
@@ -1051,7 +1094,6 @@ export default function CreateInvoiceForm({
                 open={showVerifyGstinDialog}
                 onOpenChange={setShowVerifyGstinDialog}
               />
-                
             </motion.div>
           </motion.div>
         )}

@@ -109,32 +109,46 @@ export async function POST(req) {
     const now = new Date();
     const lastReset = new Date(owner.uploadedInvoiceCount.lastDailyReset);
     const hoursSinceLastReset = (now - lastReset) / (1000 * 60 * 60);
+    const timeLeft = 24 - hoursSinceLastReset;
+    const hoursLeft = Math.ceil(timeLeft);
 
     // Reset daily uploads if 24 hours have passed
     if (hoursSinceLastReset >= 24) {
-      owner.uploadedInvoiceCount.dailyUploads = 0;
+      owner.uploadedInvoiceCount.dailyUploadCount = 0;
       owner.uploadedInvoiceCount.lastDailyReset = now;
     }
 
     // Check if daily limit reached
-    if (owner.uploadedInvoiceCount.dailyUploads >= 3) {
-      const timeLeft = 24 - hoursSinceLastReset;
-      const hoursLeft = Math.ceil(timeLeft);
+    const isProPlan = owner?.plan?.planName === "pro" && owner?.plan?.planEndDate > new Date();
+    if (isProPlan) {
+      if (owner.uploadedInvoiceCount.dailyUploadCount >= 10) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Daily upload limit reached. Please try again after ${hoursLeft} hours.`,
+            timeLeft: hoursLeft,
+          },
+          { status: 429 }
+        );
+      }
+    }
+
+    if (owner.uploadedInvoiceCount.dailyUploadCount >= 3) {
       return NextResponse.json(
         {
           success: false,
-          message: `Daily upload limit reached. Please try again after ${hoursLeft} hours.`,
+          message: `Daily upload limit reached. Please try again after ${hoursLeft} hours. Upgrade to pro plan to increase daily upload limit`,
           timeLeft: hoursLeft,
         },
         { status: 429 }
       );
     }
 
-    const invoiceNumber = await extractInvoiceNumberFromPdf(file);
+    const invoiceData = await extractInvoiceNumberFromPdf(file);
     if (
-      !invoiceNumber ||
-      invoiceNumber === "Not Found" ||
-      invoiceNumber === "Extraction Failed"
+      !invoiceData.invoiceId ||
+      invoiceData.invoiceId === "Not Found" ||
+      invoiceData.invoiceId === "Extraction Failed"
     ) {
       return NextResponse.json(
         { success: false, message: "Invoice number not found" },
@@ -143,7 +157,7 @@ export async function POST(req) {
     }
 
     const existedInvoice = await InvoiceModel.findOne({
-      invoiceId: invoiceNumber,
+      invoiceId: invoiceData.invoiceId,
       owner: owner._id,
     });
 
@@ -170,7 +184,6 @@ export async function POST(req) {
         () => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[crypto.randomInt(0, 36)]
       ).join("");
 
-      console.log("INVOICE COUNT", await InvoiceModel.countDocuments({}));
 
       // Modify coupon code by adding random chars at start and invoice count
       dbCouponCode = `${couponData.couponCode}${
@@ -185,13 +198,13 @@ export async function POST(req) {
     }
 
     // Generate QR Code PDF with modified coupon code if provided
-    const qrPdfBuffer = await generateQrPdf(
-      invoiceNumber,
+    const { pdf, feedbackUrl } = await generateQrPdf(
+      invoiceData.invoiceId,
       username,
       modifiedCouponCodeforURL,
       owner
     );
-    const mergedPdfBuffer = await mergePdfs(buffer, qrPdfBuffer);
+    const mergedPdfBuffer = await mergePdfs(buffer, pdf);
 
     // Upload Final Merged PDF to Cloudinary
     const finalUpload = await new Promise((resolve, reject) => {
@@ -199,7 +212,8 @@ export async function POST(req) {
         return str.replace(/[^a-zA-Z0-9-_\.]/g, "_");
       };
 
-      const sanitizedInvoiceNumber = sanitiseString(invoiceNumber);
+      const sanitizedInvoiceNumber = sanitiseString(invoiceData.invoiceId);
+
       cloudinary.v2.uploader
         .upload_stream(
           {
@@ -217,10 +231,17 @@ export async function POST(req) {
     const finalPdfUrl = finalUpload.secure_url;
 
     // Add new invoice with initial AIuseCount, coupon if provided, and PDF URLs
-    console.log("DB COUPON CODE", dbCouponCode);
     const newInvoice = new InvoiceModel({
-      invoiceId: invoiceNumber,
+      invoiceId: invoiceData.invoiceId,
       owner: owner._id,
+      customerDetails: {
+        customerName: invoiceData.customerName,
+        customerEmail: invoiceData.customerEmail,
+        amount:
+          invoiceData.totalAmount !== "Not Found"
+            ? parseFloat(invoiceData.totalAmount).toFixed(2)
+            : null,
+      },
       mergedPdfUrl: finalPdfUrl,
       AIuseCount: 0,
       couponAttached: couponData
@@ -236,9 +257,7 @@ export async function POST(req) {
     await newInvoice.save();
 
     // Update upload counts
-    owner.uploadedInvoiceCount.count += 1;
-    owner.uploadedInvoiceCount.dailyUploads += 1;
-    owner.uploadedInvoiceCount.lastUpdated = now;
+    owner.uploadedInvoiceCount.dailyUploadCount += 1;
 
     await owner.save();
 
@@ -247,7 +266,16 @@ export async function POST(req) {
         success: true,
         message: "Invoice uploaded successfully",
         url: finalPdfUrl,
-        invoiceNumber,
+        invoiceNumber: invoiceData.invoiceId,
+        customerName: invoiceData.customerName,
+        customerEmail: invoiceData.customerEmail,
+        customerAmount:
+          invoiceData.totalAmount !== "Not Found"
+            ? parseFloat(invoiceData.totalAmount).toFixed(2)
+            : null,
+        feedbackUrl,
+        dailyUploadCount: owner.uploadedInvoiceCount.dailyUploadCount,
+        timeLeft: hoursLeft,
       },
       { status: 200 }
     );

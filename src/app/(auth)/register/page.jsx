@@ -22,11 +22,15 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { signIn } from "next-auth/react";
+import { usePathname } from "next/navigation";
+import LoadingScreen from "@/components/LoadingScreen";
 
 function Page() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState(1);
   const router = useRouter();
+  const [homeLoading, setHomeLoading] = useState(false);
+  const pathname = usePathname();
 
   // Show Password State
   const [showPassword, setShowPassword] = useState(false);
@@ -81,7 +85,7 @@ function Page() {
       toast(response.data.message);
       router.replace(`/verify/${data.username}`);
     } catch (error) {
-      toast("Sign-up failed");
+      toast(error?.response?.data?.message || "Sign-up failed");
     } finally {
       setIsSubmitting(false);
     }
@@ -99,7 +103,6 @@ function Page() {
         `/api/check-username-unique?username=${encodeURIComponent(username)}`
       );
 
-
       setUsernameStatus({
         isChecking: false,
         isAvailable: response.data.success,
@@ -113,6 +116,21 @@ function Page() {
       });
     }
   };
+
+  const handleNavigation = (route) => {
+    if (route === pathname) {
+      // Same route, no loading screen
+      return;
+    }
+    setHomeLoading(true);
+  };
+
+  useEffect(() => {
+    return () => {
+      setHomeLoading(false);
+    };
+  }, [pathname]);
+
 
   // Add debounced username check
   const debouncedUsernameCheck = (username) => {
@@ -147,13 +165,19 @@ function Page() {
       toast.error("Failed to sign in with Google");
     }
   };
-
+  if (homeLoading) {
+    return <LoadingScreen />;
+  }
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Left Section with Gradient */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0A0A0A] via-[#0A0A0A] to-[#000000] p-8 flex-col justify-center items-center text-white">
         <div className="max-w-md space-y-4">
-          <h1 className="text-4xl font-extrabold tracking-tight cursor-pointer" onClick={() => router.push("/")}>InvisiFeed</h1>
+          <Link href="/" onClick={() => handleNavigation("/")}>
+            <h1 className="text-4xl font-extrabold tracking-tight cursor-pointer">
+              InvisiFeed
+            </h1>
+          </Link>
           <p className="text-lg text-gray-200">
             Transform your organization with honest, anonymous feedback
           </p>
@@ -207,7 +231,11 @@ function Page() {
                     {stepNumber}
                   </div>
                   <span className="text-xs mt-1 text-gray-400">
-                    {stepNumber === 1 ? "Organization" : stepNumber === 2 ? "Username" : "Password"}
+                    {stepNumber === 1
+                      ? "Organization"
+                      : stepNumber === 2
+                      ? "Username"
+                      : "Password"}
                   </span>
                 </div>
                 {stepNumber < 3 && (
@@ -285,7 +313,7 @@ function Page() {
                       name="username"
                       render={({ field }) => (
                         <FormItem>
-                             <FormLabel className="text-md text-gray-400">
+                          <FormLabel className="text-md text-gray-400">
                             Set up a unique username
                           </FormLabel>
                           <FormControl>
@@ -410,7 +438,6 @@ function Page() {
                     onClick={() => setStep(step - 1)}
                     className="w-full bg-transparent hover:bg-gray-800 text-gray-400 border border-gray-700 hover:text-white font-medium cursor-pointer h-9"
                   >
-                   
                     Back
                   </Button>
                 )}
@@ -419,7 +446,12 @@ function Page() {
                   <Button
                     type="button"
                     onClick={handleNext}
-                    disabled={isSubmitting || (step === 2 && (!usernameStatus.isAvailable || usernameStatus.isChecking))}
+                    disabled={
+                      isSubmitting ||
+                      (step === 2 &&
+                        (!usernameStatus.isAvailable ||
+                          usernameStatus.isChecking))
+                    }
                     className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium cursor-pointer h-9 shadow-lg shadow-yellow-500/20"
                   >
                     {isSubmitting ? (

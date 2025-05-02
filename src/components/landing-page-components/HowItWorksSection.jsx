@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { UserPlus, Upload, QrCode, Send, MessageSquare } from "lucide-react";
+import { UserPlus, Upload, QrCode, Send, MessageSquare, FileText } from "lucide-react";
 
 const steps = [
   {
@@ -12,23 +12,23 @@ const steps = [
     delay: 0.1,
   },
   {
-    title: "Upload your invoice",
+    title: "Create or upload invoice",
     description:
-      "Upload your invoice and optionally add coupons for customers who submit feedback",
+      "Create a new invoice or upload an existing one to convert it into a Smart Invoice",
     icon: Upload,
     delay: 0.2,
   },
   {
-    title: "Get merged PDF",
+    title: "Generate Smart Invoice",
     description:
-      "Our system extracts invoice number and returns a merged PDF with QR code/link to feedback form",
-    icon: QrCode,
+      "Our system extracts invoice number and returns a Smart Invoice with QR code/link to feedback form",
+    icon: FileText,
     delay: 0.3,
   },
   {
     title: "Send to customer",
     description:
-      "Send the PDF to your customer - they scan and submit feedback anonymously",
+      "Send the PDF to your customer - they scan and submit feedback anonymously or non-anonymously",
     icon: Send,
     delay: 0.4,
   },

@@ -273,6 +273,8 @@ const InvoiceDocument = ({
     coupon: invoiceData.coupon || undefined,
   };
 
+
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -570,7 +572,7 @@ const InvoiceDocument = ({
                 <Text>
                   Scan this QR code to provide feedback on our service.
                 </Text>
-                <Text>Your input helps us improve!</Text>
+                <Text>Your feedback stays anonymous!</Text>
                 <Text>
                   Complete the feedback form for a chance to win a special
                   discount coupon for your next service.

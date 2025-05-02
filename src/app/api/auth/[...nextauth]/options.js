@@ -3,9 +3,9 @@ import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/dbConnect";
 import OwnerModel from "@/models/Owner";
-import jwt from "jsonwebtoken";
 import { deleteOldInvoicePdfs } from "@/utils/deleteOldInvoicesFromCloudinary";
 import sendVerificationEmail from "@/utils/sendVerificationEmail";
+import DeletedAccountModel from "@/models/DeletedAccount";
 
 export const authOptions = {
   providers: [
@@ -64,28 +64,9 @@ export const authOptions = {
           // Delete old invoice PDFs (older than 15 minutes)
           await deleteOldInvoicePdfs(user.username);
 
-          // Generate tokens
-          const accessToken = generateAccessToken(user);
-          const refreshToken = generateRefreshToken(user);
-
-          const decodedAccessToken = jwt.decode(accessToken);
-          const decodedRefreshToken = jwt.decode(refreshToken);
-
-          // Store refresh token in database
-          user.refreshToken = refreshToken;
-          user.gstinDetails = {
-            gstinVerificationStatus: false,
-            gstinNumber: "",
-            gstinVerificationResponse: null,
-          };
-          await user.save();
-
           return {
             ...user.toObject(),
-            accessToken,
-            refreshToken,
-            accessTokenExpiry: decodedAccessToken.exp * 1000, // 20 seconds
-            refreshTokenExpiry: decodedRefreshToken.exp * 1000, // 60 seconds
+            id: user._id.toString(),
           };
         } catch (err) {
           throw new Error(err.message);
@@ -114,16 +95,47 @@ export const authOptions = {
 
             // ✅ Allow sign-in if it's a valid Google user
             user.id = existingUser._id.toString();
+            user.organizationName = existingUser.organizationName;
             user.username = existingUser.username;
             user.isProfileCompleted = existingUser.isProfileCompleted;
             user.phoneNumber = existingUser.phoneNumber;
             user.address = existingUser.address;
             user.gstinDetails = existingUser.gstinDetails;
+            user.plan = existingUser.plan;
+            user.proTrialUsed = existingUser.proTrialUsed;
 
             return true;
           }
 
           // 🔹 New Google Sign-up (Create user)
+          const deletedAccount = await DeletedAccountModel.findOne({
+            email: user.email,
+          });
+          if (
+            deletedAccount &&
+            deletedAccount.deletionDate &&
+            deletedAccount.deletionDate.getTime() + 15 * 24 * 60 * 60 * 1000 >
+              new Date().getTime()
+          ) {
+            const remainingMs =
+              deletedAccount.deletionDate.getTime() +
+              15 * 24 * 60 * 60 * 1000 -
+              new Date().getTime();
+            const remainingDays = Math.ceil(
+              remainingMs / (24 * 60 * 60 * 1000)
+            );
+            return `/sign-in?error=ACCOUNT_DELETED&remainingDays=${remainingDays}`;
+          }
+
+          if (
+            deletedAccount &&
+            deletedAccount.deletionDate &&
+            deletedAccount.deletionDate.getTime() + 15 * 24 * 60 * 60 * 1000 <
+              new Date().getTime()
+          ) {
+            await DeletedAccountModel.findByIdAndDelete(deletedAccount._id);
+          }
+
           const baseUsername = user.email.split("@")[0];
           let username = baseUsername;
           let counter = 1;
@@ -160,10 +172,13 @@ export const authOptions = {
 
           user.id = newUser._id.toString();
           user.username = username;
+          user.organizationName = newUser.organizationName;
           user.isProfileCompleted = newUser.isProfileCompleted;
           user.phoneNumber = newUser.phoneNumber;
           user.address = newUser.address;
           user.gstinDetails = newUser.gstinDetails;
+          user.plan = newUser.plan;
+          user.proTrialUsed = newUser.proTrialUsed;
           return true;
         } catch (error) {
           console.error("Google Sign-In Error:", error);
@@ -171,50 +186,52 @@ export const authOptions = {
         }
       }
 
+
       return true;
     },
 
     async jwt({ token, user, account, profile, session, trigger }) {
       if (user && account) {
+     
         // Initial sign in
         token.id = user.id;
         token.provider = account.provider;
         token.username = user.username;
         token.gstinDetails = user.gstinDetails;
+        token.organizationName = user.organizationName;
+        token.isProfileCompleted = user.isProfileCompleted || "pending";
+        token.phoneNumber = user.phoneNumber;
+        token.address = user.address;
+        token.plan = user.plan;
+        token.proTrialUsed = user.proTrialUsed;
 
         if (account.provider === "google") {
           token.email = profile.email;
-          token.organizationName = profile.name;
-          token.isProfileCompleted = user.isProfileCompleted || "pending";
-          token.gstinDetails = user.gstinDetails;
-          token.phoneNumber = user.phoneNumber;
-          token.address = user.address;
+        }
+      }
 
-          // For Google sign-in, ensure we have the username
+      // Check if plan has expired and update if needed
+      if (
+        token.plan?.planName === "pro" ||
+        token.plan?.planName === "pro-trial"
+      ) {
+        const now = new Date();
+        if (new Date(token.plan.planEndDate) < now) {
           try {
-            const existingUser = await OwnerModel.findOne({
-              email: profile.email,
-            });
-            if (existingUser) {
-              token.username = existingUser.username;
-              token.isProfileCompleted =
-                existingUser.isProfileCompleted || "pending";
-              token.gstinDetails = existingUser.gstinDetails;
+            await dbConnect();
+            const user = await OwnerModel.findById(token.id);
+            if (user) {
+              user.plan = {
+                planName: "free",
+                planStartDate: null,
+                planEndDate: null,
+              };
+              await user.save();
+              token.plan = user.plan;
             }
           } catch (error) {
-            console.error("Error finding user in JWT callback:", error);
+            console.error("Error updating expired plan:", error);
           }
-        } else {
-          // Existing credentials logic
-          token.accessToken = user.accessToken;
-          token.refreshToken = user.refreshToken;
-          token.gstinDetails = user.gstinDetails;
-          token.organizationName = user.organizationName;
-          token.phoneNumber = user.phoneNumber;
-          token.address = user.address;
-          token.accessTokenExpiry = user.accessTokenExpiry;
-          token.refreshTokenExpiry = user.refreshTokenExpiry;
-          token.isProfileCompleted = user.isProfileCompleted || "pending";
         }
       }
 
@@ -225,12 +242,15 @@ export const authOptions = {
         token.gstinDetails = session.user.gstinDetails;
         token.phoneNumber = session.user.phoneNumber;
         token.address = session.user.address;
+        token.plan = session.user.plan;
+        token.proTrialUsed = session.user.proTrialUsed;
       }
 
       return token;
     },
 
     async session({ session, token, trigger }) {
+
       if (token) {
         session.user.id = token.id;
         session.user.email = token.email;
@@ -240,13 +260,9 @@ export const authOptions = {
         session.user.username = token.username;
         session.user.phoneNumber = token.phoneNumber;
         session.user.address = token.address;
-
-        if (token.provider !== "google") {
-          session.accessToken = token.accessToken;
-          session.refreshToken = token.refreshToken;
-          session.accessTokenExpiry = token.accessTokenExpiry;
-          session.refreshTokenExpiry = token.refreshTokenExpiry;
-        }
+        session.user.plan = token.plan;
+        session.user.proTrialUsed = token.proTrialUsed;
+      
       }
       return session;
     },
@@ -282,20 +298,6 @@ export const authOptions = {
     },
   },
 
-  events: {
-    async signOut({ token }) {
-      try {
-        await dbConnect();
-        // Delete refresh token from database
-        await OwnerModel.findByIdAndUpdate(token._id, {
-          refreshToken: null,
-        });
-      } catch (error) {
-        console.error("Error deleting refresh token:", error);
-      }
-    },
-  },
-
   pages: {
     signIn: "/sign-in",
     error: "/sign-in", // Add error page redirect
@@ -303,36 +305,9 @@ export const authOptions = {
 
   session: {
     strategy: "jwt",
+    maxAge: parseInt(process.env.SESSION_MAX_AGE),
+    updateAge: parseInt(process.env.SESSION_UPDATE_AGE),
   },
 
   secret: process.env.NEXTAUTH_SECRET,
 };
-
-// Helper functions to generate tokens
-function generateAccessToken(user) {
-  return jwt.sign(
-    {
-      _id: user._id,
-      email: user.email,
-      username: user.username,
-      isVerified: user.isVerified,
-      organizationName: user.organizationName,
-    },
-    process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
-  );
-}
-
-function generateRefreshToken(user) {
-  return jwt.sign(
-    {
-      _id: user._id,
-      email: user.email,
-      username: user.username,
-      isVerified: user.isVerified,
-      organizationName: user.organizationName,
-    },
-    process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
-  );
-}

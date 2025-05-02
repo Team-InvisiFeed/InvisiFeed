@@ -1,6 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 
-
 const OwnerSchema = new Schema({
   organizationName: {
     type: String,
@@ -30,6 +29,30 @@ const OwnerSchema = new Schema({
   verifyCode: {
     type: String,
     required: [true, "Verify code is required"],
+  },
+
+  plan: {
+    planName: {
+      type: String,
+      enum: ["free", "pro", "pro-trial"],
+      required: false,
+      default: "free",
+    },
+    planStartDate: {
+      type: Date,
+      required: false,
+      default: null,
+    },
+    planEndDate: {
+      type: Date,
+      required: false,
+      default: null,
+    },
+  },
+
+  proTrialUsed: {
+    type: Boolean,
+    default: false,
   },
 
   gstinDetails: {
@@ -70,11 +93,6 @@ const OwnerSchema = new Schema({
     default: "pending",
   },
 
-  refreshToken: {
-    type: String,
-    default: null,
-  },
-
   resetToken: {
     type: String,
     default: null,
@@ -89,7 +107,7 @@ const OwnerSchema = new Schema({
     type: String,
     required: false,
     default: "",
-    trim:true
+    trim: true,
   },
 
   address: {
@@ -124,21 +142,15 @@ const OwnerSchema = new Schema({
     },
   },
 
-  feedbacks: [{
-    type: Schema.Types.ObjectId,
-    ref: "Feedback",
-  }],
+  feedbacks: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Feedback",
+    },
+  ],
 
   uploadedInvoiceCount: {
-    count: {
-      type: Number,
-      default: 0,
-    },
-    lastUpdated: {
-      type: Date,
-      default: Date.now,
-    },
-    dailyUploads: {
+    dailyUploadCount: {
       type: Number,
       default: 0,
     },
@@ -158,6 +170,7 @@ const OwnerSchema = new Schema({
       default: [],
     },
   },
+
 });
 
 const OwnerModel =
