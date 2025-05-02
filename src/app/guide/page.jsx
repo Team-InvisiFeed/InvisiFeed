@@ -48,15 +48,8 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import {
-  Document,
-  Page,
-  View,
-  Text,
-  Image,
-  StyleSheet,
-} from "@react-pdf/renderer";
-import QRCode from "qrcode";
+import { BsEmojiAngryFill, BsEmojiSmileFill, BsEmojiNeutralFill, BsEmojiFrownFill, BsEmojiHeartEyesFill,BsEmojiSunglassesFill } from "react-icons/bs";
+
 
 const steps = [
   {
@@ -66,20 +59,32 @@ const steps = [
     content: [
       {
         title: "Create Your Account",
-        description: "Sign up with your business email and set up your profile",
+        description:
+          "Sign up with your business email or Google account and set up your profile",
         details: [
-          "Enter your business details",
-          "Add your GSTIN information",
-          "Customize your feedback form",
+          "Enter your credentials",
+          "Verify your email",
+          "Set up your profile",
         ],
       },
       {
-        title: "Configure Your Settings",
-        description: "Set up your preferences and notification settings",
+        title: "Complete Your Profile",
+        description: "Add your business details and customize your profile",
         details: [
-          "Choose your feedback form fields",
-          "Set up email notifications",
-          "Configure your dashboard view",
+          "Enter your business details",
+          "Verify your GSTIN(if applicable)",
+          "GSTIN Details make your invoice look more genuine",
+          "Hands on guide to create your first invoice",
+        ],
+      },
+      {
+        title: "Choose the right plan",
+        description: "Choose the right plan for your business",
+        details: [
+          "Free plan is available for new users",
+          "Pro plan is available for businesses looking for advanced features",
+          "You can see the features of each plan on the pricing page",
+          "Choose the right plan for your business to get the most out of InvisiFeed",
         ],
       },
     ],
@@ -91,20 +96,36 @@ const steps = [
     content: [
       {
         title: "Upload Existing Invoice",
-        description: "Upload your PDF invoices to the platform",
+        description: "Upload your PDF invoice to the platform",
         details: [
-          "Drag and drop your PDF file",
-          "Verify invoice details",
-          "Add optional coupon",
+          "Upload your PDF file (upto 3 MB)",
+          "Extract invoice details with AI",
+          "Add coupon(if applicable)",
+          "Your invoice will be merged with a page having link to feedback form , nothing will be changed in your original invoice",
+          "You can download the smart invoice (with feedback form link) as PDF",
+          "You can also share the invoice with a link or directly send it to your clients",
         ],
       },
       {
         title: "Create New Invoice",
         description: "Use our built-in invoice creator",
         details: [
+          "Profile completion is mandatory to create an invoice",
           "Fill in client details",
           "Add line items and amounts",
-          "Include GST information",
+          "Add coupon(if applicable)",
+          "We will generate a new smart invoice with link to feedback form",
+          "You can download the smart invoice (with feedback form link) as PDF",
+          "You can also share the invoice with a link or directly send it to your clients",
+        ],
+      },
+      {
+        title: "View Invoices",
+        description: "View all your past invoices",
+        details: [
+          "You can view details of all your invoices on the Show Invoices page",
+          "Customer Name, Invoice Number, Invoice Date, Invoice Amount, Feedback Status",
+          "We are working on features to let you download your past invoices as PDF",
         ],
       },
     ],
@@ -115,37 +136,54 @@ const steps = [
     description: "Understand how feedback is collected from clients",
     content: [
       {
-        title: "Enhanced Invoice PDF",
-        description: "How the feedback form is integrated into invoices",
+        title: "Delivery of Feedback Form",
+        description:
+          "Customer will receive a link to feedback form with their invoice",
         details: [
-          "Second page with feedback form",
-          "QR code for easy access",
-          "Anonymous submission process",
+          "They can submit their feedback by clicking on the link in the invoice",
+          "QR code is also provided in the invoice which can be scanned to submit feedback",
+          "They can submit their feedback anonymously without providing their personal details",
+          "Coupon(if applicable) will be popped up in the feedback form after submission of feedback",
+        ],
+      },
+      {
+        title: "Anonymous Feedback",
+        description:
+          "Customer can submit their feedback anonymously or non-anonymously",
+        details: [
+          "Both anonymous and non-anonymous feedback are collected",
+          "If customer wants to submit their feedback anonymously, they can do so by clicking on the anonymous checkbox in the feedback form",
+          "Customers do not need to enter their personal details to submit feedback",
+          "For non-anonymous feedback, customer details are collected from the invoice details automatically",
         ],
       },
       {
         title: "Coupon System",
         description: "Using coupons to encourage feedback",
         details: [
-          "Add optional discount coupons",
+          "Add discount coupons to your invoice",
           "Set coupon validity period",
           "Automatic coupon delivery",
+          "Businesses can manage coupons created by them on our platform",
         ],
       },
     ],
   },
   {
-    title: "Feedback Analysis",
+    title: "Business Analytics",
     icon: LineChart,
     description: "Learn how to analyze and use the feedback data",
     content: [
       {
         title: "Dashboard Overview",
-        description: "Understanding your feedback dashboard",
+        description: "Understanding your business analytics dashboard",
         details: [
           "Feedback collection rate",
-          "Overall satisfaction scores",
+          "Overall Ratings of your business",
+          "Positive and negative feedback ratio",
           "Response time metrics",
+          "Rating trends over time",
+          "Areas of improvement and strengths of your business",
         ],
       },
       {
@@ -155,6 +193,18 @@ const steps = [
           "Rating breakdown by category",
           "Trend analysis over time",
           "AI-powered insights",
+          "Feedback summary and analysis",
+          "Quick actions to improve your business",
+        ],
+      },
+      {
+        title: "Sales Analytics",
+        description: "Deep dive into sales data",
+        details: [
+          "Total sales made by your business",
+          "Sales trends over time",
+          "Sales summary and analysis (coming soon)",
+          "Quick actions to improve your sales (coming soon)",
         ],
       },
     ],
@@ -170,7 +220,7 @@ const steps = [
         details: [
           "Automated sentiment analysis",
           "Key improvement areas",
-          "Success pattern recognition",
+          "Success pattern recognition (coming soon)",
         ],
       },
       {
@@ -178,8 +228,20 @@ const steps = [
         description: "Monitor your progress and growth",
         details: [
           "Historical performance comparison",
-          "Goal setting and tracking",
-          "Custom reporting",
+          "Goal setting and tracking (coming soon)",
+          "Custom reporting (coming soon)",
+        ],
+      },
+      {
+        title: "Upcoming Features",
+        description: "We are working on these features",
+        details: [
+          "Customizable invoice template",
+          "Customizable feedback form",
+          "Notification system for new feedback",
+          "AI powered sales prediction",
+          "Public portfolio of your business",
+
         ],
       },
     ],
@@ -187,129 +249,12 @@ const steps = [
 ];
 
 const emojiOptions = [
-  { value: 1, emoji: "😡", label: "Very Dissatisfied" },
-  { value: 2, emoji: "😞", label: "Dissatisfied" },
-  { value: 3, emoji: "😐", label: "Neutral" },
-  { value: 4, emoji: "😊", label: "Satisfied" },
-  { value: 5, emoji: "😍", label: "Very Satisfied" },
+  { value: 1, emoji: <BsEmojiAngryFill />, label: "Very Dissatisfied" },
+  { value: 2, emoji: <BsEmojiFrownFill />, label: "Dissatisfied" },
+  { value: 3, emoji: <BsEmojiNeutralFill />, label: "Neutral" },
+  { value: 4, emoji: <BsEmojiSmileFill />, label: "Satisfied" },
+  { value: 5, emoji: <BsEmojiHeartEyesFill />, label: "Very Satisfied" },
 ];
-
-const QrDocumentPreview = ({ invoiceNumber, username, owner }) => {
-  const styles = StyleSheet.create({
-    page: {
-      backgroundColor: "#ffffff",
-      padding: 30,
-      fontSize: 10,
-    },
-    centerContent: {
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    companyInfo: {
-      textAlign: "center",
-      marginBottom: 10,
-    },
-    companyName: {
-      fontSize: 36,
-      fontWeight: "bold",
-      color: "#4f46e5",
-    },
-    orgInfo: {
-      display: "flex",
-      flexDirection: "row",
-      justifyContent: "space-between",
-    },
-    companyTagline: {
-      fontSize: 14,
-      color: "#6b7280",
-      alignSelf: "center",
-    },
-    invoiceDetails: {
-      marginTop: 20,
-      marginBottom: 20,
-    },
-    invoiceNumber: {
-      fontSize: 16,
-      fontWeight: "bold",
-      color: "#333",
-    },
-    invoiceDate: {
-      marginTop: 5,
-      fontSize: 12,
-      color: "#555",
-    },
-    body: {
-      marginVertical: 20,
-    },
-    textCenter: {
-      textAlign: "center",
-      marginVertical: 5,
-    },
-    infoText: {
-      fontSize: 12,
-      color: "#4b5563",
-    },
-    infoTextBold: {
-      fontSize: 14,
-      fontWeight: "bold",
-      color: "#1a1a1a",
-    },
-    qrCode: {
-      width: 100,
-      height: 100,
-      marginTop: 10,
-      marginBottom: 10,
-    },
-  });
-
-  const currentDate = new Date().toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
-  return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        <View style={[styles.centerContent]}>
-          <View style={styles.companyInfo}>
-            <Text style={styles.companyName}>InvisiFeed</Text>
-            <Text style={styles.companyTagline}>Your Feedback Matters</Text>
-          </View>
-        </View>
-
-        <View style={styles.orgInfo}>
-          <View style={styles.invoiceDetails}>
-            <Text style={styles.invoiceNumber}>
-              From: {owner?.organizationName}
-            </Text>
-            <Text style={styles.invoiceDate}>Email: {owner?.email}</Text>
-          </View>
-          <View style={styles.invoiceDetails}>
-            <Text style={styles.invoiceNumber}>Invoice: {invoiceNumber}</Text>
-            <Text style={styles.invoiceDate}>Invoice Date: {currentDate}</Text>
-          </View>
-        </View>
-
-        <View style={[styles.body, styles.centerContent]}>
-          <Text style={[styles.infoTextBold, styles.textCenter]}>
-            Scan this QR code to share your valuable feedback
-          </Text>
-          <Text style={[styles.infoText, styles.textCenter]}>
-            Your insights help us deliver exceptional service
-          </Text>
-          <Text style={[styles.infoText, styles.textCenter]}>
-            Thank you for choosing InvisiFeed!
-          </Text>
-          <Image
-            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
-            style={styles.qrCode}
-          />
-        </View>
-      </Page>
-    </Document>
-  );
-};
 
 const FeedbackFormPreview = () => {
   const [formData, setFormData] = useState({
@@ -353,9 +298,9 @@ const FeedbackFormPreview = () => {
                 key={option.value}
                 type="button"
                 onClick={() => handleChange(key, option.value)}
-                className={`text-2xl transition-all duration-200 flex-shrink-0 ${
+                className={`text-2xl text-white sm:text-3xl p-2 flex-shrink-0 ${
                   formData[key] === option.value
-                    ? "bg-yellow-400/5 rounded-full p-1 border border-yellow-400/10"
+                    ? "text-yellow-400"
                     : "opacity-80 hover:opacity-100"
                 }`}
               >
@@ -451,32 +396,6 @@ const GuideSection = () => {
   const [showQRPDF, setShowQRPDF] = useState(false);
   const currentStep = steps[activeStep];
   const IconComponent = currentStep.icon;
-
-  // Sample data for previews
-  const sampleInvoiceData = {
-    businessName: "Sample Business",
-    businessAddress: "123 Business St, City",
-    businessPhone: "+1 234 567 8900",
-    businessEmail: "contact@samplebusiness.com",
-    gstin: "GSTIN123456789",
-    customerName: "John Doe",
-    customerAddress: "456 Customer Ave, Town",
-    customerPhone: "+1 987 654 3210",
-    customerEmail: "john@example.com",
-    invoiceDate: new Date().toISOString(),
-    dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    paymentTerms: "Net 30",
-    items: [
-      {
-        description: "Sample Service",
-        quantity: 1,
-        rate: 100,
-        discount: 0,
-        tax: 18,
-      },
-    ],
-    taxRate: 18,
-  };
 
   return (
     <section className="py-24 bg-[#0A0A0A] relative">
@@ -587,8 +506,8 @@ const GuideSection = () => {
                               key={detailIndex}
                               className="flex items-start space-x-2 text-gray-300"
                             >
-                              <ChevronRight className="w-4 h-4 text-yellow-500 mt-1" />
-                              <span className="text-sm sm:text-base">
+                              <ChevronRight className="w-4 h-4 text-yellow-500 flex-shrink-0" />
+                              <span className="text-xs sm:text-sm">
                                 {detail}
                               </span>
                             </li>
@@ -679,7 +598,7 @@ const GuideSection = () => {
                     <div>
                       <button
                         onClick={() => setShowFeedbackForm(true)}
-                        className="text-white font-medium hover:text-yellow-500 transition-colors"
+                        className="text-white font-medium hover:text-yellow-500 transition-colors cursor-pointer"
                       >
                         Show Feedback Form
                       </button>
@@ -693,7 +612,7 @@ const GuideSection = () => {
                     <div>
                       <button
                         onClick={() => setShowSmartInvoice(true)}
-                        className="text-white font-medium hover:text-yellow-500 transition-colors"
+                        className="text-white font-medium hover:text-yellow-500 transition-colors cursor-pointer"
                       >
                         Show Smart Invoice
                       </button>
@@ -708,7 +627,7 @@ const GuideSection = () => {
                     <div>
                       <button
                         onClick={() => setShowQRPDF(true)}
-                        className="text-white font-medium hover:text-yellow-500 transition-colors"
+                        className="text-white font-medium hover:text-yellow-500 transition-colors cursor-pointer"
                       >
                         Show Invoice + QR PDF
                       </button>
@@ -732,7 +651,7 @@ const GuideSection = () => {
               Feedback Form Preview
             </DialogTitle>
           </DialogHeader>
-          
+
           <FeedbackFormPreview />
         </DialogContent>
       </Dialog>
@@ -763,9 +682,14 @@ const GuideSection = () => {
           </DialogHeader>
           <div className="relative w-full h-[80vh] overflow-auto">
             <img
-              src="/QR_Sample.png"
+              src="/UploadedInvFirstPage.png"
               alt="Sample QR PDF"
-              className="w-full h-auto object-contain rounded-lg shadow-lg"
+              className="w-full h-auto object-contain rounded-t-lg shadow-lg"
+            />
+            <img
+              src="/UploadedInvSecPage.png"
+              alt="Sample QR PDF"
+              className="w-full h-auto object-contain rounded-b-lg shadow-lg"
             />
           </div>
         </DialogContent>

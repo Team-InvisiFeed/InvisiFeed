@@ -46,6 +46,7 @@ function ForgotPasswordContent() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isNavigatingToSignIn, setIsNavigatingToSignIn] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -82,7 +83,7 @@ function ForgotPasswordContent() {
       const response = await axios.post("/api/forgot-password", {
         email: data.email,
       });
-      console.log(response)
+
       if (response?.data?.success) {
         setStep(2);
         toast.success("Reset link sent to your email");
@@ -356,12 +357,16 @@ function ForgotPasswordContent() {
             <div className="text-center mt-4">
               <p className="text-gray-400 text-sm">
                 Remember your password?{" "}
-                <Link
-                  href="/sign-in"
-                  className="text-yellow-400 hover:text-yellow-300 font-medium"
+                <button
+                  onClick={() => {
+                    setIsNavigatingToSignIn(true);
+                    router.push("/sign-in");
+                  }}
+                  disabled={isNavigatingToSignIn}
+                  className={`font-medium cursor-pointer text-yellow-400 hover:text-yellow-300 transition-colors`}
                 >
-                  Sign In
-                </Link>
+                  {isNavigatingToSignIn ? "Loading..." : "Sign In"}
+                </button>
               </p>
             </div>
           </motion.div>

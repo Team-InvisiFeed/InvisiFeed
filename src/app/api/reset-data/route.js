@@ -36,22 +36,12 @@ export async function DELETE(request) {
     const deletedFeedbacks = await FeedbackModel.deleteMany({
       givenTo: owner._id,
     });
-    console.log(
-      "Deleted feedbacks:",
-      deletedFeedbacks.acknowledged,
-      "deletedCount:",
-      deletedFeedbacks.deletedCount
-    );
+  
 
     owner.feedbacks = [];
 
     const deletedInvoices = await InvoiceModel.deleteMany({ owner: owner._id });
-    console.log(
-      "Deleted invoices:",
-      deletedInvoices.acknowledged,
-      "deletedCount:",
-      deletedInvoices.deletedCount
-    );
+   
 
     await owner.save();
 

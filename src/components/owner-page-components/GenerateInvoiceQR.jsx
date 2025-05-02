@@ -9,6 +9,7 @@ import {
   Share2,
   FileUp,
   Plus,
+  RefreshCw,
   X,
   Trash,
 } from "lucide-react";
@@ -17,22 +18,34 @@ import ConfirmModal from "@/components/ConfirmModal";
 import CreateInvoiceForm from "./CreateInvoiceForm";
 import CompleteProfileDialog from "./CompleteProfileDialog";
 import axios from "axios";
+import { SubscriptionPopup } from "../SubscriptionPopup";
+import { usePathname } from "next/navigation";
+import LoadingScreen from "../LoadingScreen";
+import Link from "next/link";
+
 
 export default function Home() {
   const { data: session } = useSession();
   const owner = session?.user;
 
+  const pathname = usePathname();
+
   const [file, setFile] = useState(null);
   const [pdfUrl, setPdfUrl] = useState("");
+  const [feedbackUrl, setFeedbackUrl] = useState("");
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [loading, setLoading] = useState(false);
-  const [dailyUploads, setDailyUploads] = useState(0);
+  const [dailyUploadCount, setDailyUploadCount] = useState(0);
   const [timeLeft, setTimeLeft] = useState(null);
   const [initialLoading, setInitialLoading] = useState(true);
   const [customerEmail, setCustomerEmail] = useState("");
+  const [extractedCustomerEmail, setExtractedCustomerEmail] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [customerAmount, setCustomerAmount] = useState("");
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [showCouponForm, setShowCouponForm] = useState(false);
+
   const [showSampleInvoices, setShowSampleInvoices] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
@@ -43,12 +56,16 @@ export default function Home() {
   });
   const [couponSaved, setCouponSaved] = useState(false);
   const [showCreateInvoice, setShowCreateInvoice] = useState(false);
-  const [uploadCount, setUploadCount] = useState(0);
-  const [dailyLimit, setDailyLimit] = useState(3);
-  const [showInvoiceForm, setShowInvoiceForm] = useState(false);
+  
+  const [dailyLimit, setDailyLimit] = useState(owner?.plan?.planName === "pro" && owner?.plan?.planEndDate > new Date() ? 10 : 3);
+
   const [isLoading, setIsLoading] = useState(false);
   const [showCompleteProfileDialog, setShowCompleteProfileDialog] =
     useState(false);
+  const [couponDeleteConfirm, setCouponDeleteConfirm] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [isSubscriptionPopupOpen, setIsSubscriptionPopupOpen] = useState(false);
+  const [fileLoading, setFileLoading] = useState(false);
 
   // Sample invoice data
   const sampleInvoices = [
@@ -87,11 +104,10 @@ export default function Home() {
       try {
         const { data } = await axios.get(`/api/upload-count`);
         if (data.success) {
-          setDailyUploads(data.dailyUploads);
+          setDailyUploadCount(data.dailyUploadCount);
           if (data.timeLeft) {
             setTimeLeft(data.timeLeft);
           }
-          setUploadCount(data.count);
           if (data.dailyLimit) {
             setDailyLimit(data.dailyLimit);
           }
@@ -149,6 +165,26 @@ export default function Home() {
     toast.success("Coupon saved successfully");
   };
 
+  const handleNavigation = (route) => {
+      if (route === pathname) {
+        // Same route, no loading screen
+        return;
+      }
+      setLoading(true);
+      
+    };
+    
+  
+    useEffect(() => {
+      return () => {
+        setLoading(false);
+      };
+    }, [pathname]);
+  
+    if (loading) {
+      return <LoadingScreen />;
+    }
+
   const handleSampleInvoiceSelect = async (sampleInvoice) => {
     try {
       // Fetch the sample invoice PDF
@@ -189,12 +225,12 @@ export default function Home() {
       return;
     }
 
-    if (uploadCount >= dailyLimit) {
+    if (dailyUploadCount >= dailyLimit) {
       toast.error(`Daily upload limit (${dailyLimit}) reached`);
       return;
     }
 
-    setLoading(true);
+    setFileLoading(true);
     const formData = new FormData();
     formData.append("file", fileToUpload);
     if (couponSaved) {
@@ -207,15 +243,20 @@ export default function Home() {
     formData.append("isSampleInvoice", isSampleInvoice);
 
     try {
-      const { data } = await axios.post("/api/upload-invoice", formData);
+      const response = await axios.post("/api/upload-invoice", formData);
+      const data = response.data;
 
       setPdfUrl(data.url);
+      setFeedbackUrl(data.feedbackUrl);
       setInvoiceNumber(data.invoiceNumber);
-      setDailyUploads((prev) => prev + 1);
-      setUploadCount((prev) => prev + 1);
+      setCustomerName(data.customerName);
+      setExtractedCustomerEmail(data.customerEmail);
+      setCustomerAmount(data.customerAmount);
+      setDailyUploadCount(data.dailyUploadCount);
       setEmailSent(false);
       setCustomerEmail("");
       setCouponSaved(false);
+      setTimeLeft(data.timeLeft);
       setCouponData({
         couponCode: "",
         description: "",
@@ -223,7 +264,7 @@ export default function Home() {
       });
       toast.success("Invoice uploaded successfully");
     } catch (error) {
-      console.log(error);
+
       if (error.response?.status === 429) {
         setTimeLeft(error.response.data.timeLeft);
         toast.error(
@@ -236,12 +277,18 @@ export default function Home() {
         );
       }
     } finally {
-      setLoading(false);
+      setFileLoading(false);
     }
   };
 
   const handleUpload = async () => {
     await handleUploadWithFile(file);
+  };
+  const handleUploadInvoiceFreePlanClick = (e) => {
+    if (owner?.plan?.planName === "free" || owner?.plan?.planEndDate < new Date()) {
+      e.preventDefault(); // prevent file dialog from opening
+      setIsSubscriptionPopupOpen(true); // show popup instead
+    }
   };
 
   const handleSendEmail = async () => {
@@ -256,6 +303,7 @@ export default function Home() {
         customerEmail,
         invoiceNumber,
         pdfUrl,
+        feedbackUrl,
         companyName: owner?.organizationName || "Your Company",
       });
 
@@ -300,28 +348,46 @@ export default function Home() {
     }
   };
 
+  const handleRefreshComponent = () => {
+    setFile(null);
+    setPdfUrl("");
+    setInvoiceNumber("");
+    setCustomerEmail("");
+    setEmailSent(false);
+    setShowSampleInvoices(false);
+    setIsLoading(false);
+  };
+
   const handleCreateInvoice = async (invoiceData) => {
-    if (uploadCount >= dailyLimit) {
+    if (dailyUploadCount >= dailyLimit) {
       toast.error(`Daily upload limit (${dailyLimit}) reached`);
       return;
     }
 
-    setLoading(true);
+    setSaving(true);
     try {
-      const { data } = await axios.post("/api/create-invoice", {
+      const response = await axios.post("/api/create-invoice", {
         ...invoiceData,
       });
+      const data = response.data;
 
       if (data.success) {
         setPdfUrl(data.url);
+        setFeedbackUrl(data.feedbackUrl);
         setInvoiceNumber(data.invoiceNumber);
-        setUploadCount((prev) => prev + 1);
+        setCustomerName(data.customerName);
+        setExtractedCustomerEmail(data.customerEmail);
+        setCustomerAmount(data.customerAmount);
+        setDailyUploadCount(data.dailyUploadCount);
+        setTimeLeft(data.timeLeft);
         setShowCreateInvoice(false);
+        setSaving(false);
         toast.success("Invoice created successfully");
       } else {
         toast.error(
           data.message || "Failed to create invoice. Please try again."
         );
+        setSaving(false);
       }
     } catch (error) {
       console.error("Error creating invoice:", error);
@@ -330,7 +396,7 @@ export default function Home() {
           "Failed to create invoice. Please try again."
       );
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
@@ -343,13 +409,13 @@ export default function Home() {
   }
   return (
     <>
-      
       {/* Create Invoice Form */}
-      {showCreateInvoice &&  (
+      {showCreateInvoice && (
         <CreateInvoiceForm
           onSave={handleCreateInvoice}
           onCancel={() => setShowCreateInvoice(false)}
           open={showCreateInvoice}
+          saving={saving}
           onOpenChange={setShowCreateInvoice}
         />
       )}
@@ -379,6 +445,13 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-yellow-400/5 rounded-full blur-3xl" />
           <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-yellow-400/5 rounded-full blur-3xl" />
+          <button
+            className="absolute top-2 sm:top-4 right-2 sm:right-4 rounded-full p-2 hover:bg-yellow-400/40 transition-colors cursor-pointer duration-300"
+            onClick={handleRefreshComponent}
+          >
+            <RefreshCw className="h-5 w-5 text-yellow-400 cursor-pointer" />
+          </button>
+
           <div className="relative z-10 w-full">
             <h1 className="text-3xl font-bold mb-2 text-center bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
               Invoice Management
@@ -401,7 +474,7 @@ export default function Home() {
                   <p className="text-sm text-gray-300">
                     Daily Uploads:{" "}
                     <span className="font-medium text-yellow-400">
-                      {dailyUploads}
+                      {dailyUploadCount}
                     </span>
                     /
                     <span className="font-medium text-yellow-400">
@@ -414,7 +487,7 @@ export default function Home() {
 
             {/* Action Buttons */}
             <div className="flex justify-center space-x-4 mb-8 ">
-              {file ? null : dailyUploads >= 3 ? (
+              {file ? null : dailyUploadCount >= dailyLimit ? (
                 <div className="text-center">
                   <p className="text-yellow-400 text-lg font-medium mb-2">
                     Daily Limit Reached
@@ -423,11 +496,18 @@ export default function Home() {
                     You have reached your daily upload limit. Please try again
                     in {timeLeft}h.
                   </p>
+                  {
+                    (owner?.plan?.planName === "free" || owner?.plan?.planEndDate < new Date() )? (
+                      <Link href="/pricing" onClick={() => handleNavigation("/pricing")}>
+                      <button className="text-yellow-400 text-sm mt-3 cursor-pointer p-3 rounded-full border border-yellow-400/20 bg-gradient-to-br hover:from-yellow-400/20 hover:to-yellow-400/10" >Please upgrade your plan to upload more invoices.</button>
+                      </Link>
+                    ) : null
+                  }
                 </div>
               ) : !showCreateInvoice ? (
                 <button
                   onClick={handleShowCreateInvoice}
-                  className="flex items-center space-x-2 px-6 py-3 max-w-md w-full cursor-pointer bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105 justify-center"
+                  className="flex items-center space-x-2 px-6 py-3 max-w-md w-full cursor-pointer bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30  justify-center"
                 >
                   <Plus className="h-5 w-5" />
                   <span>Create Invoice</span>
@@ -435,7 +515,7 @@ export default function Home() {
               ) : (
                 <button
                   onClick={() => setShowCreateInvoice(false)}
-                  className="flex items-center cursor-pointer space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105"
+                  className="flex items-center cursor-pointer space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30"
                 >
                   <X className="h-5 w-5" />
                   <span>Cancel</span>
@@ -444,7 +524,7 @@ export default function Home() {
             </div>
 
             {/* File Input Section */}
-            {!showCreateInvoice && dailyUploads < 3 && (
+            {!showCreateInvoice && dailyUploadCount < dailyLimit && (
               <div className="mb-8 flex flex-col items-center w-full space-y-4">
                 {/* Display File Name */}
                 {file && (
@@ -462,16 +542,19 @@ export default function Home() {
                           {file.name}
                         </span>
                       </span>
+                      <button onClick={() => setFile(null)} title="Remove File">
+                        <Trash
+                          size={17}
+                          className="text-white hover:text-gray-400  ml-auto cursor-pointer transition-all duration-200"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFile(null);
+                          }}
+                        />
+                      </button>
                     </div>
 
                     {/* Close Button */}
-                    <button
-                      onClick={() => setFile(null)}
-                      className="flex items-center justify-center w-6 h-6  text-white rounded-full transition-all duration-200"
-                      title="Remove File"
-                    >
-                      <Trash className="h-4 w-4 cursor-pointer " />
-                    </button>
                   </motion.div>
                 )}
 
@@ -482,12 +565,14 @@ export default function Home() {
                   onChange={handleFileChange}
                   className="hidden"
                   id="file-upload"
-                  disabled={initialLoading}
+                  disabled={initialLoading || owner?.plan?.planName === "free" || owner?.plan?.planEndDate < new Date()}
                 />
+                
                 {/* Custom Button */}
                 <label
                   htmlFor="file-upload"
-                  className={`w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl cursor-pointer transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105 ${
+                  onClick={handleUploadInvoiceFreePlanClick}
+                  className={`w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl cursor-pointer transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 ${
                     initialLoading ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                 >
@@ -499,7 +584,7 @@ export default function Home() {
                 {file && !couponSaved && (
                   <button
                     onClick={() => setShowCouponForm(true)}
-                    className="w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105 cursor-pointer"
+                    className="w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 cursor-pointer"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -521,52 +606,62 @@ export default function Home() {
                   <div className="w-full max-w-md flex flex-col items-center space-y-2">
                     <button
                       onClick={() => setShowCouponForm(true)}
-                      className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-xl transition-all duration-300 shadow-lg hover:scale-105 cursor-pointer"
+                      className="w-full flex items-center justify-between px-6 py-2 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-xl transition-all duration-300 shadow-lg cursor-pointer "
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                      </svg>
-                      <span>Edit Coupon</span>
+                      <div className="flex items-center justify-center space-x-2 flex-1">
+                        {/* Center the "Edit Coupon" */}
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        </svg>
+                        <span>Edit Coupon</span>
+                      </div>
+                      {/* Trash icon positioned to the far right */}
+                      <Trash
+                        size={35}
+                        className="text-gray-500 hover:text-gray-900 rounded-full p-2 hover:bg-gray-200 cursor-pointer transition-all duration-200"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // setCouponSaved(false);
+                          setCouponDeleteConfirm(true);
+                          setCouponData({
+                            couponCode: "",
+                            description: "",
+                            expiryDays: "30",
+                          });
+                          
+                        }}
+                      />
                     </button>
-                    <p
-                      onClick={() => {
-                        setCouponSaved(false);
-                        setCouponData({
-                          couponCode: "",
-                          description: "",
-                          expiryDays: "30",
-                        });
-                        toast.success("Coupon deleted successfully");
-                      }}
-                      className="text-gray-400 hover:text-yellow-400 text-sm cursor-pointer transition-colors"
-                    >
-                      Delete Coupon
-                    </p>
                   </div>
                 )}
 
-                {/* Upload Button */}
-                {
-                  pdfUrl && (<div className="w-full max-w-md mx-auto">
+                {/* Generate Invoice Button */}
+                {file && (
+                  <div className="w-full max-w-md mx-auto">
                     <motion.button
                       onClick={handleUpload}
                       disabled={
-                        loading || !file || dailyUploads >= 3 || initialLoading
+                        fileLoading ||
+                        !file ||
+                        dailyUploadCount >= dailyLimit ||
+                        initialLoading
                       }
                       className="w-full px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none cursor-pointer"
                       whileHover={{
-                        scale: dailyUploads < 3 && !initialLoading ? 1.02 : 1,
+                        scale:
+                          dailyUploadCount < dailyLimit && !initialLoading ? 1.02 : 1,
                       }}
                       whileTap={{
-                        scale: dailyUploads < 3 && !initialLoading ? 0.98 : 1,
+                        scale:
+                          dailyUploadCount < dailyLimit && !initialLoading ? 0.98 : 1,
                       }}
                     >
-                      {loading || initialLoading ? (
+                      {fileLoading || initialLoading ? (
                         <div className="flex items-center justify-center space-x-2 ">
                           <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin" />
                           <span>
@@ -577,13 +672,13 @@ export default function Home() {
                         "Generate Smart Invoice"
                       )}
                     </motion.button>
-                  </div>)
-                }
-                
+                  </div>
+                )}
+
                 <p
                   onClick={() => setShowSampleInvoices(true)}
                   className="text-gray-100 text-sm mt-4 text-center cursor-pointer hover:text-yellow-400 transition-colors"
-                  disabled={initialLoading || dailyUploads >= 3}
+                  disabled={initialLoading || dailyUploadCount >= dailyLimit}
                 >
                   Try out our sample invoices to get started
                 </p>
@@ -609,11 +704,35 @@ export default function Home() {
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative">
-                  <h2 className="text-lg font-semibold mb-2 text-yellow-400">
+                  <h2 className="text-lg font-bold  text-yellow-400">
                     Extracted Invoice Number
                   </h2>
-                  <p className="text-2xl font-bold text-white">
+                  <p className="text-md font-semibold mb-2 text-white">
                     {invoiceNumber}
+                  </p>
+                </div>
+                <div className="relative">
+                  <h2 className="text-lg font-bold  text-yellow-400">
+                    Extracted Customer Name
+                  </h2>
+                  <p className="text-md font-semibold mb-2 text-white">
+                    {customerName}
+                  </p>
+                </div>
+                <div className="relative">
+                  <h2 className="text-lg font-bold  text-yellow-400">
+                    Extracted Customer Email
+                  </h2>
+                  <p className="text-md font-semibold mb-2 text-white">
+                    {extractedCustomerEmail}
+                  </p>
+                </div>
+                <div className="relative">
+                  <h2 className="text-lg font-bold  text-yellow-400">
+                    Extracted Customer Amount
+                  </h2>
+                  <p className="text-md font-semibold mb-2 text-white">
+                    {customerAmount}
                   </p>
                 </div>
               </motion.div>
@@ -671,7 +790,7 @@ export default function Home() {
                   <div className="w-full">
                     <input
                       type="email"
-                      placeholder="Enter Customer Email"
+                      placeholder="Enter Customer Email" 
                       value={customerEmail}
                       onChange={(e) => setCustomerEmail(e.target.value)}
                       className="w-full px-4 py-3 bg-[#0A0A0A]/50 border border-yellow-400/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/30 transition-all duration-300"
@@ -683,7 +802,7 @@ export default function Home() {
                   <button
                     onClick={handleSendEmail}
                     disabled={sendingEmail || emailSent || !customerEmail}
-                    className="cursor-pointer w-full px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
+                    className="cursor-pointer w-full px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {sendingEmail ? (
                       <>
@@ -727,7 +846,7 @@ export default function Home() {
                     href={pdfUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 hover:scale-105"
+                    className="flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30"
                   >
                     <Download className="h-5 w-5" />
                     <span>Download PDF with QR Code</span>
@@ -815,7 +934,7 @@ export default function Home() {
                 </button>
                 <button
                   onClick={handleCouponSave}
-                  className="px-5 py-2.5 bg-yellow-400 text-gray-900 rounded-xl hover:bg-yellow-500 transition-all duration-300 cursor-pointer hover:scale-105"
+                  className="px-5 py-2.5 bg-yellow-400 text-gray-900 rounded-xl hover:bg-yellow-500 transition-all duration-300 cursor-pointer "
                 >
                   Save
                 </button>
@@ -825,7 +944,7 @@ export default function Home() {
         )}
 
         {/* Sample Invoices Modal */}
-        {showSampleInvoices && dailyUploads < 3 && (
+        {showSampleInvoices && dailyUploadCount < dailyLimit && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm p-4 overflow-">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -873,8 +992,8 @@ export default function Home() {
                   <button
                     key={invoice.id}
                     onClick={() => handleSampleInvoiceSelect(invoice)}
-                    className="w-full px-4 py-3 bg-[#0A0A0A] border border-yellow-400/20 rounded-xl text-white hover:bg-[#0A0A0A]/80 hover:border-yellow-400/40 transition-all duration-300 flex items-center justify-between cursor-pointer hover:scale-105"
-                    disabled={loading || dailyUploads >= 3}
+                    className="w-full px-4 py-3 bg-[#0A0A0A] border border-yellow-400/20 rounded-xl text-white hover:bg-[#0A0A0A]/80 hover:border-yellow-400/40 transition-all duration-300 flex items-center justify-between cursor-pointer"
+                    disabled={loading || dailyUploadCount >= dailyLimit}
                   >
                     <span className="text-sm">{invoice.name}</span>
                     {loading && file && file.name === `${invoice.name}.pdf` ? (
@@ -888,6 +1007,28 @@ export default function Home() {
             </motion.div>
           </div>
         )}
+
+        {/* Coupon Delete Confirm Modal */}
+        {couponDeleteConfirm && (
+          <ConfirmModal
+            message="Are you sure you want to delete this coupon?"
+            onConfirm={() => {
+              // Handle delete logic here
+              setCouponSaved(false);
+              setCouponDeleteConfirm(false);
+              toast.success("Coupon deleted successfully");
+            }}
+            onCancel={() => {
+              setCouponDeleteConfirm(false);
+            }}
+          />
+        )}
+
+        {/* Subscription Popup */}
+        <SubscriptionPopup
+          isOpen={isSubscriptionPopupOpen}
+          onClose={() => setIsSubscriptionPopupOpen(false)}
+        />
       </div>
     </>
   );

@@ -67,23 +67,23 @@ export async function POST(req) {
       
       User's Suggestion: "${body.suggestionContent}"
       
-      Based on these ratings, the user's feedback, and suggestion, generate a constructive 30-word suggestion for improvement. Focus on specific, actionable points that could enhance their experience. Keep the tone positive and solution-oriented.`;
+      Based on these ratings, the user's feedback, and suggestion, generate a constructive 30-word suggestion for improvement. Focus on specific, actionable points that could enhance their experience. Keep the tone positive and solution-oriented. Set the character count of response in the range 100-200, not above 500. Give response as plain text, no text decoration, starting or ending quotation marks, or formatting.`;
     } else if (body.feedbackContent && body.feedbackContent.trim() !== "") {
       prompt += `
       
       User's Feedback: "${body.feedbackContent}"
       
-      Based on these ratings and the user's feedback, generate a constructive 30-word suggestion for improvement. Focus on specific, actionable points that could enhance their experience. Keep the tone positive and solution-oriented.`;
+      Based on these ratings and the user's feedback, generate a constructive 30-word suggestion for improvement. Focus on specific, actionable points that could enhance their experience. Keep the tone positive and solution-oriented. The character count of response in the range 100-200, strictly not above 500. Give response as plain text, no text decoration, starting or ending quotation marks, or formatting.`;
     } else if (body.suggestionContent && body.suggestionContent.trim() !== "") {
       prompt += `
       
       User's Suggestion: "${body.suggestionContent}"
       
-      Based on these ratings and the user's suggestion, generate a constructive 20-word suggestion for improvement. Focus on specific, actionable points that could enhance their experience. Keep the tone positive and solution-oriented.`;
+      Based on these ratings and the user's suggestion, generate a constructive 20-word suggestion for improvement. Focus on specific, actionable points that could enhance their experience. Keep the tone positive and solution-oriented. The character count of response in the range 100-200, strictly not above 500. Give response as plain text, no text decoration, starting or ending quotation marks, or formatting.`;
     } else {
       prompt += `
       
-      Based on these ratings, generate a constructive 20-word suggestion for improvement. Focus on the areas with lower ratings and provide specific, actionable advice. Keep the tone positive and solution-oriented.`;
+      Based on these ratings, generate a constructive 20-word suggestion for improvement. Focus on the areas with lower ratings and provide specific, actionable advice. Keep the tone positive and solution-oriented. The character count of response in the range 100-200, strictly not above 500. Give response as plain text, no text decoration, starting or ending quotation marks, or formatting.`;
     }
 
     const model = genAI.getGenerativeModel({

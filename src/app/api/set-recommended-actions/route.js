@@ -76,7 +76,7 @@ export async function PUT(req) {
     `;
 
     // Generate improvement suggestions
-    const improvementsPrompt = `${ratingsPrompt}\n\nBased on these ratings, provide exactly 3 specific, actionable improvement points. Each point should be a single line without any special characters or formatting. Focus on areas with lower ratings. Keep each point concise and practical.`;
+    const improvementsPrompt = `${ratingsPrompt}\n\nBased on these ratings, provide exactly 3 specific, actionable improvement points. Each point should be a single line without any special characters or formatting. Focus on areas with lower ratings. Keep each point concise and practical. Do not include any introduction, preamble, or additional text—just 3 specific points.`;
     const improvementsResult = await model.generateContent(improvementsPrompt);
     const improvements = improvementsResult.response
       .text()
@@ -86,7 +86,7 @@ export async function PUT(req) {
       .slice(0, 3);
 
     // Generate strengths
-    const strengthsPrompt = `${ratingsPrompt}\n\nBased on these ratings, provide exactly 3 key strengths. Each point should be a single line without any special characters or formatting. Focus on areas with higher ratings. Keep each point concise and impactful.`;
+    const strengthsPrompt = `${ratingsPrompt}\n\nBased on these ratings, provide exactly 3 key strengths. Each point should be a single line without any special characters or formatting. Focus on areas with higher ratings. Keep each point concise and impactful. Do not include any introduction, preamble, or additional text—just 3 specific points.`;
     const strengthsResult = await model.generateContent(strengthsPrompt);
     const strengths = strengthsResult.response
       .text()

@@ -34,23 +34,6 @@ export async function middleware(request) {
     }
   }
 
-  // Check if tokens are expired
-  if (token) {
-    if (Date.now() > token.accessTokenExpiry) {
-      const now = Date.now();
-      // If refresh token is expired, redirect to login
-      if (now > token.refreshTokenExpiry) {
-        const response = NextResponse.redirect(
-          new URL("/sign-in", request.url)
-        );
-        // Clear all cookies
-        response.cookies.delete("next-auth.session-token");
-        response.cookies.delete("next-auth.csrf-token");
-        response.cookies.delete("next-auth.callback-url");
-        return response;
-      }
-    }
-  }
 
   // Redirect logged-in users from home page to their user page
   // if (token && url.pathname === "/") {
@@ -92,15 +75,6 @@ export async function middleware(request) {
     return NextResponse.redirect(new URL("/complete-profile", request.url));
   }
 
-  // Handle token expiry for user routes
-  if (token) {
-    if (
-      Date.now() > token.refreshTokenExpiry &&
-      url.pathname.startsWith("/user")
-    ) {
-      return NextResponse.redirect(new URL("/sign-in", request.url));
-    }
-  }
 
   // Redirect unauthenticated users to sign-in page
   if (!token && url.pathname.startsWith("/user")) {

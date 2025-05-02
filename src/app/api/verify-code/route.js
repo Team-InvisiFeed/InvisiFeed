@@ -12,12 +12,9 @@ export async function POST(request) {
     const owner = await OwnerModel.findOne({ username: decodedUsername });
 
     if (!owner) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          message: "User not found",
-        }),
-        { status: 500 }
+      return NextResponse.json(
+        { success: false, message: "Owner not found" },
+        { status: 404 }
       );
     }
 

@@ -13,10 +13,10 @@ export async function POST(req) {
         { status: 401 }
       );
     }
-    const { customerEmail, invoiceNumber, pdfUrl, companyName } =
+    const { customerEmail, invoiceNumber, pdfUrl, companyName , feedbackUrl } =
       await req.json();
 
-    if (!customerEmail || !invoiceNumber || !pdfUrl) {
+    if (!customerEmail || !invoiceNumber || !pdfUrl || !feedbackUrl) {
       return NextResponse.json(
         { success: false, message: "Missing required fields" },
         { status: 400 }
@@ -27,7 +27,8 @@ export async function POST(req) {
       customerEmail,
       invoiceNumber,
       pdfUrl,
-      companyName
+      companyName,
+      feedbackUrl
     );
 
     if (result.success) {

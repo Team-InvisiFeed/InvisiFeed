@@ -2,14 +2,36 @@
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
+import LoadingScreen from "../LoadingScreen";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function CompleteProfileDialog({ open, onOpenChange }) {
-  const router = useRouter();
+
   const { data: session } = useSession();
   const owner = session?.user;
+  const [loading,setLoading] = useState(false);
+
+  const handleNavigation = (route) => {
+    if (route === pathname) {
+      // Same route, no loading screen
+      return;
+    }
+    setLoading(true);
+    
+  };
+  const pathname = usePathname();
+  
+  useEffect(() => {
+    return () => {
+      setLoading(false);
+    };
+  }, [pathname]);
+  
+  if(loading) return <LoadingScreen />;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -28,15 +50,13 @@ export default function CompleteProfileDialog({ open, onOpenChange }) {
             whileTap={{ scale: 0.98 }}
             className="w-full"
           >
+            <Link href={`/user/${owner?.username}/update-profile`} onClick={() => handleNavigation(`/user/${owner?.username}/update-profile`)}>
             <Button
-              onClick={() => {
-                router.push(`/user/${owner?.username}/update-profile`);
-                onOpenChange(false);
-              }}
               className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium"
             >
               Complete Profile
             </Button>
+            </Link>
           </motion.div>
           <Button
             variant="outline"

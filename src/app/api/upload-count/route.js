@@ -19,12 +19,14 @@ export async function GET(req) {
     }
 
     const owner = await OwnerModel.findOne({ username });
+
     if (!owner) {
       return NextResponse.json(
         { success: false, message: "Owner not found" },
         { status: 404 }
       );
     }
+    const isProPlan = owner?.plan?.planName === "pro" && owner?.plan?.planEndDate > new Date();
 
     // Calculate time remaining if daily limit is reached
     let timeLeft = null;
@@ -32,16 +34,25 @@ export async function GET(req) {
     const lastReset = new Date(owner.uploadedInvoiceCount.lastDailyReset);
     const hoursSinceLastReset = (now - lastReset) / (1000 * 60 * 60);
 
-    if (owner.uploadedInvoiceCount.dailyUploads >= 3) {
+    if(hoursSinceLastReset > 24){
+      owner.uploadedInvoiceCount.dailyUploadCount = 0;
+      await owner.save();
+    }
+
+    if (isProPlan && owner.uploadedInvoiceCount.dailyUploadCount >= 10) {
+      timeLeft = Math.ceil(24 - hoursSinceLastReset);
+    }
+
+    if (!isProPlan && owner.uploadedInvoiceCount.dailyUploadCount >= 3) {
       timeLeft = Math.ceil(24 - hoursSinceLastReset);
     }
 
     return NextResponse.json({
       success: true,
       message: "Upload count fetched successfully",
-      dailyUploads: owner.uploadedInvoiceCount.dailyUploads,
+      dailyUploadCount: owner.uploadedInvoiceCount.dailyUploadCount,
       timeLeft,
-      dailyLimit: 3,
+      dailyLimit: isProPlan ? 10 : 3,
     });
   } catch (error) {
     console.error("Error fetching upload count:", error);

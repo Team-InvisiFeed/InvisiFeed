@@ -14,15 +14,14 @@ import {
   Zap,
   BarChart,
 } from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 function HeroSection() {
   const router = useRouter();
   const [isLandscape, setIsLandscape] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-
+  const [isNavigating, setIsNavigating] = useState(false);
   // Check device orientation and size
   useEffect(() => {
     const checkDevice = () => {
@@ -45,6 +44,10 @@ function HeroSection() {
       window.removeEventListener("orientationchange", checkDevice);
     };
   }, []);
+
+  const pathname = usePathname();
+  
+  
 
   return (
     <section
@@ -92,17 +95,28 @@ function HeroSection() {
               transition={{ duration: 0.5, delay: 0.4 }}
               className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto"
             >
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="cursor-pointer group flex items-center justify-center space-x-2 sm:space-x-3 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 w-full sm:w-auto"
-                onClick={() => router.push("/register")}
-              >
-                <span className="text-sm sm:text-base">
-                  Generate Your First Feedback PDF
-                </span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </motion.button>
+              <Link href="/register" passHref>
+      <motion.div
+        whileHover={!isNavigating ? { scale: 1.05 } : undefined}
+        whileTap={!isNavigating ? { scale: 0.95 } : undefined}
+        onClick={() => setIsNavigating(true)}
+        className="cursor-pointer group flex items-center justify-center space-x-2 sm:space-x-3 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 w-full sm:w-auto"
+      >
+        {isNavigating ? (
+          <div className="flex items-center space-x-2">
+            <div className="w-4 h-4 border-2 border-t-transparent border-gray-900 rounded-full animate-spin"></div>
+            <span className="text-sm sm:text-base">Loading...</span>
+          </div>
+        ) : (
+          <>
+            <span className="text-sm sm:text-base">
+              Generate Your First Smart Invoice
+            </span>
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          </>
+        )}
+      </motion.div>
+    </Link>
             </motion.div>
           </motion.div>
 

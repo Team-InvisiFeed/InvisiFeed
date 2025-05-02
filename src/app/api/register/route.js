@@ -3,17 +3,39 @@ import dbConnect from "@/lib/dbConnect";
 import OwnerModel from "@/models/Owner";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
+import DeletedAccountModel from "@/models/DeletedAccount";
 
 export async function POST(req) {
   await dbConnect();
 
   try {
-    const {
-      organizationName,
-      email,
-      username,
-      password,
-    } = await req.json();
+    const { organizationName, email, username, password } = await req.json();
+
+    const deletedAccount = await DeletedAccountModel.findOne({ email });
+
+
+
+    if (
+      deletedAccount &&
+      deletedAccount.deletionDate &&
+      (deletedAccount.deletionDate.getTime() + 15 * 24 * 60 * 60 * 1000) > new Date().getTime()
+    ) {
+      const remainingMs = deletedAccount.deletionDate.getTime() + (15 * 24 * 60 * 60 * 1000) - new Date().getTime();
+      const remainingDays = Math.ceil(remainingMs / (24 * 60 * 60 * 1000));
+    
+      return NextResponse.json(
+        {
+          success: false,
+          message: `Account already deleted, please try again after ${remainingDays} days`,
+        },
+        { status: 400 }
+      );
+    }
+
+    if(deletedAccount && deletedAccount.deletionDate && deletedAccount.deletionDate.getTime() + 15 * 24 * 60 * 60 * 1000 < new Date().getTime()){
+      await DeletedAccountModel.findByIdAndDelete(deletedAccount._id);
+    }
+    
 
     const existingUserVerifiedByUsername = await OwnerModel.findOne({
       username,

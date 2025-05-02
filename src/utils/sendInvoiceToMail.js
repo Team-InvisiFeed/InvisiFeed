@@ -4,9 +4,10 @@ const sendInvoiceToMail = async (
   customerEmail,
   invoiceNumber,
   pdfUrl,
-  companyName
+  companyName,
+  feedbackUrl
 ) => {
-  const subject = `Invoice from ${companyName} - #${invoiceNumber}`;
+  const subject = `Invoice from ${companyName} - ${invoiceNumber}`;
 
   // HTML email template with styling
   const htmlMessage = `
@@ -36,9 +37,9 @@ const sendInvoiceToMail = async (
         </div>
 
         <div style="text-align: center; margin-top: 30px;">
-          <a href="${pdfUrl}" 
+          <a href="${feedbackUrl}" 
              style="display: inline-block; padding: 12px 24px; background-color: #FACC15; color: #000000; text-decoration: none; border-radius: 4px; font-weight: bold; transition: background-color 0.3s;">
-            View Invoice Online
+            Give Feedback
           </a>
         </div>
       </div>
@@ -63,7 +64,7 @@ const sendInvoiceToMail = async (
     🎁 Special Offer!
     Submit your feedback for this service and get a chance to win an exclusive discount coupon for your next service. Your valuable feedback helps us serve you better!
 
-    You can also view your invoice online at: ${pdfUrl}
+    You can also give feedback at: ${feedbackUrl}
 
     Best regards,
 

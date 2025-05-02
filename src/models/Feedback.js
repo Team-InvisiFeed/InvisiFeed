@@ -6,6 +6,11 @@ const FeedbackSchema = new Schema({
     ref: "Owner",
     required: true,
   },
+  invoiceId: {
+    type: Schema.Types.ObjectId,
+    ref: "Invoice",
+    default: null,
+  },
   satisfactionRating: {
     type: Number,
     required: true,
