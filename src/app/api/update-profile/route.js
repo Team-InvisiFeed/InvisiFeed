@@ -11,7 +11,6 @@ export async function PATCH(req) {
     const session = await getServerSession(authOptions);
     const username = session?.user?.username;
     const body = await req.json();
-    console.log("body: ", body);
 
     // Find the user
     const user = await OwnerModel.findOne({ username });
@@ -32,10 +31,7 @@ export async function PATCH(req) {
     }
     if (body?.data?.address) {
       user.address = body?.data?.address;
-    }
-
-    console.log("user phoneNumber: ", user.phoneNumber);
-    // Check if all required fields are filled
+    }    // Check if all required fields are filled
 
     const hasOrganizationName =
       user.organizationName && user.organizationName.trim() !== "";
