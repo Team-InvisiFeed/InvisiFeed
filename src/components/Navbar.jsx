@@ -34,7 +34,6 @@ function Navbar() {
       return;
     }
     setLoading(true);
-    
   };
 
   const handleSamePageNavigation = (route) => {
@@ -44,8 +43,7 @@ function Navbar() {
     }
     setLoading(true);
     router.push(route);
-  }
-  
+  };
 
   useEffect(() => {
     return () => {
@@ -54,9 +52,7 @@ function Navbar() {
   }, [pathname]);
 
   if (loading) {
-    return (
-      <LoadingScreen />
-    );
+    return <LoadingScreen />;
   }
 
   return (
@@ -75,37 +71,38 @@ function Navbar() {
 
         {/* Navigation Links - Desktop */}
         <div className="hidden md:flex space-x-6 absolute left-1/2 -translate-x-1/2">
-          {pathname === "/" || pathname === "/pricing" ||
+          {pathname === "/" ||
+          pathname === "/pricing" ||
           pathname === "/purpose" ||
           pathname === "/guide" ||
           pathname === "/privacy-policy" ||
           pathname === "/terms-of-service" ? (
             <>
-              <Link href={"/"}
+              <Link
+                href={"/"}
                 onClick={() => handleNavigation("/")}
                 className={`text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer`}
-                
               >
                 Home
-              </Link >
-              <Link href={"/purpose"}
+              </Link>
+              <Link
+                href={"/purpose"}
                 onClick={() => handleNavigation("/purpose")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                
               >
                 Purpose
               </Link>
-              <Link href={"/guide"}
+              <Link
+                href={"/guide"}
                 onClick={() => handleNavigation("/guide")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                
               >
                 Guide
               </Link>
-              <Link href={"/pricing"}
+              <Link
+                href={"/pricing"}
                 onClick={() => handleNavigation("/pricing")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-              
               >
                 Pricing
               </Link>
@@ -117,7 +114,6 @@ function Navbar() {
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-               
               >
                 Contact
               </motion.div>
@@ -130,33 +126,16 @@ function Navbar() {
                   const targetPath = `/user/${owner?.username}`;
 
                   if (currentPath === targetPath) {
-                    // Smooth scroll to the element with ID "dashboard"
-                    document.getElementById("dashboard")?.scrollIntoView({ behavior: "smooth" });
-                  } else {
-                    // Navigate to the target page
-                    handleSamePageNavigation(`${targetPath}#dashboard`);
-                  }
-                }}
-                className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-               
-              >
-                Dashboard
-              </motion.div>
-              <motion.div
-                onClick={() => {
-                  const currentPath = window.location.pathname;
-                  const targetPath = `/user/${owner?.username}`;
-
-                  if (currentPath === targetPath) {
                     // Smooth scroll to the element with ID "generate"
-                    document.getElementById("generate")?.scrollIntoView({ behavior: "smooth" });
+                    document
+                      .getElementById("generate")
+                      ?.scrollIntoView({ behavior: "smooth" });
                   } else {
                     // Navigate to the target page
                     handleSamePageNavigation(`${targetPath}#generate`);
                   }
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                
               >
                 Generate
               </motion.div>
@@ -166,15 +145,36 @@ function Navbar() {
                   const targetPath = `/user/${owner?.username}`;
 
                   if (currentPath === targetPath) {
+                    // Smooth scroll to the element with ID "dashboard"
+                    document
+                      .getElementById("dashboard")
+                      ?.scrollIntoView({ behavior: "smooth" });
+                  } else {
+                    // Navigate to the target page
+                    handleSamePageNavigation(`${targetPath}#dashboard`);
+                  }
+                }}
+                className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
+              >
+                Dashboard
+              </motion.div>
+
+              <motion.div
+                onClick={() => {
+                  const currentPath = window.location.pathname;
+                  const targetPath = `/user/${owner?.username}`;
+
+                  if (currentPath === targetPath) {
                     // Smooth scroll to the element with ID "ratings"
-                    document.getElementById("ratings")?.scrollIntoView({ behavior: "smooth" });
+                    document
+                      .getElementById("ratings")
+                      ?.scrollIntoView({ behavior: "smooth" });
                   } else {
                     // Navigate to the target page
                     handleSamePageNavigation(`${targetPath}#ratings`);
                   }
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-              
               >
                 Ratings
               </motion.div>
@@ -194,7 +194,6 @@ function Navbar() {
                   }
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                
               >
                 Feedbacks
               </motion.div>
@@ -208,40 +207,38 @@ function Navbar() {
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-            
               >
                 Contact
               </motion.div>
             </>
           ) : (
             <>
-              <Link href={"/"}
+              <Link
+                href={"/"}
                 onClick={() => handleNavigation("/")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-           
               >
                 Home
               </Link>
-              <Link href={"/purpose"}
+              <Link
+                href={"/purpose"}
                 onClick={() => handleNavigation("/purpose")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-             
               >
                 Purpose
               </Link>
-              <Link href={"/guide"}
+              <Link
+                href={"/guide"}
                 onClick={() => handleNavigation("/guide")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-            
               >
                 Guide
               </Link>
 
-
-              <Link href={"/pricing"}
+              <Link
+                href={"/pricing"}
                 onClick={() => handleNavigation("/pricing")}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-               
               >
                 Pricing
               </Link>
@@ -253,7 +250,6 @@ function Navbar() {
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-                
               >
                 Contact
               </motion.div>
