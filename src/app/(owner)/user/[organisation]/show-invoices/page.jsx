@@ -114,10 +114,6 @@ export default function ShowInvoicesPage({ params }) {
     };
   }, [pathname]);
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
-
   if (
     owner?.plan?.planName === "free" ||
     owner?.plan?.planEndDate < new Date()
@@ -278,7 +274,7 @@ export default function ShowInvoicesPage({ params }) {
                 size="sm"
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="border-yellow-400/20 text-yellow-400 hover:bg-yellow-400/10"
+                className=" bg-[#0A0A0A] border-yellow-400/20 text-yellow-500 hover:bg-yellow-500/30 rounded-full transition-all duration-100 cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
@@ -290,7 +286,7 @@ export default function ShowInvoicesPage({ params }) {
                 size="sm"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="border-yellow-400/20 text-yellow-400 hover:bg-yellow-400/10"
+                className="bg-[#0A0A0A] border-yellow-400/20 text-yellow-500 hover:bg-yellow-500/30 rounded-full transition-all duration-100 cursor-pointer"
               >
                 <ChevronRight className="w-4 h-4" />
               </Button>
