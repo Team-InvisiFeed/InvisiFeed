@@ -17,6 +17,7 @@ const PricingSection = () => {
   const [isFreeLoading, setIsFreeLoading] = useState(false);
   const [isProLoading, setIsProLoading] = useState(false);
   const [isProTrialLoading, setIsProTrialLoading] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const handlePayment = async (plan) => {
@@ -33,7 +34,6 @@ const PricingSection = () => {
 
         const data = await response.data;
 
-
         if (data.success) {
           await update({
             user: {
@@ -45,6 +45,7 @@ const PricingSection = () => {
 
           toast.success("Successfully switched to Pro trial plan");
           setShowConfirmModal(false);
+          setConfirming(false);
           setIsProTrialLoading(false);
         } else {
           setIsProTrialLoading(true);
@@ -176,9 +177,9 @@ const PricingSection = () => {
                   <span className="text-4xl font-bold text-yellow-400">₹0</span>
                 </div>
                 <p className="text-gray-400">
-                Ideal for new freelancers and businesses — kickstart your journey for free.
-
-</p>
+                  Ideal for new freelancers and businesses — kickstart your
+                  journey for free.
+                </p>
               </div>
 
               <ul className="space-y-3 mb-8">
@@ -250,9 +251,9 @@ const PricingSection = () => {
                   <span className="text-gray-400 ml-2">/month</span>
                 </div>
                 <p className="text-gray-400">
-                Perfect for growing businesses and service providers — at less than the price of a cold coffee.
-
-</p>
+                  Perfect for growing businesses and service providers — at less
+                  than the price of a cold coffee.
+                </p>
               </div>
 
               <ul className="space-y-3 mb-8">
@@ -278,6 +279,7 @@ const PricingSection = () => {
                 onClick={() => {
                   if (user?.proTrialUsed === true) {
                     handlePayment("pro");
+                    setConfirming(true);
                   } else if (
                     (user?.plan?.planName === "free" &&
                       user?.proTrialUsed === false) ||
@@ -358,6 +360,7 @@ const PricingSection = () => {
           <ConfirmModal
             message="Are you sure you want to switch to Pro trial?"
             onConfirm={() => handlePayment("pro-trial")}
+            confirming={confirming}
             onCancel={() => setShowConfirmModal(false)}
           />
         )}
