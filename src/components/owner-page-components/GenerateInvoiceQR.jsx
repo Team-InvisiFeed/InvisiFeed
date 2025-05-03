@@ -12,6 +12,7 @@ import {
   RefreshCw,
   X,
   Trash,
+  Eye,
 } from "lucide-react";
 import { toast } from "sonner";
 import ConfirmModal from "@/components/ConfirmModal";
@@ -23,8 +24,7 @@ import { usePathname } from "next/navigation";
 import LoadingScreen from "../LoadingScreen";
 import Link from "next/link";
 
-
-export default function Home() {
+export default function GenerateInvoice() {
   const { data: session } = useSession();
   const owner = session?.user;
 
@@ -56,8 +56,12 @@ export default function Home() {
   });
   const [couponSaved, setCouponSaved] = useState(false);
   const [showCreateInvoice, setShowCreateInvoice] = useState(false);
-  
-  const [dailyLimit, setDailyLimit] = useState(owner?.plan?.planName === "pro" && owner?.plan?.planEndDate > new Date() ? 10 : 3);
+
+  const [dailyLimit, setDailyLimit] = useState(
+    owner?.plan?.planName === "pro" && owner?.plan?.planEndDate > new Date()
+      ? 10
+      : 3
+  );
 
   const [isLoading, setIsLoading] = useState(false);
   const [showCompleteProfileDialog, setShowCompleteProfileDialog] =
@@ -66,35 +70,46 @@ export default function Home() {
   const [saving, setSaving] = useState(false);
   const [isSubscriptionPopupOpen, setIsSubscriptionPopupOpen] = useState(false);
   const [fileLoading, setFileLoading] = useState(false);
+  const [confirming, setConfirming] = useState(false);
 
   // Sample invoice data
   const sampleInvoices = [
     {
       id: 1,
       name: "Sample Invoice 1",
-      url: "https://res.cloudinary.com/dqma4eudc/image/upload/v1744806047/sample_invoice_5_cloudinary_e8ua1u.pdf",
+      url: "https://res.cloudinary.com/dqma4eudc/image/upload/v1746254651/SampleInvoice1_cotx54.pdf",
     },
     {
       id: 2,
       name: "Sample Invoice 2",
-      url: "https://res.cloudinary.com/dqma4eudc/image/upload/v1744806048/sample_invoice_1_cloudinary_efgvcf.pdf",
+      url: "https://res.cloudinary.com/dqma4eudc/image/upload/v1746254652/SampleInvoice2_hjpeay.pdf",
     },
     {
       id: 3,
       name: "Sample Invoice 3",
-      url: "https://res.cloudinary.com/dqma4eudc/image/upload/v1744806048/sample_invoice_2_cloudinary_sbitwu.pdf",
+      url: "https://res.cloudinary.com/dqma4eudc/image/upload/v1746254651/SampleInvoice3_lipycq.pdf ",
     },
     {
       id: 4,
       name: "Sample Invoice 4",
-      url: "https://res.cloudinary.com/dqma4eudc/image/upload/v1744806048/sample_invoice_4_cloudinary_owmwhz.pdf",
+      url: "https://res.cloudinary.com/dqma4eudc/image/upload/v1746254651/SampleInvoice4_wrzovq.pdf ",
     },
     {
       id: 5,
       name: "Sample Invoice 5",
-      url: "https://res.cloudinary.com/dqma4eudc/image/upload/v1744806048/sample_invoice_3_cloudinary_n5hif6.pdf",
+      url: "https://res.cloudinary.com/dqma4eudc/image/upload/v1746254651/SampleInvoice5_tlgyuw.pdf ",
     },
   ];
+
+  const handleViewInvoice = (event, sampleInvoice) => {
+    event.stopPropagation();
+
+    if (sampleInvoice && sampleInvoice.url) {
+      window.open(sampleInvoice.url, "blank");
+    } else {
+      toast.error("No invoice available yet.");
+    }
+  };
 
   // Fetch initial upload count
   useEffect(() => {
@@ -166,24 +181,22 @@ export default function Home() {
   };
 
   const handleNavigation = (route) => {
-      if (route === pathname) {
-        // Same route, no loading screen
-        return;
-      }
-      setLoading(true);
-      
-    };
-    
-  
-    useEffect(() => {
-      return () => {
-        setLoading(false);
-      };
-    }, [pathname]);
-  
-    if (loading) {
-      return <LoadingScreen />;
+    if (route === pathname) {
+      // Same route, no loading screen
+      return;
     }
+    setLoading(true);
+  };
+
+  useEffect(() => {
+    return () => {
+      setLoading(false);
+    };
+  }, [pathname]);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   const handleSampleInvoiceSelect = async (sampleInvoice) => {
     try {
@@ -206,6 +219,7 @@ export default function Home() {
 
       // Set the file and close the modal
       setFile(file);
+
       setShowSampleInvoices(false);
     } catch (error) {
       console.error("Error loading sample invoice:", error);
@@ -251,10 +265,10 @@ export default function Home() {
       setInvoiceNumber(data.invoiceNumber);
       setCustomerName(data.customerName);
       setExtractedCustomerEmail(data.customerEmail);
+      setCustomerEmail(data.customerEmail || extractedCustomerEmail);
       setCustomerAmount(data.customerAmount);
       setDailyUploadCount(data.dailyUploadCount);
       setEmailSent(false);
-      setCustomerEmail("");
       setCouponSaved(false);
       setTimeLeft(data.timeLeft);
       setCouponData({
@@ -264,7 +278,6 @@ export default function Home() {
       });
       toast.success("Invoice uploaded successfully");
     } catch (error) {
-
       if (error.response?.status === 429) {
         setTimeLeft(error.response.data.timeLeft);
         toast.error(
@@ -285,7 +298,10 @@ export default function Home() {
     await handleUploadWithFile(file);
   };
   const handleUploadInvoiceFreePlanClick = (e) => {
-    if (owner?.plan?.planName === "free" || owner?.plan?.planEndDate < new Date()) {
+    if (
+      owner?.plan?.planName === "free" ||
+      owner?.plan?.planEndDate < new Date()
+    ) {
       e.preventDefault(); // prevent file dialog from opening
       setIsSubscriptionPopupOpen(true); // show popup instead
     }
@@ -336,6 +352,10 @@ export default function Home() {
         setCustomerEmail("");
         setEmailSent(false);
         setShowSampleInvoices(false);
+        setShowConfirmModal(false);
+        setConfirming(false);
+        setCouponSaved(false);
+        setCouponData(false);
       } else {
         toast.error("Failed to reset data: " + data.message);
       }
@@ -377,6 +397,7 @@ export default function Home() {
         setInvoiceNumber(data.invoiceNumber);
         setCustomerName(data.customerName);
         setExtractedCustomerEmail(data.customerEmail);
+        setCustomerEmail(data.customerEmail);
         setCustomerAmount(data.customerAmount);
         setDailyUploadCount(data.dailyUploadCount);
         setTimeLeft(data.timeLeft);
@@ -423,9 +444,10 @@ export default function Home() {
         <ConfirmModal
           message="Are you sure you want to reset all data? This will remove all invoices, feedbacks, and recommendations."
           onConfirm={() => {
-            setShowConfirmModal(false);
             confirmAction();
+            setConfirming(true);
           }}
+          confirming={confirming}
           onCancel={() => setShowConfirmModal(false)}
         />
       )}
@@ -496,13 +518,17 @@ export default function Home() {
                     You have reached your daily upload limit. Please try again
                     in {timeLeft}h.
                   </p>
-                  {
-                    (owner?.plan?.planName === "free" || owner?.plan?.planEndDate < new Date() )? (
-                      <Link href="/pricing" onClick={() => handleNavigation("/pricing")}>
-                      <button className="text-yellow-400 text-sm mt-3 cursor-pointer p-3 rounded-full border border-yellow-400/20 bg-gradient-to-br hover:from-yellow-400/20 hover:to-yellow-400/10" >Please upgrade your plan to upload more invoices.</button>
-                      </Link>
-                    ) : null
-                  }
+                  {owner?.plan?.planName === "free" ||
+                  owner?.plan?.planEndDate < new Date() ? (
+                    <Link
+                      href="/pricing"
+                      onClick={() => handleNavigation("/pricing")}
+                    >
+                      <button className="text-yellow-400 text-sm mt-3 cursor-pointer p-3 rounded-full border border-yellow-400/20 bg-gradient-to-br hover:from-yellow-400/20 hover:to-yellow-400/10">
+                        Please upgrade your plan to upload more invoices.
+                      </button>
+                    </Link>
+                  ) : null}
                 </div>
               ) : !showCreateInvoice ? (
                 <button
@@ -565,9 +591,13 @@ export default function Home() {
                   onChange={handleFileChange}
                   className="hidden"
                   id="file-upload"
-                  disabled={initialLoading || owner?.plan?.planName === "free" || owner?.plan?.planEndDate < new Date()}
+                  disabled={
+                    initialLoading ||
+                    owner?.plan?.planName === "free" ||
+                    owner?.plan?.planEndDate < new Date()
+                  }
                 />
-                
+
                 {/* Custom Button */}
                 <label
                   htmlFor="file-upload"
@@ -633,7 +663,6 @@ export default function Home() {
                             description: "",
                             expiryDays: "30",
                           });
-                          
                         }}
                       />
                     </button>
@@ -654,11 +683,15 @@ export default function Home() {
                       className="w-full px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none cursor-pointer"
                       whileHover={{
                         scale:
-                          dailyUploadCount < dailyLimit && !initialLoading ? 1.02 : 1,
+                          dailyUploadCount < dailyLimit && !initialLoading
+                            ? 1.02
+                            : 1,
                       }}
                       whileTap={{
                         scale:
-                          dailyUploadCount < dailyLimit && !initialLoading ? 0.98 : 1,
+                          dailyUploadCount < dailyLimit && !initialLoading
+                            ? 0.98
+                            : 1,
                       }}
                     >
                       {fileLoading || initialLoading ? (
@@ -790,7 +823,7 @@ export default function Home() {
                   <div className="w-full">
                     <input
                       type="email"
-                      placeholder="Enter Customer Email" 
+                      placeholder="Enter Customer Email"
                       value={customerEmail}
                       onChange={(e) => setCustomerEmail(e.target.value)}
                       className="w-full px-4 py-3 bg-[#0A0A0A]/50 border border-yellow-400/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/30 transition-all duration-300"
@@ -999,7 +1032,13 @@ export default function Home() {
                     {loading && file && file.name === `${invoice.name}.pdf` ? (
                       <div className="w-4 h-4 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <FileUp className="h-4 w-4 text-yellow-400" />
+                      <div className="flex items-center space-x-4">
+                        <Eye
+                          className="h-4 w-4 text-yellow-400"
+                          onClick={(event) => handleViewInvoice(event, invoice)}
+                        />
+                        <FileUp className="h-4 w-4 text-yellow-400" />
+                      </div>
                     )}
                   </button>
                 ))}

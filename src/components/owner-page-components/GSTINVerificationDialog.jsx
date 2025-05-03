@@ -155,7 +155,7 @@ export default function GSTINVerificationDialog({ open, onOpenChange }) {
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="border-yellow-400/20 text-yellow-400 hover:bg-yellow-400/10"
+              className=" text-black hover:bg-gray-300 cursor-pointer"
             >
               Cancel
             </Button>
@@ -163,7 +163,7 @@ export default function GSTINVerificationDialog({ open, onOpenChange }) {
               <Button
                 onClick={handleVerify}
                 disabled={isLoading}
-                className="bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900"
+                className="bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 cursor-pointer"
               >
                 {isLoading ? (
                   <>

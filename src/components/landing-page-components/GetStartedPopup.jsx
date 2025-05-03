@@ -18,7 +18,6 @@ const GetStartedPopup = () => {
   const { data: session } = useSession();
   const owner = session?.user;
 
-
   // Reset hasShown when user returns to home page
   useEffect(() => {
     if (pathname === "/") {
@@ -103,7 +102,7 @@ const GetStartedPopup = () => {
                 <Button
                   onClick={handleRegister}
                   disabled={isRegisterLoading}
-                  className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium shadow-lg shadow-yellow-500/20"
+                  className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium shadow-lg shadow-yellow-500/20 cursor-pointer"
                 >
                   {isRegisterLoading ? (
                     <>
@@ -117,11 +116,12 @@ const GetStartedPopup = () => {
                     </>
                   )}
                 </Button>
+
                 <Button
                   onClick={handleSignIn}
                   disabled={isSignInLoading}
                   variant="outline"
-                  className="w-full border-yellow-400/20 text-yellow-400 hover:bg-yellow-400/10"
+                  className="w-full border-yellow-400/20  hover:bg-gray-200 text-black cursor-pointer"
                 >
                   {isSignInLoading ? (
                     <>

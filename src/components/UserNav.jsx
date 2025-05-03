@@ -37,19 +37,24 @@ function UserNav({ isMobile = false }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Added state for controlling dropdown
   const [loading, setLoading] = useState(false);
 
+  const handleNavigation = (route) => {
+    if (route === pathname) {
+      // Same route, no loading screen
+      return;
+    }
+    setLoading(true);
+  };
 
   const onManageProfile = () => {
     handleNavigation(`/user/${owner?.username}/update-profile`);
   };
 
   const onManageInvoice = () => {
-
     handleNavigation(`/user/${owner?.username}/show-invoices`);
   };
 
   const onManageCoupons = () => {
     handleNavigation(`/user/${owner?.username}/manage-coupons`);
-
   };
 
   const handleSignOut = async () => {
@@ -63,20 +68,12 @@ function UserNav({ isMobile = false }) {
   //   setIsNavigatingToSignIn(true);
 
   //   setIsDropdownOpen(false); // Close dropdown
-    
+
   // };
 
   const handleUsernameClick = () => {
     setIsDropdownOpen(false); // Close dropdown
-    handleNavigation(`/user/${owner?.username}`);
-  };
-
-  const handleNavigation = (route) => {
-    if (route === pathname) {
-      // Same route, no loading screen
-      return;
-    }
-    setLoading(true);
+    handleNavigation(`/user/${owner?.username}/generate`);
   };
 
   const pathname = usePathname();
@@ -94,20 +91,20 @@ function UserNav({ isMobile = false }) {
 
   if (!owner) {
     return (
-      <Link href="/sign-in" onClick={(e) => {
-        handleNavigation("/sign-in");
-       }}>
-      <Button
-        
-        disabled={isNavigatingToSignIn}
-        className={`${
-          isMobile ? "" : "hidden md:flex"
-        } bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium shadow-lg shadow-yellow-500/20 cursor-pointer min-w-[120px]`}
+      <Link
+        href="/sign-in"
+        onClick={(e) => {
+          handleNavigation("/sign-in");
+        }}
       >
-        
+        <Button
+          disabled={isNavigatingToSignIn}
+          className={`${
+            isMobile ? "" : "hidden md:flex"
+          } bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium shadow-lg shadow-yellow-500/20 cursor-pointer min-w-[120px]`}
+        >
           Get Started
-        
-      </Button>
+        </Button>
       </Link>
     );
   }
@@ -132,7 +129,7 @@ function UserNav({ isMobile = false }) {
             <div className="flex items-center justify-start p-2">
               <div className="flex flex-col space-y-1 leading-none">
                 <Link
-                  href={`/user/${owner?.username}`}
+                  href={`/user/${owner?.username}/generate`}
                   className="font-medium text-yellow-400 cursor-pointer"
                   onClick={handleUsernameClick} // Close dropdown when username is clicked
                 >
@@ -155,11 +152,11 @@ function UserNav({ isMobile = false }) {
             <Link
               href={`/user/${owner?.username}/show-invoices`}
               onClick={(e) => {
-                e.preventDefault();
                 if (
                   owner?.plan?.planName === "free" ||
                   owner?.plan?.planEndDate < new Date()
                 ) {
+                  e.preventDefault();
                   setIsSubscriptionPopupOpen(true);
                 } else {
                   onManageInvoice();
@@ -183,11 +180,11 @@ function UserNav({ isMobile = false }) {
             <Link
               href={`/user/${owner?.username}/manage-coupons`}
               onClick={(e) => {
-                e.preventDefault();
                 if (
                   owner?.plan?.planName === "free" ||
                   owner?.plan?.planEndDate < new Date()
                 ) {
+                  e.preventDefault();
                   setIsSubscriptionPopupOpen(true);
                 } else {
                   onManageCoupons();

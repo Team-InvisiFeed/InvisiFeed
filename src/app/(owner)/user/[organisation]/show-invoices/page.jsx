@@ -82,7 +82,6 @@ export default function ShowInvoicesPage({ params }) {
   };
 
   const renderFeedbackCell = (invoice) => {
-
     if (!invoice.isFeedbackSubmitted) {
       return <span className="text-gray-400">Not Submitted</span>;
     }
@@ -107,7 +106,6 @@ export default function ShowInvoicesPage({ params }) {
       return;
     }
     setLoading(true);
-
   };
 
   useEffect(() => {
@@ -115,10 +113,6 @@ export default function ShowInvoicesPage({ params }) {
       setLoading(false);
     };
   }, [pathname]);
-
-  if (loading) {
-    return <LoadingScreen />;
-  }
 
   if (
     owner?.plan?.planName === "free" ||
@@ -133,17 +127,14 @@ export default function ShowInvoicesPage({ params }) {
             </span>
           </div>
           <Link href="/pricing" onClick={() => handleNavigation("/pricing")}>
-          <button
-            className="bg-yellow-400 text-[#0A0A0A] py-2 px-6 font-semibold rounded-full shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 transition duration-300 ease-in-out cursor-pointer"
-          >
-            Subscribe to Pro
-          </button>
+            <button className="bg-yellow-400 text-[#0A0A0A] py-2 px-6 font-semibold rounded-full shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 transition duration-300 ease-in-out cursor-pointer">
+              Subscribe to Pro
+            </button>
           </Link>
         </div>
       </div>
     );
   }
-
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] py-6 sm:py-12 px-3 sm:px-4">
@@ -283,7 +274,7 @@ export default function ShowInvoicesPage({ params }) {
                 size="sm"
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="border-yellow-400/20 text-yellow-400 hover:bg-yellow-400/10"
+                className=" bg-[#0A0A0A] border-yellow-400/20 text-yellow-500 hover:bg-yellow-500/30 rounded-full transition-all duration-100 cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
@@ -295,7 +286,7 @@ export default function ShowInvoicesPage({ params }) {
                 size="sm"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="border-yellow-400/20 text-yellow-400 hover:bg-yellow-400/10"
+                className="bg-[#0A0A0A] border-yellow-400/20 text-yellow-500 hover:bg-yellow-500/30 rounded-full transition-all duration-100 cursor-pointer"
               >
                 <ChevronRight className="w-4 h-4" />
               </Button>

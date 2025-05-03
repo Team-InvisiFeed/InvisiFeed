@@ -924,110 +924,109 @@ export default function CreateInvoiceForm({
                       <div className="space-y-4">
                         {(owner?.plan?.planName === "pro" ||
                           owner?.plan?.planName === "pro-trial" ||
-                          (owner?.plan?.planEndDate > new Date())) && (
-                            <>
-                              <FormField
-                                control={form.control}
-                                name="addCoupon"
-                                render={({ field }) => (
-                                  <FormItem className="flex items-center space-x-2">
-                                    <FormControl>
-                                      <Checkbox
-                                        checked={field.value}
-                                        onCheckedChange={field.onChange}
-                                        className="border-yellow-400/20 data-[state=checked]:bg-yellow-400 data-[state=checked]:text-gray-900"
-                                      />
-                                    </FormControl>
-                                    <FormLabel className="text-gray-300">
-                                      Add Coupon for Customer
-                                    </FormLabel>
-                                  </FormItem>
-                                )}
-                              />
-                              {form.watch("addCoupon") && (
-                                <Card className="bg-[#0A0A0A] border-yellow-400/20">
-                                  <CardContent className="pt-6">
-                                    <div className="space-y-4">
-                                      <FormField
-                                        control={form.control}
-                                        name="coupon.code"
-                                        render={({ field }) => (
-                                          <FormItem>
-                                            <FormLabel className="text-gray-300">
-                                              Coupon Code
-                                            </FormLabel>
-                                            <FormControl>
-                                              <Input
-                                                {...field}
-                                                className="bg-[#0A0A0A] text-white border-yellow-400/20"
-                                                onChange={(e) =>
-                                                  field.onChange(
-                                                    e.target.value.toUpperCase()
-                                                  )
-                                                }
-                                                placeholder="Enter coupon code"
-                                              />
-                                            </FormControl>
-                                            <FormMessage />
-                                            <p className="text-xs text-gray-400 mt-1">
-                                              This coupon code will go under
-                                              slight modification for security
-                                              purposes
-                                            </p>
-                                          </FormItem>
-                                        )}
-                                      />
-                                      <FormField
-                                        control={form.control}
-                                        name="coupon.description"
-                                        render={({ field }) => (
-                                          <FormItem>
-                                            <FormLabel className="text-gray-300">
-                                              Description
-                                            </FormLabel>
-                                            <FormControl>
-                                              <Textarea
-                                                {...field}
-                                                className="bg-[#0A0A0A] text-white border-yellow-400/20"
-                                                placeholder="Enter coupon description"
-                                                rows="3"
-                                              />
-                                            </FormControl>
-                                            <FormMessage />
-                                          </FormItem>
-                                        )}
-                                      />
-                                      <FormField
-                                        control={form.control}
-                                        name="coupon.expiryDays"
-                                        render={({ field }) => (
-                                          <FormItem>
-                                            <FormLabel className="text-gray-300">
-                                              Expiry (in days)
-                                            </FormLabel>
-                                            <FormControl>
-                                              <Input
-                                                {...field}
-                                                type="number"
-                                                min="1"
-                                                className="bg-[#0A0A0A] text-white border-yellow-400/20"
-                                              />
-                                            </FormControl>
-                                            <FormMessage />
-                                          </FormItem>
-                                        )}
-                                      />
-                                    </div>
-                                  </CardContent>
-                                </Card>
+                          owner?.plan?.planEndDate > new Date()) && (
+                          <>
+                            <FormField
+                              control={form.control}
+                              name="addCoupon"
+                              render={({ field }) => (
+                                <FormItem className="flex items-center space-x-2">
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value}
+                                      onCheckedChange={field.onChange}
+                                      className="border-yellow-400/20 data-[state=checked]:bg-yellow-400 data-[state=checked]:text-gray-900"
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="text-gray-300">
+                                    Add Coupon for Customer
+                                  </FormLabel>
+                                </FormItem>
                               )}
-                            </>
-                          )}
+                            />
+                            {form.watch("addCoupon") && (
+                              <Card className="bg-[#0A0A0A] border-yellow-400/20">
+                                <CardContent className="pt-6">
+                                  <div className="space-y-4">
+                                    <FormField
+                                      control={form.control}
+                                      name="coupon.code"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel className="text-gray-300">
+                                            Coupon Code
+                                          </FormLabel>
+                                          <FormControl>
+                                            <Input
+                                              {...field}
+                                              className="bg-[#0A0A0A] text-white border-yellow-400/20"
+                                              onChange={(e) =>
+                                                field.onChange(
+                                                  e.target.value.toUpperCase()
+                                                )
+                                              }
+                                              placeholder="Enter coupon code"
+                                            />
+                                          </FormControl>
+                                          <FormMessage />
+                                          <p className="text-xs text-gray-400 mt-1">
+                                            This coupon code will go under
+                                            slight modification for security
+                                            purposes
+                                          </p>
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField
+                                      control={form.control}
+                                      name="coupon.description"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel className="text-gray-300">
+                                            Description
+                                          </FormLabel>
+                                          <FormControl>
+                                            <Textarea
+                                              {...field}
+                                              className="bg-[#0A0A0A] text-white border-yellow-400/20"
+                                              placeholder="Enter coupon description"
+                                              rows="3"
+                                            />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                    <FormField
+                                      control={form.control}
+                                      name="coupon.expiryDays"
+                                      render={({ field }) => (
+                                        <FormItem>
+                                          <FormLabel className="text-gray-300">
+                                            Expiry (in days)
+                                          </FormLabel>
+                                          <FormControl>
+                                            <Input
+                                              {...field}
+                                              type="number"
+                                              min="1"
+                                              className="bg-[#0A0A0A] text-white border-yellow-400/20"
+                                            />
+                                          </FormControl>
+                                          <FormMessage />
+                                        </FormItem>
+                                      )}
+                                    />
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            )}
+                          </>
+                        )}
 
-                          {
-                            owner?.plan?.planName === "free" && owner?.plan?.planEndDate < new Date() && (
-                              
-                              <Link
+                        {owner?.plan?.planName === "free" &&
+                          owner?.plan?.planEndDate < new Date() && (
+                            <Link
                               className="text-gray-100 cursor-pointer hover:text-yellow-500 text-sm"
                               href="/pricing"
                               target="_blank"
@@ -1035,10 +1034,7 @@ export default function CreateInvoiceForm({
                             >
                               Upgrade to Pro for coupon feature.
                             </Link>
-                              
-                            )
-                          }
-                       
+                          )}
                       </div>
                     </CardContent>
                   </Card>
