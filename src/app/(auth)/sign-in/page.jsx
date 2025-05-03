@@ -91,7 +91,7 @@ function SignInContent() {
       }
     }
 
-    router.replace(`/user/${result?.user?.username}`);
+    router.replace(`/user/${result?.user?.username}/generate`);
   };
 
   const error = searchParams.get("error");
@@ -250,7 +250,7 @@ function SignInContent() {
       }
 
       // After successful sign-in, redirect to user page
-      router.push(`/user/${result?.user?.username}`);
+      router.push(`/user/${result?.user?.username}/generate`);
     } catch (error) {
       console.error("Google sign in error:", error);
       toast.error("Failed to sign in with Google");

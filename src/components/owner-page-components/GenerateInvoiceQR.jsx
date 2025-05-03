@@ -24,7 +24,7 @@ import { usePathname } from "next/navigation";
 import LoadingScreen from "../LoadingScreen";
 import Link from "next/link";
 
-export default function Home() {
+export default function GenerateInvoice() {
   const { data: session } = useSession();
   const owner = session?.user;
 
