@@ -209,13 +209,13 @@ Want a demo, walkthrough, or request access to the private repo?
 
 #### **Shubh Verma**
 * Email: [shubhverma2003@gmail.com](mailto:shubhverma2003@gmail.com)
-* Twitter: [@ShubhOnX](www.x.com/ShubhOnX)
-* LinkedIn: [@shubh-v21](www.linkedin.com/in/shubh-v21)
+* Twitter: [@ShubhOnX](https://x.com/ShubhOnX)
+* LinkedIn: [@shubh-v21](https://linkedin.com/in/shubh-v21)
 
 #### **Sneha Sharma**
 * Email: [snehav2109@gmail.com](mailto:snehav2109@gmail.com)
-* Twitter: [@SnehaDevs](www.x.com/SnehaDevs)
-* LinkedIn: [@shubh-v21](www.linkedin.com/in/ss0807)
+* Twitter: [@SnehaDevs](https://x.com/SnehaDevs)
+* LinkedIn: [@ss0807](https://linkedin.com/in/ss0807)
 
 ---
 
