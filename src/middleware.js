@@ -50,7 +50,7 @@ export async function middleware(request) {
       url.pathname.startsWith("/verify"))
   ) {
     return NextResponse.redirect(
-      new URL(`/user/${token.username}`, request.url)
+      new URL(`/user/${token.username}/generate`, request.url)
     );
   }
 
@@ -62,7 +62,7 @@ export async function middleware(request) {
     url.pathname.startsWith("/complete-profile")
   ) {
     return NextResponse.redirect(
-      new URL(`/user/${token.username}`, request.url)
+      new URL(`/user/${token.username}/generate`, request.url)
     );
   }
 
