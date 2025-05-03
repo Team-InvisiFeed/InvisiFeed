@@ -39,7 +39,9 @@ const RatingDisplay = ({ rating, label }) => (
 const CustomerDetails = ({ details, invoiceId }) => {
   return (
     <div className="mt-4 p-4 bg-gradient-to-br from-yellow-400/5 to-transparent rounded-lg border border-yellow-400/10">
-      <h3 className="text-sm font-medium text-gray-400 mb-2">Customer Details</h3>
+      <h3 className="text-sm font-medium text-gray-400 mb-2">
+        Customer Details
+      </h3>
       {invoiceId ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -54,7 +56,7 @@ const CustomerDetails = ({ details, invoiceId }) => {
             <div>
               <span className="text-gray-400">Amount:</span>
               <span className="ml-2 text-gray-300">
-                ₹{parseFloat(details.amount).toLocaleString('en-IN')}
+                ₹{parseFloat(details.amount).toLocaleString("en-IN")}
               </span>
             </div>
           )}
@@ -67,7 +69,6 @@ const CustomerDetails = ({ details, invoiceId }) => {
     </div>
   );
 };
-
 
 const CustomerFeedbacks = () => {
   const params = useParams();
@@ -154,8 +155,15 @@ const CustomerFeedbacks = () => {
     <div className="min-h-screen bg-[#0A0A0A] py-8 px-4">
       <div className="max-w-6xl mx-auto">
         {feedbacks.length === 0 ? (
-          <div className="flex justify-center items-center min-h-[50vh]">
-            <p className="text-gray-400 text-lg">No feedbacks available yet.</p>
+          <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-yellow-400 mb-2">
+                No Feedbacks Found
+              </h2>
+              <p className="text-gray-400">
+                This organisation hasn't received any feedbacks yet.
+              </p>
+            </div>
           </div>
         ) : (
           <>
@@ -229,7 +237,10 @@ const CustomerFeedbacks = () => {
                       </CardHeader>
                       <CardContent className="space-y-4">
                         {feedback.customerDetails && (
-                          <CustomerDetails details={feedback.customerDetails} invoiceId={feedback.invoiceId} />
+                          <CustomerDetails
+                            details={feedback.customerDetails}
+                            invoiceId={feedback.invoiceId}
+                          />
                         )}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <RatingDisplay
@@ -257,8 +268,6 @@ const CustomerFeedbacks = () => {
                             label="Overall"
                           />
                         </div>
-
-                        
 
                         {feedback.feedbackContent && (
                           <div className="mt-4">
