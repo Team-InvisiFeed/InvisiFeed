@@ -117,7 +117,7 @@ function MobileNav() {
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
               >
-                <MessageCircle className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
+                <Mail className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
                 <span className="text-xs text-gray-300 hover:text-yellow-400">
                   Contact
                 </span>
@@ -226,7 +226,7 @@ function MobileNav() {
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
               >
-                <MessageCircle className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
+                <Mail className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
                 <span className="text-xs text-gray-300 hover:text-yellow-400">
                   Contact
                 </span>
