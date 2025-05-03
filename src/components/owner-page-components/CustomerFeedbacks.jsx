@@ -46,23 +46,23 @@ const CustomerDetails = ({ details, invoiceId }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <span className="text-gray-400">Name:</span>
-            <span className="ml-2 text-gray-300">{details.customerName}</span>
+            <span className="ml-2 text-white">{details.customerName}</span>
           </div>
           <div>
             <span className="text-gray-400">Email:</span>
-            <span className="ml-2 text-gray-300">{details.customerEmail}</span>
+            <span className="ml-2 text-white">{details.customerEmail}</span>
           </div>
           {details.amount && (
             <div>
               <span className="text-gray-400">Amount:</span>
-              <span className="ml-2 text-gray-300">
+              <span className="ml-2 text-white">
                 ₹{parseFloat(details.amount).toLocaleString("en-IN")}
               </span>
             </div>
           )}
         </div>
       ) : (
-        <div className="text-gray-300">
+        <div className="text-white">
           <span>Sent Anonymously</span>
         </div>
       )}
@@ -274,7 +274,7 @@ const CustomerFeedbacks = () => {
                             <h3 className="text-sm font-medium text-gray-400 mb-2">
                               Feedback
                             </h3>
-                            <p className="text-gray-300">
+                            <p className="text-white">
                               {feedback.feedbackContent}
                             </p>
                           </div>
@@ -285,7 +285,7 @@ const CustomerFeedbacks = () => {
                             <h3 className="text-sm font-medium text-gray-400 mb-2">
                               Suggestions
                             </h3>
-                            <p className="text-gray-300">
+                            <p className="text-white">
                               {feedback.suggestionContent}
                             </p>
                           </div>
