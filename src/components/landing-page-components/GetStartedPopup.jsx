@@ -116,7 +116,7 @@ const GetStartedPopup = () => {
                     </>
                   )}
                 </Button>
-                //Sign In Button
+
                 <Button
                   onClick={handleSignIn}
                   disabled={isSignInLoading}
