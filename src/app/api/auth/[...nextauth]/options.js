@@ -274,7 +274,7 @@ export const authOptions = {
       if (url.includes("/user")) {
         // If we have a token with username, use it
         if (token?.username) {
-          return `${baseUrl}/user/${token.username}`;
+          return `${baseUrl}/user/${token.username}/generate`;
         }
 
         // If we have a token with email, try to get username from database
@@ -282,7 +282,7 @@ export const authOptions = {
           try {
             const user = await OwnerModel.findOne({ email: token.email });
             if (user?.username) {
-              return `${baseUrl}/user/${user.username}`;
+              return `${baseUrl}/user/${user.username}/generate`;
             }
           } catch (error) {
             console.error("Error getting username from database:", error);

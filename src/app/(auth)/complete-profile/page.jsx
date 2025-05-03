@@ -83,7 +83,7 @@ function Page() {
       session.user.isProfileCompleted === "completed" ||
       session.user.isProfileCompleted === "skipped"
     ) {
-      router.push(`/user/${session?.user?.username}`);
+      router.push(`/user/${session?.user?.username}/generate`);
     }
   }, [session, status, router]);
 
@@ -274,7 +274,7 @@ function Page() {
 
         // Redirect to user page
         setIsNavigatingToUserPage(true);
-        router.push(`/user/${session?.user?.username}`);
+        router.push(`/user/${session?.user?.username}/generate`);
       } else {
         toast.error(data.message || "Failed to complete profile");
       }
@@ -343,7 +343,7 @@ function Page() {
 
         // Redirect to user page
         setIsNavigatingToUserPage(true);
-        router.push(`/user/${session?.user?.username}`);
+        router.push(`/user/${session?.user?.username}/generate`);
       } else {
         toast.error(data.message || "Failed to skip profile completion");
         setIsSkipping(false);
