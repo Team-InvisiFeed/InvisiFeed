@@ -127,6 +127,9 @@ function MobileNav() {
             <>
               <Link
                 href={`/user/${owner?.username}/generate`}
+                onClick={() =>
+                  handleNavigation(`/user/${owner?.username}/generate`)
+                }
                 className="flex flex-col items-center space-y-1"
               >
                 <Zap className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
@@ -136,6 +139,9 @@ function MobileNav() {
               </Link>
               <Link
                 href={`/user/${owner?.username}/dashboard`}
+                onClick={() =>
+                  handleNavigation(`/user/${owner?.username}/dashboard`)
+                }
                 className="flex flex-col items-center space-y-1"
               >
                 <BarChart2 className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
@@ -145,6 +151,9 @@ function MobileNav() {
               </Link>
               <Link
                 href={`/user/${owner?.username}/feedbacks`}
+                onClick={() =>
+                  handleNavigation(`/user/${owner?.username}/feedbacks`)
+                }
                 className="flex flex-col items-center space-y-1"
               >
                 <MessageCircle className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
