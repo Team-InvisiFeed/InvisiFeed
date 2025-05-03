@@ -73,7 +73,7 @@ function UserNav({ isMobile = false }) {
 
   const handleUsernameClick = () => {
     setIsDropdownOpen(false); // Close dropdown
-    handleNavigation(`/user/${owner?.username}`);
+    handleNavigation(`/user/${owner?.username}/generate`);
   };
 
   const pathname = usePathname();
@@ -129,7 +129,7 @@ function UserNav({ isMobile = false }) {
             <div className="flex items-center justify-start p-2">
               <div className="flex flex-col space-y-1 leading-none">
                 <Link
-                  href={`/user/${owner?.username}`}
+                  href={`/user/${owner?.username}/generate`}
                   className="font-medium text-yellow-400 cursor-pointer"
                   onClick={handleUsernameClick} // Close dropdown when username is clicked
                 >
