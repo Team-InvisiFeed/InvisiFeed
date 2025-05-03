@@ -13,9 +13,11 @@ import {
   Book,
   Check,
   Gem,
+  Mail,
 } from "lucide-react";
 import LoadingScreen from "./LoadingScreen";
 import { MdMoney } from "react-icons/md";
+import Link from "next/link";
 
 function MobileNav() {
   const { data: session } = useSession();
@@ -123,99 +125,48 @@ function MobileNav() {
             </>
           ) : owner ? (
             <>
-              <motion.button
-                onClick={() => {
-                  const currentPath = window.location.pathname;
-                  const targetPath = `/user/${owner?.username}`;
-
-                  if (currentPath === targetPath) {
-                    // Smooth scroll to the element with ID "generate"
-                    document
-                      .getElementById("generate")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  } else {
-                    // Navigate to the target page
-                    handleNavigation(`${targetPath}#generate`);
-                  }
-                }}
+              <Link
+                href={`/user/${owner?.username}/generate`}
                 className="flex flex-col items-center space-y-1"
-                whileTap={{ scale: 0.95 }}
               >
                 <Zap className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
                 <span className="text-xs text-gray-300 hover:text-yellow-400">
                   Generate
                 </span>
-              </motion.button>
-              <motion.button
-                onClick={() => {
-                  const currentPath = window.location.pathname;
-                  const targetPath = `/user/${owner?.username}`;
-
-                  if (currentPath === targetPath) {
-                    // Smooth scroll to the element with ID "dashboard"
-                    document
-                      .getElementById("dashboard")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  } else {
-                    // Navigate to the target page
-                    handleNavigation(`${targetPath}#dashboard`);
-                  }
-                }}
+              </Link>
+              <Link
+                href={`/user/${owner?.username}/dashboard`}
                 className="flex flex-col items-center space-y-1"
-                whileTap={{ scale: 0.95 }}
               >
                 <BarChart2 className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
                 <span className="text-xs text-gray-300 hover:text-yellow-400">
                   Dashboard
                 </span>
-              </motion.button>
-
-              <motion.button
-                onClick={() => {
-                  const currentPath = window.location.pathname;
-                  const targetPath = `/user/${owner?.username}`;
-
-                  if (currentPath === targetPath) {
-                    // Smooth scroll to the element with ID "ratings"
-                    document
-                      .getElementById("ratings")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  } else {
-                    // Navigate to the target page
-                    handleNavigation(`${targetPath}#ratings`);
-                  }
-                }}
+              </Link>
+              <Link
+                href={`/user/${owner?.username}/feedbacks`}
                 className="flex flex-col items-center space-y-1"
-                whileTap={{ scale: 0.95 }}
-              >
-                <Star className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
-                <span className="text-xs text-gray-300 hover:text-yellow-400">
-                  Ratings
-                </span>
-              </motion.button>
-              <motion.button
-                onClick={() => {
-                  const currentPath = window.location.pathname;
-                  const targetPath = `/user/${owner?.username}`;
-
-                  if (currentPath === targetPath) {
-                    // Smooth scroll to the element with ID "feedbacks"
-                    document
-                      .getElementById("feedbacks")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  } else {
-                    // Navigate to the target page
-                    handleNavigation(`${targetPath}#feedbacks`);
-                  }
-                }}
-                className="flex flex-col items-center space-y-1"
-                whileTap={{ scale: 0.95 }}
               >
                 <MessageCircle className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
                 <span className="text-xs text-gray-300 hover:text-yellow-400">
-                  Feedback
+                  Feedbacks
                 </span>
-              </motion.button>
+              </Link>
+
+              <motion.div
+                onClick={(e) => {
+                  e.preventDefault();
+
+                  document
+                    .getElementById("contact")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="flex flex-col items-center space-y-1 text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
+                whileTap={{ scale: 0.95 }}
+              >
+                <Mail className="h-6 w-6 text-gray-300 hover:text-yellow-400" />
+                <span className="text-xs">Contact</span>
+              </motion.div>
             </>
           ) : (
             <>

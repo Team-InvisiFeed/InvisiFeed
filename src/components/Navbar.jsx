@@ -120,83 +120,35 @@ function Navbar() {
             </>
           ) : owner ? (
             <>
-              <motion.div
-                onClick={() => {
-                  const currentPath = window.location.pathname;
-                  const targetPath = `/user/${owner?.username}`;
-
-                  if (currentPath === targetPath) {
-                    // Smooth scroll to the element with ID "generate"
-                    document
-                      .getElementById("generate")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  } else {
-                    // Navigate to the target page
-                    handleSamePageNavigation(`${targetPath}#generate`);
-                  }
-                }}
+              <Link
+                href={`/user/${owner?.username}/generate`}
+                onClick={() =>
+                  handleNavigation(`/user/${owner?.username}/generate`)
+                }
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
               >
                 Generate
-              </motion.div>
-              <motion.div
-                onClick={() => {
-                  const currentPath = window.location.pathname;
-                  const targetPath = `/user/${owner?.username}`;
+              </Link>
 
-                  if (currentPath === targetPath) {
-                    // Smooth scroll to the element with ID "dashboard"
-                    document
-                      .getElementById("dashboard")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  } else {
-                    // Navigate to the target page
-                    handleSamePageNavigation(`${targetPath}#dashboard`);
-                  }
-                }}
+              <Link
+                href={`/user/${owner?.username}/dashboard`}
+                onClick={() =>
+                  handleNavigation(`/user/${owner?.username}/dashboard`)
+                }
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
               >
                 Dashboard
-              </motion.div>
+              </Link>
 
-              <motion.div
-                onClick={() => {
-                  const currentPath = window.location.pathname;
-                  const targetPath = `/user/${owner?.username}`;
-
-                  if (currentPath === targetPath) {
-                    // Smooth scroll to the element with ID "ratings"
-                    document
-                      .getElementById("ratings")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  } else {
-                    // Navigate to the target page
-                    handleSamePageNavigation(`${targetPath}#ratings`);
-                  }
-                }}
-                className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
-              >
-                Ratings
-              </motion.div>
-              <motion.div
-                onClick={() => {
-                  const currentPath = window.location.pathname;
-                  const targetPath = `/user/${owner?.username}`;
-
-                  if (currentPath === targetPath) {
-                    // Smooth scroll to the element with ID "feedbacks"
-                    document
-                      .getElementById("feedbacks")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  } else {
-                    // Navigate to the target page
-                    handleSamePageNavigation(`${targetPath}#feedbacks`);
-                  }
-                }}
+              <Link
+                href={`/user/${owner?.username}/feedbacks`}
+                onClick={() =>
+                  handleNavigation(`/user/${owner?.username}/feedbacks`)
+                }
                 className="text-gray-300 hover:text-yellow-400 transition-colors cursor-pointer"
               >
                 Feedbacks
-              </motion.div>
+              </Link>
 
               <motion.div
                 onClick={(e) => {
