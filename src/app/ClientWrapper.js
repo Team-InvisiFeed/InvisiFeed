@@ -13,7 +13,7 @@ export default function ClientWrapper({ children }) {
   const { status } = useSession();
 
   // Check if the route matches specific paths
-  const isFeedbackPage =
+  const isPageWithoutNavbarAndFooter =
     pathname.startsWith("/feedback") ||
     pathname.startsWith("/sign-in") ||
     pathname.startsWith("/register") ||
@@ -28,10 +28,10 @@ export default function ClientWrapper({ children }) {
 
   return (
     <>
-      {!isFeedbackPage && <Navbar />}
+      {!isPageWithoutNavbarAndFooter && <Navbar />}
       <main>{children || <p>No children to render</p>}</main>
-      {!isFeedbackPage && <Footer />}
-      {!isFeedbackPage && <MobileNav />}
+      {!isPageWithoutNavbarAndFooter && <Footer />}
+      {!isPageWithoutNavbarAndFooter && <MobileNav />}
     </>
   );
 }
