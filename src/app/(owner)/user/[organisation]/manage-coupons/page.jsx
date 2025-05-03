@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import {  usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
@@ -27,7 +27,6 @@ export default function ManageCoupons() {
   const [currentPage, setCurrentPage] = useState(1);
   const [deleting, setDeleting] = useState(false);
   const couponsPerPage = 10;
-
 
   useEffect(() => {
     if (owner?.username) {
@@ -97,10 +96,7 @@ export default function ManageCoupons() {
       return;
     }
     setLoading(true);
-    
   };
-
-
 
   useEffect(() => {
     return () => {
@@ -136,12 +132,9 @@ export default function ManageCoupons() {
             </span>
           </div>
           <Link href="/pricing" onClick={() => handleNavigation("/pricing")}>
-          <button
-            className="bg-yellow-400 text-[#0A0A0A] py-2 px-6 font-semibold rounded-full shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 transition duration-300 ease-in-out cursor-pointer"
-            
-          >
-            Subscribe to Pro
-          </button>
+            <button className="bg-yellow-400 text-[#0A0A0A] py-2 px-6 font-semibold rounded-full shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 transition duration-300 ease-in-out cursor-pointer">
+              Subscribe to Pro
+            </button>
           </Link>
         </div>
       </div>
@@ -251,7 +244,7 @@ export default function ManageCoupons() {
                               transition={{ duration: 0.2 }}
                               className="border-t border-yellow-400/10"
                             >
-                              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 px-5 py-2">
                                 <div>
                                   <h3 className="text-sm font-medium text-gray-400">
                                     Description
