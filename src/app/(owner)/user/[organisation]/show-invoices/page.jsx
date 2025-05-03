@@ -82,7 +82,6 @@ export default function ShowInvoicesPage({ params }) {
   };
 
   const renderFeedbackCell = (invoice) => {
-
     if (!invoice.isFeedbackSubmitted) {
       return <span className="text-gray-400">Not Submitted</span>;
     }
@@ -107,7 +106,6 @@ export default function ShowInvoicesPage({ params }) {
       return;
     }
     setLoading(true);
-
   };
 
   useEffect(() => {
@@ -133,17 +131,14 @@ export default function ShowInvoicesPage({ params }) {
             </span>
           </div>
           <Link href="/pricing" onClick={() => handleNavigation("/pricing")}>
-          <button
-            className="bg-yellow-400 text-[#0A0A0A] py-2 px-6 font-semibold rounded-full shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 transition duration-300 ease-in-out cursor-pointer"
-          >
-            Subscribe to Pro
-          </button>
+            <button className="bg-yellow-400 text-[#0A0A0A] py-2 px-6 font-semibold rounded-full shadow-md hover:bg-yellow-600 focus:ring-2 focus:ring-yellow-300 transition duration-300 ease-in-out cursor-pointer">
+              Subscribe to Pro
+            </button>
           </Link>
         </div>
       </div>
     );
   }
-
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] py-6 sm:py-12 px-3 sm:px-4">
