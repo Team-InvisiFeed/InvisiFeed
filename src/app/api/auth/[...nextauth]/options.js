@@ -35,6 +35,12 @@ export const authOptions = {
             throw new Error("User not found with this email or username");
           }
 
+          if (user?.isGoogleAuth) {
+            throw new Error(
+              "You have signed up with Google. Please sign in using Google."
+            );
+          }
+
           if (!user.isVerified) {
             const verifyCode = Math.floor(
               100000 + Math.random() * 900000
@@ -186,13 +192,11 @@ export const authOptions = {
         }
       }
 
-
       return true;
     },
 
     async jwt({ token, user, account, profile, session, trigger }) {
       if (user && account) {
-     
         // Initial sign in
         token.id = user.id;
         token.provider = account.provider;
@@ -250,7 +254,6 @@ export const authOptions = {
     },
 
     async session({ session, token, trigger }) {
-
       if (token) {
         session.user.id = token.id;
         session.user.email = token.email;
@@ -262,7 +265,6 @@ export const authOptions = {
         session.user.address = token.address;
         session.user.plan = token.plan;
         session.user.proTrialUsed = token.proTrialUsed;
-      
       }
       return session;
     },
