@@ -192,7 +192,7 @@ function UpdateProfilePage() {
             ...session.user,
             organizationName:
               data.user.organizationName || session.user.organizationName,
-            phoneNumber: data.user.phoneNumber || session.user.phoneNumber,
+            phoneNumber: data.user.phoneNumber,
             address: data.user.address || session.user.address,
             isProfileCompleted: data.user.isProfileCompleted,
           },
