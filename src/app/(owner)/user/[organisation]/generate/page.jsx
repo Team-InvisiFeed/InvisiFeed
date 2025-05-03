@@ -1,9 +1,9 @@
-import GenerateInvoice from '@/components/owner-page-components/GenerateInvoiceQR'
+import InvoiceManagement from '@/components/owner-page-components/InvoiceManagement'
 import React from 'react'
 
 function page() {
   return (
-    <GenerateInvoice />
+    <InvoiceManagement />
   )
 }
 
