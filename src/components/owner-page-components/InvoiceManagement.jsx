@@ -76,7 +76,6 @@ export default function InvoiceManagement() {
 
   const fileInputRef = useRef(null);
 
-
   // Sample invoice data
   const sampleInvoices = [
     {
@@ -159,11 +158,8 @@ export default function InvoiceManagement() {
 
   const handleFileChange = (e) => {
     console.log(e);
-    
-    
 
-    const selectedFile = e.target.files[0] ;
-
+    const selectedFile = e.target.files[0];
 
     // Check if file size is greater than 3MB
     if (selectedFile && selectedFile.size > 3 * 1024 * 1024) {
@@ -174,7 +170,6 @@ export default function InvoiceManagement() {
     setFile(selectedFile);
     setEmailSent(false);
     setCustomerEmail("");
-    
   };
 
   const handleCouponSave = () => {
@@ -210,10 +205,8 @@ export default function InvoiceManagement() {
   }
 
   useEffect(() => {
-    console.log("File:" , file);
-    
-  }, [file])
-  
+    console.log("File:", file);
+  }, [file]);
 
   const handleSampleInvoiceSelect = async (sampleInvoice) => {
     try {
@@ -344,7 +337,7 @@ export default function InvoiceManagement() {
         setEmailSent(true);
         setCustomerEmail("");
         toast.success("Email sent successfully");
-        setShowDropdown(false)
+        setShowDropdown(false);
       } else {
         toast.error(data.error || "Failed to send email. Please try again.");
       }
@@ -391,7 +384,6 @@ export default function InvoiceManagement() {
   };
 
   const handleRefreshComponent = () => {
-    
     setFile(null);
     setFileLoading(false);
     setPdfUrl("");
@@ -409,13 +401,12 @@ export default function InvoiceManagement() {
     setShowCreateInvoice(false);
     setShowConfirmModal(false);
     setConfirming(false);
-    setShowDropdown(false);   
-    
+    setShowDropdown(false);
+
     // 👇 Reset file input field
-  if (fileInputRef.current) {
-    fileInputRef.current.value = null;
-  }
-    
+    if (fileInputRef.current) {
+      fileInputRef.current.value = null;
+    }
   };
 
   const handleCreateInvoice = async (invoiceData) => {
@@ -656,26 +647,30 @@ export default function InvoiceManagement() {
                 </label>
 
                 {/* Create Coupon Button */}
-                {file && !couponSaved && (
-                  <button
-                    onClick={() => setShowCouponForm(true)}
-                    className="w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 cursor-pointer"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
+                {file &&
+                  !couponSaved &&
+                  (owner?.plan?.planName !== "free" ||
+                    (owner?.plan?.planEndDate &&
+                      new Date(owner?.plan?.planEndDate) > new Date())) && (
+                    <button
+                      onClick={() => setShowCouponForm(true)}
+                      className="w-full max-w-md flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 cursor-pointer"
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    <span>Create Coupon</span>
-                  </button>
-                )}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span>Create Coupon</span>
+                    </button>
+                  )}
 
                 {couponSaved && (
                   <div className="w-full max-w-md flex flex-col items-center space-y-2">
@@ -726,7 +721,6 @@ export default function InvoiceManagement() {
                         initialLoading
                       }
                       className="w-full px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none cursor-pointer"
-                      
                     >
                       {fileLoading || initialLoading ? (
                         <div className="flex items-center justify-center space-x-2 ">
@@ -854,81 +848,83 @@ export default function InvoiceManagement() {
                   </div>
 
                   <div className="w-full max-w-md space-y-2">
-  {/* Trigger Button */}
-  <button
-    onClick={() => setShowDropdown(!showDropdown)}
-    disabled={sendingEmail || emailSent}
-    className="w-full px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-xl transition-all duration-300 ease-in-out shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 flex items-center justify-center cursor-pointer space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-  >
-    {sendingEmail ? (
-      <>
-        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-        <span>Sending...</span>
-      </>
-    ) : emailSent ? (
-      <>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-            clipRule="evenodd"
-          />
-        </svg>
-        <span>Email Sent!</span>
-      </>
-    ) : (
-      <>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-        </svg>
-        <span>Send Email</span>
-      </>
-    )}
-  </button>
+                    {/* Trigger Button */}
+                    <button
+                      onClick={() => setShowDropdown(!showDropdown)}
+                      disabled={sendingEmail || emailSent}
+                      className="w-full px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-xl transition-all duration-300 ease-in-out shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 flex items-center justify-center cursor-pointer space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {sendingEmail ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span>Sending...</span>
+                        </>
+                      ) : emailSent ? (
+                        <>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          <span>Email Sent!</span>
+                        </>
+                      ) : (
+                        <>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                          </svg>
+                          <span>Send Email</span>
+                        </>
+                      )}
+                    </button>
 
-  {/* Smooth Height Transition Dropdown */}
-  <div
-    style={{
-      maxHeight: showDropdown ? "500px" : "0px",
-    }}
-    className="transition-all duration-300 ease-in-out overflow-hidden"
-  >
-    <div className="mt-3 bg-[#0A0A0A]/50 p-4 rounded-xl border border-yellow-400/10 space-y-3">
-      <p className="text-xs text-gray-400 text-center">
-        Email will be sent via <strong>invisifeed@gmail.com</strong>
-      </p>
-      <div className="relative">
-        <input
-          type="email"
-          value={customerEmail}
-          onChange={(e) => setCustomerEmail(e.target.value)}
-          placeholder="Enter customer email"
-          className="w-full px-4 py-3 pr-10 bg-[#0A0A0A]/70 border border-yellow-400/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/30 transition-all duration-200" 
-          disabled={sendingEmail || emailSent}
-        />
-        <button
-          onClick={handleSendEmail}
-          className="absolute inset-y-0 right-3 flex items-center text-yellow-400 hover:text-yellow-300 disabled:opacity-50 cursor-pointer"
-          disabled={!customerEmail || sendingEmail || emailSent}
-        >
-          <Send className="w-5 h-5" />
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
+                    {/* Smooth Height Transition Dropdown */}
+                    <div
+                      style={{
+                        maxHeight: showDropdown ? "500px" : "0px",
+                      }}
+                      className="transition-all duration-300 ease-in-out overflow-hidden"
+                    >
+                      <div className="mt-3 bg-[#0A0A0A]/50 p-4 rounded-xl border border-yellow-400/10 space-y-3">
+                        <p className="text-xs text-gray-400 text-center">
+                          Email will be sent via{" "}
+                          <strong>invisifeed@gmail.com</strong>
+                        </p>
+                        <div className="relative">
+                          <input
+                            type="email"
+                            value={customerEmail}
+                            onChange={(e) => setCustomerEmail(e.target.value)}
+                            placeholder="Enter customer email"
+                            className="w-full px-4 py-3 pr-10 bg-[#0A0A0A]/70 border border-yellow-400/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/30 transition-all duration-200"
+                            disabled={sendingEmail || emailSent}
+                          />
+                          <button
+                            onClick={handleSendEmail}
+                            className="absolute inset-y-0 right-3 flex items-center text-yellow-400 hover:text-yellow-300 disabled:opacity-50 cursor-pointer"
+                            disabled={
+                              !customerEmail || sendingEmail || emailSent
+                            }
+                          >
+                            <Send className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
                   {/* Download Button */}
                   <a
