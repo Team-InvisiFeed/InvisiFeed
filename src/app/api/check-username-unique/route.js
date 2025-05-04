@@ -22,14 +22,11 @@ export async function GET(request) {
     const result = UsernameQuerySchema.safeParse(queryParam);
 
     if (!result.success) {
-      const usernameErrors = result.error.format().username?._errors || [];
       return NextResponse.json(
         {
           success: false,
           message:
-            usernameErrors.length > 0
-              ? usernameErrors.join(", ")
-              : "Invalid query parameters",
+            "Invalid username"
         },
         { status: 400 }
       );
