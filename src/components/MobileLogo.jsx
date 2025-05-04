@@ -8,7 +8,7 @@ export default function MobileLogo() {
   return (
     <div className="lg:hidden flex justify-center items-center py-4">
       <h1
-        className="text-3xl font-extrabold tracking-tight text-white cursor-pointer"
+        className="text-3xl font-bold  text-yellow-400 cursor-pointer"
         onClick={() => router.push("/")}
       >
         InvisiFeed

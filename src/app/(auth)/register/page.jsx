@@ -484,7 +484,7 @@ function Page() {
                 <button
                   type="button"
                   onClick={handleGoogleSignIn}
-                  className="w-full flex items-center justify-center space-x-2 px-6 py-5 bg-transparent hover:bg-[#000000ab] text-white font-medium cursor-pointer h-9 shadow-lg hover:shadow-yellow-500/10 rounded-lg border-[#161616] border-[0.001rem] transition-all duration-300 ease-in-out"
+                  className="w-full flex items-center justify-center space-x-2 px-6 py-5 bg-white hover:bg-gray-300 text-black font-medium cursor-pointer h-9 shadow-lg rounded-lg transition-all duration-300 ease-in-out"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24">
                     <path

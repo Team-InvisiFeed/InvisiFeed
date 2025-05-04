@@ -296,7 +296,7 @@ function SignInContent() {
       {/* Right Section with Form */}
       <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-6 bg-[#0A0A0A]">
         <div className="w-full max-w-md">
-          <div className="mb-8">
+          <div className="mb-4">
             <MobileLogo />
           </div>
           <motion.div
@@ -405,7 +405,7 @@ function SignInContent() {
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-2 bg-[#0A0A0A] text-gray-400">
-                  Or continue with
+                  or
                 </span>
               </div>
             </div>
@@ -414,7 +414,7 @@ function SignInContent() {
             <button
               type="button" // Add type="button" to prevent form submission
               onClick={handleGoogleSignIn}
-              className="w-full flex items-center justify-center space-x-2 px-6 py-5 bg-transparent hover:bg-[#000000ab] text-white font-medium cursor-pointer h-9 shadow-lg hover:shadow-yellow-500/10 rounded-lg border-[#161616] border-[0.001rem] transition-all duration-300 ease-in-out"
+              className="w-full flex items-center justify-center space-x-2 px-6 py-5 bg-white hover:bg-gray-300 text-black font-medium cursor-pointer h-9 shadow-lg rounded-lg transition-all duration-300 ease-in-out"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
