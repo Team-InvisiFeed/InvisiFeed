@@ -90,6 +90,22 @@ textarea:-webkit-autofill:active {
   display: none; /* Hide arrows in Firefox */
 }
 
+input::selection {
+  background-color: #9CA3AF
+  ; /* Example: Tailwind's yellow-300 */
+  color: #000;               /* Optional: text color on selection */
+}
+
+* {
+  user-select: none;
+}
+
+input,
+textarea,
+select {
+  user-select: text;
+}
+
 
 
 @theme inline {
