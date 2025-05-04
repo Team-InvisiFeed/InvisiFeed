@@ -145,7 +145,7 @@ export default function ShowInvoicesPage({ params }) {
       >
         <Card className="w-full bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/20">
           <CardHeader className="border-b border-yellow-400/20">
-            <CardTitle className="text-xl sm:text-2xl font-bold text-yellow-400">
+            <CardTitle className="text-xl sm:text-3xl text-center font-bold text-yellow-400">
               Invoices
             </CardTitle>
           </CardHeader>
