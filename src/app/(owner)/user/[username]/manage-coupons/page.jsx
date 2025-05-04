@@ -142,7 +142,7 @@ export default function ManageCoupons() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] pt-16 sm:pt-20 md:pt-24 px-3 sm:px-4 md:px-6">
+    <div className="min-h-screen bg-[#0A0A0A] pt-16 sm:pt-10 md:pt-12 px-3 sm:px-4 md:px-6">
       <div className="w-full max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -150,10 +150,10 @@ export default function ManageCoupons() {
           transition={{ duration: 0.3 }}
           className="mb-6 sm:mb-8"
         >
-          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
+          <h1 className="text-2xl text-center sm:text-3xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent">
             Manage Coupons
           </h1>
-          <p className="text-sm sm:text-base text-gray-400 mt-1.5 sm:mt-2">
+          <p className="text-sm text-center sm:text-base text-gray-400 mt-1.5 sm:mt-2">
             View and manage all your active coupons
           </p>
         </motion.div>
