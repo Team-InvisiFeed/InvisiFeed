@@ -854,84 +854,81 @@ export default function InvoiceManagement() {
                   </div>
 
                   <div className="w-full max-w-md space-y-2">
-                    {/* Trigger Button */}
-                    <button
-                      onClick={() => setShowDropdown(!showDropdown)}
-                      disabled={sendingEmail || emailSent}
-                      className="w-full px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 flex items-center justify-center cursor-pointer space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {sendingEmail ? (
-                        <>
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          <span>Sending...</span>
-                        </>
-                      ) : emailSent ? (
-                        <>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          <span>Email Sent!</span>
-                        </>
-                      ) : (
-                        <>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                          </svg>
-                          <span>Send Email</span>
-                        </>
-                      )}
-                    </button>
+  {/* Trigger Button */}
+  <button
+    onClick={() => setShowDropdown(!showDropdown)}
+    disabled={sendingEmail || emailSent}
+    className="w-full px-6 py-3 bg-gradient-to-r from-white to-gray-200 hover:from-white hover:to-gray-400 text-black font-medium rounded-xl transition-all duration-300 ease-in-out shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 flex items-center justify-center cursor-pointer space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+  >
+    {sendingEmail ? (
+      <>
+        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+        <span>Sending...</span>
+      </>
+    ) : emailSent ? (
+      <>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fillRule="evenodd"
+            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+            clipRule="evenodd"
+          />
+        </svg>
+        <span>Email Sent!</span>
+      </>
+    ) : (
+      <>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+        </svg>
+        <span>Send Email</span>
+      </>
+    )}
+  </button>
 
-                    {/* Dropdown Panel */}
-                    <div
-                      className={`transition-all duration-200 overflow-hidden ${
-                        showDropdown
-                          ? "max-h-[200px] opacity-100"
-                          : "max-h-0 opacity-0"
-                      }`}
-                    >
-                      <div className="mt-3 bg-[#0A0A0A]/50 p-4 rounded-xl border border-yellow-400/10 space-y-3">
-                        <p className="text-xs text-gray-400 text-center">
-                          Email will be sent via{" "}
-                          <strong>invisifeed@gmail.com</strong>
-                        </p>
-                        <div className="relative">
-                          <input
-                            type="email"
-                            value={customerEmail}
-                            onChange={(e) => setCustomerEmail(e.target.value)}
-                            placeholder="Enter customer email"
-                            className="w-full px-4 py-3 pr-10 bg-[#0A0A0A]/70 border border-yellow-400/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/30 transition-all duration-300"
-                            disabled={sendingEmail || emailSent}
-                          />
-                          <button
-                            onClick={handleSendEmail}
-                            className="absolute inset-y-0 right-3 flex items-center text-yellow-400 hover:text-yellow-300 disabled:opacity-50 cursor-pointer"
-                            disabled={
-                              !customerEmail || sendingEmail || emailSent
-                            }
-                          >
-                            <Send className="w-5 h-5" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+  {/* Smooth Height Transition Dropdown */}
+  <div
+    style={{
+      maxHeight: showDropdown ? "500px" : "0px",
+    }}
+    className="transition-all duration-300 ease-in-out overflow-hidden"
+  >
+    <div className="mt-3 bg-[#0A0A0A]/50 p-4 rounded-xl border border-yellow-400/10 space-y-3">
+      <p className="text-xs text-gray-400 text-center">
+        Email will be sent via <strong>invisifeed@gmail.com</strong>
+      </p>
+      <div className="relative">
+        <input
+          type="email"
+          value={customerEmail}
+          onChange={(e) => setCustomerEmail(e.target.value)}
+          placeholder="Enter customer email"
+          className="w-full px-4 py-3 pr-10 bg-[#0A0A0A]/70 border border-yellow-400/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/30 transition-all duration-200" 
+          disabled={sendingEmail || emailSent}
+        />
+        <button
+          onClick={handleSendEmail}
+          className="absolute inset-y-0 right-3 flex items-center text-yellow-400 hover:text-yellow-300 disabled:opacity-50 cursor-pointer"
+          disabled={!customerEmail || sendingEmail || emailSent}
+        >
+          <Send className="w-5 h-5" />
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
                   {/* Download Button */}
                   <a
