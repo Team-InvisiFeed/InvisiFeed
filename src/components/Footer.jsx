@@ -10,6 +10,7 @@ import {
   Phone,
   MapPin,
   Github,
+  Coffee,
 } from "lucide-react";
 import SocialMediaPopup from "./SocialMediaPopup";
 import LoadingScreen from "./LoadingScreen"; // Import the loading screen
@@ -46,6 +47,14 @@ function Footer() {
         setIsSocialMediaPopupOpen(true);
       },
     },
+    {
+      name : "bmc",
+      icon: Coffee,
+      onClick: () => {
+        setSelectedSocialMedia("bmc");
+        setIsSocialMediaPopupOpen(true);
+      },
+    }
   ];
 
   const pathname = usePathname();

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Linkedin, Github, Twitter } from "lucide-react";
+import { X, Linkedin, Github, Twitter, Coffee } from "lucide-react";
 
 const creators = [
   {
@@ -11,6 +11,7 @@ const creators = [
     linkedin: "https://www.linkedin.com/in/shubh-v21",
     github: "https://github.com/shubh-v21",
     twitter: "https://twitter.com/shubhonx",
+    bmc: "https://buymeacoffee.com/shubhdevs",
     description: "",
   },
   {
@@ -19,6 +20,8 @@ const creators = [
     linkedin: "https://www.linkedin.com/in/ss0807/",
     github: "https://github.com/SnehaSharma245",
     twitter: "https://twitter.com/SnehaDevs",
+    bmc: "https://buymeacoffee.com/snehadevs",
+
     description: "",
   },
 ];
@@ -27,16 +30,27 @@ const socialMediaIcons = [
   { id: "github", icon: Github, label: "GitHub" },
   { id: "linkedin", icon: Linkedin, label: "LinkedIn" },
   { id: "twitter", icon: Twitter, label: "Twitter" },
+  { id: "bmc", icon: Coffee, label: "Buy Me a Coffee" },
 ];
 
-export default function SocialMediaPopup({ isOpen, onClose, initialSocialMedia }) {
-  const [socialMediaSwitch, setSocialMediaSwitch] = useState(initialSocialMedia || "github");
+export default function SocialMediaPopup({
+  isOpen,
+  onClose,
+  initialSocialMedia,
+}) {
+  const [socialMediaSwitch, setSocialMediaSwitch] = useState(
+    initialSocialMedia || "github"
+  );
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   useEffect(() => {
     if (isOpen) {
       setSocialMediaSwitch(initialSocialMedia || "github");
-      setSelectedIndex(socialMediaIcons.findIndex(icon => icon.id === (initialSocialMedia || "github")));
+      setSelectedIndex(
+        socialMediaIcons.findIndex(
+          (icon) => icon.id === (initialSocialMedia || "github")
+        )
+      );
     }
   }, [isOpen, initialSocialMedia]);
 
@@ -70,7 +84,7 @@ export default function SocialMediaPopup({ isOpen, onClose, initialSocialMedia }
 
             {/* Header */}
             <div className="text-center mb-4">
-              <motion.h2 
+              <motion.h2
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 className="text-xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent"
@@ -87,7 +101,9 @@ export default function SocialMediaPopup({ isOpen, onClose, initialSocialMedia }
                     key={id}
                     onClick={() => handleSocialMediaChange(id, index)}
                     className={`relative px-3 py-1.5 rounded-full transition-colors ${
-                      selectedIndex === index ? 'text-yellow-400' : 'text-gray-400 hover:text-yellow-400'
+                      selectedIndex === index
+                        ? "text-yellow-400"
+                        : "text-gray-400 hover:text-yellow-400"
                     }`}
                   >
                     <Icon className="h-4 w-4" />
@@ -95,7 +111,11 @@ export default function SocialMediaPopup({ isOpen, onClose, initialSocialMedia }
                       <motion.div
                         layoutId="activeTab"
                         className="absolute inset-0 bg-yellow-400/10 rounded-full"
-                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                        transition={{
+                          type: "spring",
+                          bounce: 0.2,
+                          duration: 0.6,
+                        }}
                       />
                     )}
                   </button>
@@ -119,7 +139,9 @@ export default function SocialMediaPopup({ isOpen, onClose, initialSocialMedia }
                         {creator.name}
                       </h3>
                       <p className="text-xs text-gray-400">{creator.role}</p>
-                      <p className="text-xs text-gray-500 mt-1">{creator.description}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {creator.description}
+                      </p>
 
                       <AnimatePresence mode="wait">
                         <motion.div
@@ -148,7 +170,9 @@ export default function SocialMediaPopup({ isOpen, onClose, initialSocialMedia }
                               className="mt-2 inline-flex items-center space-x-1 text-yellow-400 hover:text-yellow-300 transition-colors"
                             >
                               <Linkedin className="h-3 w-3" />
-                              <span className="text-xs">Connect on LinkedIn</span>
+                              <span className="text-xs">
+                                Connect on LinkedIn
+                              </span>
                             </a>
                           )}
                           {socialMediaSwitch === "twitter" && (
@@ -159,7 +183,22 @@ export default function SocialMediaPopup({ isOpen, onClose, initialSocialMedia }
                               className="mt-2 inline-flex items-center space-x-1 text-yellow-400 hover:text-yellow-300 transition-colors"
                             >
                               <Twitter className="h-3 w-3" />
-                              <span className="text-xs">Connect on Twitter</span>
+                              <span className="text-xs">
+                                Connect on Twitter
+                              </span>
+                            </a>
+                          )}
+                          {socialMediaSwitch === "bmc" && (
+                            <a
+                              href={creator.bmc}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-2 inline-flex items-center space-x-1 text-yellow-400 hover:text-yellow-300 transition-colors"
+                            >
+                              <Coffee className="h-3 w-3" />
+                              <span className="text-xs">
+                                Support <span>{creator.name}</span>{" "}
+                              </span>
                             </a>
                           )}
                         </motion.div>
@@ -171,14 +210,15 @@ export default function SocialMediaPopup({ isOpen, onClose, initialSocialMedia }
             </div>
 
             {/* Footer */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
               className="mt-4 text-center"
             >
               <p className="text-xs text-gray-500">
-                Follow us to stay updated with our latest developments and insights
+                Follow us to stay updated with our latest developments and
+                insights
               </p>
             </motion.div>
           </motion.div>
