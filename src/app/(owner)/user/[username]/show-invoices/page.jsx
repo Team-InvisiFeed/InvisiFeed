@@ -297,7 +297,7 @@ export default function ShowInvoicesPage({ params }) {
 
       {/* Feedback Dialog */}
       <Dialog open={showFeedbackDialog} onOpenChange={setShowFeedbackDialog}>
-        <DialogContent className="bg-[#0A0A0A] border-yellow-400/20">
+        <DialogContent className="bg-[#0A0A0A] border-yellow-400/20 max-h-[90vh] overflow-y-auto custom-popup">
           <DialogHeader>
             <DialogTitle className="text-yellow-400">
               Customer Feedback
@@ -378,6 +378,7 @@ export default function ShowInvoicesPage({ params }) {
           )}
         </DialogContent>
       </Dialog>
+      
     </div>
   );
 }
