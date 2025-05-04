@@ -21,8 +21,7 @@ export async function POST(req) {
     const data = await req.json();
     const { ...invoiceData } = data;
 
-    const { customerName, customerEmail} =
-      invoiceData;
+    const { customerName, customerEmail } = invoiceData;
 
     const session = await getServerSession(authOptions);
     const username = session?.user?.username;
@@ -49,7 +48,8 @@ export async function POST(req) {
       owner.uploadedInvoiceCount.lastDailyReset = now;
     }
 
-    const isProPlan = owner?.plan?.planName === "pro" && owner?.plan?.planEndDate > new Date();
+    const isProPlan =
+      owner?.plan?.planName === "pro" && owner?.plan?.planEndDate > new Date();
 
     if (isProPlan) {
       if (owner.uploadedInvoiceCount.dailyUploadCount >= 10) {
@@ -64,17 +64,19 @@ export async function POST(req) {
       }
     }
 
-    // Check if daily limit reached
-    if (owner.uploadedInvoiceCount.dailyUploadCount >= 3) {
+    // Check if daily limit reached for free plan and pro-trial plan
 
-      return NextResponse.json(
-        {
-          success: false,
-          message: `Daily upload limit reached. Please try again after ${hoursLeft} hours. Upgrade to pro plan to increase daily upload limit`,
-          timeLeft: hoursLeft,
-        },
-        { status: 429 }
-      );
+    if (!isProPlan) {
+      if (owner.uploadedInvoiceCount.dailyUploadCount >= 3) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Daily upload limit reached. Please try again after ${hoursLeft} hours. Upgrade to pro plan to increase daily upload limit`,
+            timeLeft: hoursLeft,
+          },
+          { status: 429 }
+        );
+      }
     }
 
     // Generate invoice number if not provided
@@ -151,7 +153,6 @@ export async function POST(req) {
     const discountTotal = discount;
     const grandTotal = sub - discount + tax;
     const taxTotal = tax;
-
 
     // Generate PDF using react-pdf/renderer
     const pdfBuffer = await generateInvoicePdf(
