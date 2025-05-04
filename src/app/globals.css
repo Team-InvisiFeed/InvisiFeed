@@ -106,6 +106,10 @@ select {
   user-select: text;
 }
 
+input, textarea {
+  @apply caret-gray-400;
+}
+
 
 
 @theme inline {
