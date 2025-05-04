@@ -187,7 +187,7 @@ const Dashboard = () => {
   const formatNumber = (number) => {
     if (number >= 1e7) return (number / 1e7).toFixed(2) + " Cr"; // Crores
     if (number >= 1e5) return (number / 1e5).toFixed(2) + " Lakh"; // Lakhs
-    if (number >= 1e3) return (number / 1e3).toFixed(2) + " K"; // Thousands
+    if (number >= 1e3) return (number / 1e3).toFixed(2) + "K"; // Thousands
     return number.toFixed(2); // Default decimal format
   };
 
