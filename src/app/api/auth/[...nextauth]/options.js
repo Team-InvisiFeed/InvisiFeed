@@ -101,7 +101,7 @@ export const authOptions = {
 
             // ✅ Allow sign-in if it's a valid Google user
             user.id = existingUser._id.toString();
-            user.organizationName = existingUser.organizationName;
+            user.businessName = existingUser.businessName;
             user.username = existingUser.username;
             user.isProfileCompleted = existingUser.isProfileCompleted;
             user.phoneNumber = existingUser.phoneNumber;
@@ -153,7 +153,7 @@ export const authOptions = {
 
           const newUser = await OwnerModel.create({
             email: user.email,
-            organizationName: user.name || "",
+            businessName: user.name || "",
             username: username,
             password: await bcrypt.hash(Math.random().toString(36), 10),
             verifyCode: "GOOGLE_AUTH",
@@ -178,7 +178,7 @@ export const authOptions = {
 
           user.id = newUser._id.toString();
           user.username = username;
-          user.organizationName = newUser.organizationName;
+          user.businessName = newUser.businessName;
           user.isProfileCompleted = newUser.isProfileCompleted;
           user.phoneNumber = newUser.phoneNumber;
           user.address = newUser.address;
@@ -202,7 +202,7 @@ export const authOptions = {
         token.provider = account.provider;
         token.username = user.username;
         token.gstinDetails = user.gstinDetails;
-        token.organizationName = user.organizationName;
+        token.businessName = user.businessName;
         token.isProfileCompleted = user.isProfileCompleted || "pending";
         token.phoneNumber = user.phoneNumber;
         token.address = user.address;
@@ -242,7 +242,7 @@ export const authOptions = {
       // Handle session update
       if (trigger === "update" && session?.user) {
         token.isProfileCompleted = session.user.isProfileCompleted || "pending";
-        token.organizationName = session.user.organizationName;
+        token.businessName = session.user.businessName;
         token.gstinDetails = session.user.gstinDetails;
         token.phoneNumber = session.user.phoneNumber;
         token.address = session.user.address;
@@ -257,7 +257,7 @@ export const authOptions = {
       if (token) {
         session.user.id = token.id;
         session.user.email = token.email;
-        session.user.organizationName = token.organizationName;
+        session.user.businessName = token.businessName;
         session.user.isProfileCompleted = token.isProfileCompleted || "pending";
         session.user.gstinDetails = token.gstinDetails;
         session.user.username = token.username;

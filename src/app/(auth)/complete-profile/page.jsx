@@ -25,7 +25,7 @@ import GSTINVerificationDialog from "@/components/owner-page-components/GSTINVer
 
 // Profile completion schema
 const completeProfileSchema = z.object({
-  organizationName: z.string().min(1, "Organization name is required"),
+  businessName: z.string().min(1, "Business name is required"),
   phoneNumber: z.string().min(10, "Phone number must be at least 10 digits"),
   address: z.object({
     localAddress: z.string().min(1, "Local address is required"),
@@ -164,7 +164,7 @@ function Page() {
     resolver: zodResolver(completeProfileSchema),
     mode: "onSubmit",
     defaultValues: {
-      organizationName: session?.user?.organizationName || "",
+      businessName: session?.user?.businessName || "",
       phoneNumber: "",
       address: {
         localAddress: "",
@@ -179,14 +179,14 @@ function Page() {
   // Update form when session is loaded
   useEffect(() => {
     if (session?.user) {
-      form.setValue("organizationName", session.user.organizationName || "");
+      form.setValue("businessName", session.user.businessName || "");
     }
   }, [session, form]);
 
 
   // Add validation state for each field
   const [fieldErrors, setFieldErrors] = useState({
-    organizationName: false,
+    businessName: false,
     phoneNumber: false,
     country: false,
     state: false,
@@ -198,9 +198,9 @@ function Page() {
   // Function to validate all fields
   const validateFields = () => {
     const newErrors = {
-      organizationName:
-        !form.getValues("organizationName")?.trim() &&
-        !session?.user?.organizationName,
+      businessName:
+        !form.getValues("businessName")?.trim() &&
+        !session?.user?.businessName,
       phoneNumber: !form.getValues("phoneNumber")?.trim(),
       country: !selectedCountry?.trim(),
       state: !selectedState?.trim(),
@@ -218,7 +218,7 @@ function Page() {
       validateFields();
     }
   }, [
-    form.getValues("organizationName"),
+    form.getValues("businessName"),
     form.getValues("phoneNumber"),
     selectedCountry,
     selectedState,
@@ -252,7 +252,7 @@ function Page() {
 
       // Submit the profile data
       const { data } = await axios.patch("/api/complete-profile", {
-        organizationName: formData.organizationName,
+        businessName: formData.businessName,
         phoneNumber: formData.phoneNumber,
         address: formattedAddress,
       });
@@ -265,7 +265,7 @@ function Page() {
           ...session,
           user: {
             ...session.user,
-            organizationName: data.updatedUser.organizationName,
+            businessName: data.updatedUser.businessName,
             phoneNumber: data.updatedUser.phoneNumber,
             address: data.updatedUser.address,
             isProfileCompleted: data.profileStatus,
@@ -316,7 +316,7 @@ function Page() {
 
       // Submit empty data with skipProfile flag
       const { data } = await axios.patch("/api/complete-profile", {
-        organizationName: session.user.organizationName || "",
+        businessName: session.user.businessName || "",
         phoneNumber: "",
         address: {
           localAddress: "",
@@ -359,10 +359,10 @@ function Page() {
     }
   };
 
-  // Set initial organization name from session
+  // Set initial business name from session
   useEffect(() => {
-    if (session?.user?.organizationName) {
-      form.setValue("organizationName", session.user.organizationName);
+    if (session?.user?.businessName) {
+      form.setValue("businessName", session.user.businessName);
     }
   }, [session, form]);
 
@@ -430,13 +430,13 @@ function Page() {
                 >
                   <FormField
                     control={form.control}
-                    name="organizationName"
+                    name="businessName"
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
                           <div className="relative">
                             <Input
-                              placeholder="Enter Organisation Name"
+                              placeholder="Enter Business Name"
                               {...field}
                               onChange={(e) => {
                                 field.onChange(e);
@@ -446,9 +446,9 @@ function Page() {
                               }}
                               className="bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9 outline-none rounded-md"
                             />
-                            {showValidation && fieldErrors.organizationName && (
+                            {showValidation && fieldErrors.businessName && (
                               <p className="text-[11px] text-red-500 mt-1">
-                                Organization name is required
+                                Business name is required
                               </p>
                             )}
                           </div>

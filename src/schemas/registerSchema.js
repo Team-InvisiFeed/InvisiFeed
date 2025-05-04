@@ -13,13 +13,13 @@ export const usernameValidation = z
 export const registerSchema = z
   .object({
     username: usernameValidation,
-    organizationName: z
+    businessName: z
       .string()
       .trim()
-      .min(1, "Organisation name is required")
+      .min(1, "Business name is required")
       .regex(
         /^[^\s].*[^\s]$/,
-        "Organisation name must not contain leading or trailing spaces"
+        "Business name must not contain leading or trailing spaces"
       ),
     email: z
       .string()

@@ -108,7 +108,7 @@ const PricingSection = () => {
           }
         },
         prefill: {
-          name: user?.organizationName,
+          name: user?.businessName,
           email: user?.email,
           contact: user?.phoneNumber,
         },

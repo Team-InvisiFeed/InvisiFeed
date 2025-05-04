@@ -74,7 +74,7 @@ const CustomerDetails = ({ details, invoiceId }) => {
 
 const CustomerFeedbacks = () => {
   const params = useParams();
-  const { organisation } = params;
+  const { username } = params;
   const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -89,7 +89,7 @@ const CustomerFeedbacks = () => {
       setLoading(true);
       const response = await axios.get("/api/get-feedbacks", {
         params: {
-          username: organisation,
+          username: username,
           page,
           limit: 5,
           sortBy,
@@ -112,7 +112,7 @@ const CustomerFeedbacks = () => {
 
   useEffect(() => {
     fetchFeedbacks(currentPage);
-  }, [currentPage, organisation, sortBy]);
+  }, [currentPage, username, sortBy]);
 
   const handlePrevPage = () => {
     if (currentPage > 1) {
@@ -163,7 +163,7 @@ const CustomerFeedbacks = () => {
                 No Feedbacks Found
               </h2>
               <p className="text-gray-400">
-                This organisation hasn't received any feedbacks yet.
+                This business hasn't received any feedbacks yet.
               </p>
             </div>
           </div>

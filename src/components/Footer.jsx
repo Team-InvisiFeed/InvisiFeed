@@ -90,7 +90,7 @@ function Footer() {
               </Link>
               <p className="text-gray-400 text-sm leading-relaxed">
                 Connecting people with invisible threads of care and connection.
-                Empowering organizations with honest, anonymous feedback.
+                Empowering businesses with honest, anonymous feedback.
               </p>
             </motion.div>
 

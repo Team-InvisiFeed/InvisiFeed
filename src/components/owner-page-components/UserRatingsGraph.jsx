@@ -63,7 +63,7 @@ export default function UserRatingsGraph() {
             No Ratings Found
           </h2>
           <p className="text-gray-400">
-            This organisation hasn't received any ratings yet.
+            This business hasn't received any ratings yet.
           </p>
         </div>
       </div>
@@ -86,7 +86,7 @@ export default function UserRatingsGraph() {
         <div className="relative">
           <CardHeader className="border-b border-yellow-400/20 px-3 sm:px-6">
             <CardTitle className="text-base sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-yellow-500 to-yellow-400 bg-clip-text text-transparent text-center sm:text-left">
-              Average Ratings for {owner.organizationName}
+              Average Ratings for {owner.businessName}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-3 sm:p-6">

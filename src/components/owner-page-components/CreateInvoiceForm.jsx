@@ -122,7 +122,7 @@ export default function CreateInvoiceForm({
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      businessName: owner?.organizationName || "",
+      businessName: owner?.businessName || "",
       businessEmail: owner?.email || "",
       businessPhone: owner?.phoneNumber || "",
       businessAddress: owner?.address

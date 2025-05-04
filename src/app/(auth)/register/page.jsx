@@ -50,7 +50,7 @@ function Page() {
     resolver: zodResolver(registerSchema),
     mode: "onTouched",
     defaultValues: {
-      organizationName: "",
+      businessName: "",
       email: "",
       username: "",
       password: "",
@@ -61,8 +61,8 @@ function Page() {
   // ✅ Handle Next Step
   const handleNext = () => {
     if (step === 1) {
-      const { organizationName, email } = form.getValues();
-      if (organizationName.trim() !== "" && email.trim() !== "") {
+      const { businessName, email } = form.getValues();
+      if (businessName.trim() !== "" && email.trim() !== "") {
         setTimeout(() => setStep(2), 0);
       } else {
         toast("Please fill all fields before proceeding.");
@@ -179,7 +179,7 @@ function Page() {
             </h1>
           </Link>
           <p className="text-lg text-gray-200">
-            Transform your organization with honest, anonymous feedback
+            Transform your business with honest, anonymous feedback
           </p>
           <div className="space-y-3 mt-4">
             <div className="flex items-center space-x-3">
@@ -232,7 +232,7 @@ function Page() {
                   </div>
                   <span className="text-xs mt-1 text-gray-400">
                     {stepNumber === 1
-                      ? "Organization"
+                      ? "Business"
                       : stepNumber === 2
                       ? "Username"
                       : "Password"}
@@ -266,12 +266,12 @@ function Page() {
                   >
                     <FormField
                       control={form.control}
-                      name="organizationName"
+                      name="businessName"
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
                             <Input
-                              placeholder="Enter Organisation Name"
+                              placeholder="Enter Business Name"
                               {...field}
                               className="bg-[#0A0A0A]/50 backdrop-blur-sm text-white border-yellow-400/10 focus:border-yellow-400 h-9"
                             />

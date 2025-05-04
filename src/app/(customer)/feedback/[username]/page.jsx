@@ -54,7 +54,7 @@ function FeedbackFormContent() {
     anonymousFeedback: false,
   });
 
-  const [organizationName, setOrganizationName] = useState("");
+  const [businessName, setBusinessName] = useState("");
 
   const [loadingFeedback, setLoadingFeedback] = useState(false);
   const [loadingSuggestion, setLoadingSuggestion] = useState(false);
@@ -91,7 +91,7 @@ function FeedbackFormContent() {
 
       const owner = data.owner;
       if (owner) {
-        setOrganizationName(owner.organizationName);
+        setBusinessName(owner.businessName);
       }
       const invoice = data.invoice;
       if (!invoice) {
@@ -522,7 +522,7 @@ function FeedbackFormContent() {
         <Card className="w-full max-w-2xl mx-auto bg-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/20 ">
           <CardHeader className="border-b border-yellow-400/20 px-4 sm:px-6">
             <CardTitle className="text-xl sm:text-2xl font-bold text-yellow-400">
-              Service Feedback for {organizationName}
+              Service Feedback for {businessName}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 sm:p-6">

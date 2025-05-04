@@ -31,7 +31,7 @@ import { useWatch } from "react-hook-form";
 import { motion } from "framer-motion";
 
 const formSchema = z.object({
-  organizationName: z.string().min(1, "Organization name is required"),
+  businessName: z.string().min(1, "Business name is required"),
   phoneNumber: z.string(),
   address: z.object({
     country: z.string(),
@@ -58,7 +58,7 @@ function UpdateProfilePage() {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      organizationName: "",
+      businessName: "",
       phoneNumber: "",
       address: {
         country: "",
@@ -190,8 +190,8 @@ function UpdateProfilePage() {
         await update({
           user: {
             ...session.user,
-            organizationName:
-              data.user.organizationName || session.user.organizationName,
+            businessName:
+              data.user.businessName || session.user.businessName,
             phoneNumber: data.user.phoneNumber,
             address: data.user.address || session.user.address,
             isProfileCompleted: data.user.isProfileCompleted,
@@ -289,19 +289,19 @@ function UpdateProfilePage() {
                   onSubmit={form.handleSubmit(handleSaveProfile)}
                   className="space-y-6"
                 >
-                  {/* Organization Name */}
+                  {/* Business Name */}
                   <FormField
                     control={form.control}
-                    name="organizationName"
+                    name="businessName"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-gray-200">
-                          Organization Name
+                          Business Name
                         </FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder="Enter Organisation Name"
+                            placeholder="Enter Business Name"
                             className="bg-[#0A0A0A]/30 border-yellow-400/20 text-gray-200 placeholder:text-gray-500 focus:border-yellow-400/50 focus:ring-yellow-400/20"
                             disabled={editingField !== "all"}
                           />

@@ -337,7 +337,7 @@ export default function InvoiceManagement() {
         invoiceNumber,
         pdfUrl,
         feedbackUrl,
-        companyName: owner?.organizationName || "Your Company",
+        companyName: owner?.businessName || "Your Company",
       });
 
       if (data.success) {
@@ -824,7 +824,7 @@ export default function InvoiceManagement() {
                           const blob = await response.blob();
                           const file = new File(
                             [blob],
-                            `Invoice by ${owner?.organizationName}.pdf`,
+                            `Invoice by ${owner?.businessName}.pdf`,
                             {
                               type: "application/pdf",
                             }

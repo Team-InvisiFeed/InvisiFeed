@@ -162,7 +162,7 @@ export async function generateQrPdf(
             <View style={styles.orgInfo}>
               <View style={styles.invoiceDetails}>
                 <Text style={styles.invoiceNumber}>
-                  From: {owner?.organizationName}
+                  From: {owner?.businessName}
                 </Text>
   
                 <Text style={styles.invoiceDate}>Email: {owner?.email}</Text>

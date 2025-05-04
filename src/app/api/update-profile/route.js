@@ -23,8 +23,8 @@ export async function PATCH(req) {
     }
 
     // Update user fields
-    if (body?.data?.organizationName) {
-      user.organizationName = body?.data?.organizationName;
+    if (body?.data?.businessName) {
+      user.businessName = body?.data?.businessName;
     }
     if (body?.data?.phoneNumber || body?.data?.phoneNumber === "") {
       user.phoneNumber = body?.data?.phoneNumber;
@@ -33,8 +33,8 @@ export async function PATCH(req) {
       user.address = body?.data?.address;
     }    // Check if all required fields are filled
 
-    const hasOrganizationName =
-      user.organizationName && user.organizationName.trim() !== "";
+    const hasBusinessName =
+      user.businessName && user.businessName.trim() !== "";
     const hasPhoneNumber = user.phoneNumber && user.phoneNumber.trim() !== "";
 
     const hasAddress =
@@ -51,7 +51,7 @@ export async function PATCH(req) {
       user.address.pincode.trim() !== "";
 
     // Update profile completion status
-    if (hasOrganizationName && hasPhoneNumber && hasAddress) {
+    if (hasBusinessName && hasPhoneNumber && hasAddress) {
       user.isProfileCompleted = "completed";
     } else {
       user.isProfileCompleted = "skipped";
@@ -69,7 +69,7 @@ export async function PATCH(req) {
           id: user._id,
           email: user.email,
           username: user.username,
-          organizationName: user.organizationName,
+          businessName: user.businessName,
           phoneNumber: user.phoneNumber,
           address: user.address,
           isProfileCompleted: user.isProfileCompleted,

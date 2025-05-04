@@ -27,8 +27,8 @@ export async function PATCH(request) {
     const isSkipRequest = data.skipProfile === true;
 
     // Determine if all fields are filled
-    const hasOrganizationName =
-      data.organizationName && data.organizationName.trim() !== "";
+    const hasBusinessName =
+      data.businessName && data.businessName.trim() !== "";
     const hasPhoneNumber = data.phoneNumber && data.phoneNumber.trim() !== "";
     const hasAddress =
       data.address &&
@@ -47,7 +47,7 @@ export async function PATCH(request) {
     let profileStatus = "pending";
     if (isSkipRequest) {
       profileStatus = "skipped";
-    } else if (hasOrganizationName && hasPhoneNumber && hasAddress) {
+    } else if (hasBusinessName && hasPhoneNumber && hasAddress) {
       profileStatus = "completed";
     } else {
       profileStatus = "skipped";
@@ -57,7 +57,7 @@ export async function PATCH(request) {
     const updatedUser = await OwnerModel.findOneAndUpdate(
       { username: username },
       {
-        organizationName: data.organizationName || "",
+        businessName: data.businessName || "",
         phoneNumber: data.phoneNumber || "",
         address: {
           localAddress: data.address?.localAddress || "",

@@ -6,7 +6,7 @@ import { UserPlus, Upload, QrCode, Send, MessageSquare, FileText } from "lucide-
 
 const steps = [
   {
-    title: "Register your organization",
+    title: "Register your business",
     description: "Sign in with Google or create an account to get started",
     icon: UserPlus,
     delay: 0.1,

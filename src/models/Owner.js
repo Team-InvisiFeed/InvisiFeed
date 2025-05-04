@@ -1,9 +1,9 @@
 import mongoose, { Schema } from "mongoose";
 
 const OwnerSchema = new Schema({
-  organizationName: {
+  businessName: {
     type: String,
-    required: [true, "Organization Name is required"],
+    required: [true, "Business Name is required"],
     trim: true,
   },
 

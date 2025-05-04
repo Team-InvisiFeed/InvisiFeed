@@ -9,7 +9,7 @@ export async function POST(req) {
   await dbConnect();
 
   try {
-    const { organizationName, email, username, password } = await req.json();
+    const { businessName, email, username, password } = await req.json();
 
     const deletedAccount = await DeletedAccountModel.findOne({ email });
 
@@ -83,7 +83,7 @@ export async function POST(req) {
       expiryDate.setHours(expiryDate.getHours() + 1);
 
       const newUser = new OwnerModel({
-        organizationName,
+        businessName,
         email,
         username,
         password: hashedPassword,

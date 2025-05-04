@@ -52,7 +52,7 @@ const features = [
   },
   {
     title: "Performance Tracking",
-    description: "Monitor and improve organizational performance with feedback analytics",
+    description: "Monitor and improve business performance with feedback analytics",
     icon: TrendingUp,
     delay: 0.6,
   },
@@ -71,7 +71,7 @@ const FeaturesSection = () => {
             transition={{ duration: 0.5 }}
             className="text-4xl font-bold text-white mb-4"
           >
-            Powerful Features for Your Organization
+            Powerful Features for Your Business
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
