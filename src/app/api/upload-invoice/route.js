@@ -119,7 +119,8 @@ export async function POST(req) {
     }
 
     // Check if daily limit reached
-    const isProPlan = owner?.plan?.planName === "pro" && owner?.plan?.planEndDate > new Date();
+    const isProPlan =
+      owner?.plan?.planName === "pro" && owner?.plan?.planEndDate > new Date();
     if (isProPlan) {
       if (owner.uploadedInvoiceCount.dailyUploadCount >= 10) {
         return NextResponse.json(
@@ -133,15 +134,17 @@ export async function POST(req) {
       }
     }
 
-    if (owner.uploadedInvoiceCount.dailyUploadCount >= 3) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: `Daily upload limit reached. Please try again after ${hoursLeft} hours. Upgrade to pro plan to increase daily upload limit`,
-          timeLeft: hoursLeft,
-        },
-        { status: 429 }
-      );
+    if (!isProPlan) {
+      if (owner.uploadedInvoiceCount.dailyUploadCount >= 3) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Daily upload limit reached. Please try again after ${hoursLeft} hours. Upgrade to pro plan to increase daily upload limit`,
+            timeLeft: hoursLeft,
+          },
+          { status: 429 }
+        );
+      }
     }
 
     const invoiceData = await extractInvoiceNumberFromPdf(file);
@@ -183,7 +186,6 @@ export async function POST(req) {
         { length: 4 },
         () => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[crypto.randomInt(0, 36)]
       ).join("");
-
 
       // Modify coupon code by adding random chars at start and invoice count
       dbCouponCode = `${couponData.couponCode}${
