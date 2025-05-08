@@ -238,9 +238,10 @@ function HeroSection() {
                         What did you like most?
                       </p>
                       <textarea
-                        className="w-full p-2 border border-gray-200 rounded-md text-xs"
+                        className="w-full p-2 border border-gray-200 rounded-md text-xs resize-none"
                         rows="1"
                         placeholder="Your feedback here..."
+                        disabled
                       ></textarea>
                     </div>
                   </div>
@@ -283,8 +284,8 @@ function HeroSection() {
                 isSmallScreen ? "text-sm" : "text-base"
               }`}
             >
-              Embed smart feedback forms in your invoices for honest
-              customer insights.
+              Embed smart feedback forms in your invoices for honest customer
+              insights.
             </motion.p>
 
             {/* Feature Icons Row */}
