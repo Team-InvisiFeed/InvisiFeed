@@ -2,50 +2,56 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { 
-  Shield, 
-  Lock, 
-  FileCheck, 
-  EyeOff, 
-  Database, 
-  CheckCircle, 
-  Building2
+import {
+  Shield,
+  Lock,
+  FileCheck,
+  EyeOff,
+  Database,
+  CheckCircle,
+  Building2,
 } from "lucide-react";
 
 const securityFeatures = [
   {
     title: "No Permanent Storage",
-    description: "We do NOT store your invoices permanently. Your data privacy is our top priority.",
+    description:
+      "We do NOT store your invoices permanently. Your data privacy is our top priority.",
     icon: Database,
     delay: 0.1,
   },
   {
     title: "Data Ownership",
-    description: "All data is owned and controlled by you. You have full control over your information.",
+    description:
+      "All data is owned and controlled by you. You have full control over your information.",
     icon: Lock,
     delay: 0.2,
   },
   {
     title: "DPDPA Compliant",
-    description: "Our platform adheres to DPDPA regulations to ensure your data is protected.",
+    description:
+      "Our platform adheres to DPDPA regulations to ensure your data is protected.",
     icon: FileCheck,
     delay: 0.3,
   },
   {
     title: "GSTIN Verification",
-    description: "We verify your GSTIN to ensure that you are a registered business.",
+    description:
+      "We verify your GSTIN to ensure that you are a registered business.",
     icon: Building2,
     delay: 0.4,
   },
   {
     title: "Anonymous Feedback",
-    description: "Customers may choose to submit feedback anonymously to encourage honesty.",
+    description:
+      "Customers may choose to submit feedback anonymously to encourage honesty.",
     icon: EyeOff,
     delay: 0.5,
   },
   {
     title: "Verified Security",
-    description: "Our security measures are regularly audited and verified by developers.",
+    description:
+      "Our security measures are regularly audited and verified by developers.",
     icon: CheckCircle,
     delay: 0.6,
   },
@@ -61,7 +67,7 @@ const SecuritySection = () => {
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
             className="text-4xl font-bold text-white mb-4"
           >
             Security & Privacy Assurance
@@ -69,10 +75,11 @@ const SecuritySection = () => {
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
             className="text-gray-400 text-lg max-w-2xl mx-auto"
           >
-            Your data security is our top priority. We implement industry-leading security measures to protect your information.
+            Your data security is our top priority. We implement
+            industry-leading security measures to protect your information.
           </motion.p>
         </div>
 
@@ -84,13 +91,15 @@ const SecuritySection = () => {
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: feature.delay }}
+                transition={{ duration: 0.3, delay: feature.delay }}
               >
                 <div className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-6 h-full hover:border-yellow-400/20 transition-colors group">
                   <div className="w-12 h-12 bg-yellow-400/10 rounded-lg flex items-center justify-center mb-4">
                     <Icon className="w-6 h-6 text-yellow-400" />
                   </div>
-                  <h3 className="text-yellow-400 font-medium mb-2">{feature.title}</h3>
+                  <h3 className="text-yellow-400 font-medium mb-2">
+                    {feature.title}
+                  </h3>
                   <p className="text-gray-400">{feature.description}</p>
                 </div>
               </motion.div>
@@ -102,4 +111,4 @@ const SecuritySection = () => {
   );
 };
 
-export default SecuritySection; 
+export default SecuritySection;

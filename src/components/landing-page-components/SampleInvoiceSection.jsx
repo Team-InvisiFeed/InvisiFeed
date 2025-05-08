@@ -17,7 +17,7 @@ const SampleInvoiceSection = () => {
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.3 }}
           >
             <h2 className="text-4xl font-bold text-white mb-6">
               Try InvisiFeed with a{" "}

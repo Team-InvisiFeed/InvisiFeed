@@ -2,7 +2,14 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { UserPlus, Upload, QrCode, Send, MessageSquare, FileText } from "lucide-react";
+import {
+  UserPlus,
+  Upload,
+  QrCode,
+  Send,
+  MessageSquare,
+  FileText,
+} from "lucide-react";
 
 const steps = [
   {
@@ -51,7 +58,7 @@ const HowItWorksSection = () => {
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
             className="text-3xl sm:text-4xl font-bold text-white mb-4"
           >
             How InvisiFeed Works
@@ -59,7 +66,7 @@ const HowItWorksSection = () => {
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
             className="text-gray-400 text-lg max-w-2xl mx-auto"
           >
             Simple steps to collect honest, anonymous feedback from your

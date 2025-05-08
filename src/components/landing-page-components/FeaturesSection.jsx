@@ -22,19 +22,22 @@ import {
 const features = [
   {
     title: "Anonymous Feedback",
-    description: "Collect honest feedback without compromising privacy of your customers",
+    description:
+      "Collect honest feedback without compromising privacy of your customers",
     icon: Shield,
     delay: 0.1,
   },
   {
     title: "Real-time Analytics",
-    description: "Get instant insights with detailed analytics of sales, feedback, and customer satisfaction",
+    description:
+      "Get instant insights with detailed analytics of sales, feedback, and customer satisfaction",
     icon: BarChart,
     delay: 0.2,
   },
   {
     title: "Smart Invoice Generation",
-    description: "Generate Smart Invoices for your customers with QR code/link to feedback form",
+    description:
+      "Generate Smart Invoices for your customers with QR code/link to feedback form",
     icon: FileText,
     delay: 0.3,
   },
@@ -46,13 +49,15 @@ const features = [
   },
   {
     title: "Create Coupons",
-    description: "Create coupons for your customers to incentivize them to provide feedback",
+    description:
+      "Create coupons for your customers to incentivize them to provide feedback",
     icon: Gift,
     delay: 0.5,
   },
   {
     title: "Performance Tracking",
-    description: "Monitor and improve business performance with feedback analytics",
+    description:
+      "Monitor and improve business performance with feedback analytics",
     icon: TrendingUp,
     delay: 0.6,
   },
@@ -68,7 +73,7 @@ const FeaturesSection = () => {
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.3 }}
             className="text-4xl font-bold text-white mb-4"
           >
             Powerful Features for Your Business
@@ -76,7 +81,7 @@ const FeaturesSection = () => {
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
             className="text-gray-400 text-lg max-w-2xl mx-auto"
           >
             Everything you need to collect, analyze, and act on feedback
@@ -92,7 +97,7 @@ const FeaturesSection = () => {
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: feature.delay }}
+                transition={{ duration: 0.3, delay: feature.delay }}
               >
                 <Card className="bg-gradient-to-br h-full from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border-yellow-400/10 hover:border-yellow-400/20 transition-colors group relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />

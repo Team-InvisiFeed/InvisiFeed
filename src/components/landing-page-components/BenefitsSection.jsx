@@ -2,37 +2,41 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { 
-  MessageSquare, 
-  Brain, 
-  TrendingUp, 
-  Award, 
-  Gift, 
-  Smile
+import {
+  MessageSquare,
+  Brain,
+  TrendingUp,
+  Award,
+  Gift,
+  Smile,
 } from "lucide-react";
 
 const benefits = [
   {
     title: "Get Real, Honest Feedback",
-    description: "Collect authentic feedback without confrontation or awkward conversations",
+    description:
+      "Collect authentic feedback without confrontation or awkward conversations",
     icon: MessageSquare,
     delay: 0.1,
   },
   {
     title: "AI-Powered Insights",
-    description: "Our AI helps summarize customer sentiment and identify key themes",
+    description:
+      "Our AI helps summarize customer sentiment and identify key themes",
     icon: Brain,
     delay: 0.2,
   },
   {
     title: "Data-Driven Improvements",
-    description: "Make informed decisions to enhance your services based on customer feedback",
+    description:
+      "Make informed decisions to enhance your services based on customer feedback",
     icon: TrendingUp,
     delay: 0.3,
   },
   {
     title: "Stand Out from Competition",
-    description: "Demonstrate your commitment to customer satisfaction by acting on feedback",
+    description:
+      "Demonstrate your commitment to customer satisfaction by acting on feedback",
     icon: Award,
     delay: 0.4,
   },
@@ -60,7 +64,7 @@ const BenefitsSection = () => {
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
             className="text-4xl font-bold text-white mb-4"
           >
             Why Use InvisiFeed?
@@ -68,10 +72,11 @@ const BenefitsSection = () => {
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
             className="text-gray-400 text-lg max-w-2xl mx-auto"
           >
-            Discover how our platform can transform your customer feedback process
+            Discover how our platform can transform your customer feedback
+            process
           </motion.p>
         </div>
 
@@ -83,13 +88,15 @@ const BenefitsSection = () => {
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: benefit.delay }}
+                transition={{ duration: 0.3, delay: benefit.delay }}
               >
                 <div className="bg-gradient-to-br from-[#0A0A0A]/80 to-[#0A0A0A]/50 backdrop-blur-sm border border-yellow-400/10 rounded-xl p-6 h-full hover:border-yellow-400/20 transition-colors group">
                   <div className="w-12 h-12 bg-yellow-400/10 rounded-lg flex items-center justify-center mb-4">
                     <Icon className="w-6 h-6 text-yellow-400" />
                   </div>
-                  <h3 className="text-yellow-400 font-medium mb-2">{benefit.title}</h3>
+                  <h3 className="text-yellow-400 font-medium mb-2">
+                    {benefit.title}
+                  </h3>
                   <p className="text-gray-400">{benefit.description}</p>
                 </div>
               </motion.div>
@@ -101,4 +108,4 @@ const BenefitsSection = () => {
   );
 };
 
-export default BenefitsSection; 
+export default BenefitsSection;

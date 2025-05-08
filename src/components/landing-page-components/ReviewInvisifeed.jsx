@@ -18,7 +18,7 @@ const ReviewInvisifeed = () => {
       toast.error("Please enter your review");
       return;
     }
-    ;    setIsSubmitting(true);
+    setIsSubmitting(true);
     try {
       const response = await axios.post("/api/review-invisifeed", {
         review,
@@ -29,7 +29,7 @@ const ReviewInvisifeed = () => {
         setIsReviewModalOpen(false);
       }
     } catch (error) {
-      if(error?.response?.data?.message === "Unauthorized"){
+      if (error?.response?.data?.message === "Unauthorized") {
         router.push("/sign-in");
       }
       toast.error("Failed to submit review. Please try again.");
@@ -38,9 +38,8 @@ const ReviewInvisifeed = () => {
     }
   };
 
-  const {data: session} = useSession();
+  const { data: session } = useSession();
   const username = session?.user?.username;
-
 
   return (
     <section className="py-10 bg-[#0A0A0A] relative ">
@@ -51,7 +50,7 @@ const ReviewInvisifeed = () => {
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
             className="text-4xl font-bold text-white mb-4"
           >
             Share Your Thoughts
@@ -59,7 +58,7 @@ const ReviewInvisifeed = () => {
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
             className="text-gray-400 text-lg max-w-2xl mx-auto"
           >
             Your feedback fuels our innovation! Join the conversation and help
@@ -78,54 +77,52 @@ const ReviewInvisifeed = () => {
             }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+            transition={{ duration: 0.4 }}
             className="px-8 py-3 bg-yellow-400 text-black font-semibold rounded-lg hover:bg-yellow-500 transition-colors cursor-pointer"
           >
             Review Us
           </motion.button>
         </div>
-
-        
       </div>
       {/* Review Modal */}
       {isReviewModalOpen && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-[#0A0A0A] border border-yellow-400/20 rounded-xl p-6 max-w-lg w-full mx-4"
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold text-white">
-                  Share Your Feedback
-                </h3>
-                <button
-                  onClick={() => setIsReviewModalOpen(false)}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-[#0A0A0A] border border-yellow-400/20 rounded-xl p-6 max-w-lg w-full mx-4"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold text-white">
+                Share Your Feedback
+              </h3>
+              <button
+                onClick={() => setIsReviewModalOpen(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-              <textarea
-                value={review}
-                onChange={(e) => setReview(e.target.value)}
-                placeholder="Share your suggestions, feedback, or report any issues..."
-                className="w-full h-32 bg-[#1A1A1A] border border-yellow-400/20 rounded-lg p-3 text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400/40 transition-colors resize-none"
-              />
+            <textarea
+              value={review}
+              onChange={(e) => setReview(e.target.value)}
+              placeholder="Share your suggestions, feedback, or report any issues..."
+              className="w-full h-32 bg-[#1A1A1A] border border-yellow-400/20 rounded-lg p-3 text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400/40 transition-colors resize-none"
+            />
 
-              <div className="flex justify-end mt-4">
-                <button
-                  onClick={handleSubmitReview}
-                  disabled={isSubmitting}
-                  className="px-6 py-2 bg-yellow-400 cursor-pointer text-black font-semibold rounded-lg hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? "Sending..." : "Send Feedback"}
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={handleSubmitReview}
+                disabled={isSubmitting}
+                className="px-6 py-2 bg-yellow-400 cursor-pointer text-black font-semibold rounded-lg hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? "Sending..." : "Send Feedback"}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </section>
   );
 };
