@@ -196,7 +196,7 @@ See our [Purpose Page](https://invisifeed.vercel.app/purpose) for survey data an
 * ⚙️ **20+ Utility Functions**
 * 📅 **5 Database Models**
 * 🚀 **800+ Commits**
-* ⏰ **Built in 50 Days**
+* ⏰ **Built in 60 Days**
 * 👥 **Team: 2 Developers**
 
 ---
