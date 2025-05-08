@@ -123,11 +123,11 @@ function HeroSection() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, delay: 0.3 }}
-            className="flex-1 relative w-full md:w-auto mt-6 md:mt-0"
+            className="flex-1 relative w-full md:w-auto mt-6 md:mt-0 "
           >
             <div className="relative w-full h-[300px] sm:h-[350px] md:h-[400px]">
               {/* Invoice with QR Code */}
-              <div className="absolute top-0 right-0 w-[80%] h-[80%] bg-white rounded-lg shadow-2xl transform rotate-3 z-10">
+              <div className="absolute top-0 right-0 w-[80%] h-[80%] bg-white rounded-lg shadow-2xl transform rotate-3 z-10 hover:text-gray-300 transition-all duration-500 ease-in-out">
                 <div className="p-3 sm:p-4">
                   <div className="flex justify-between items-center mb-3 sm:mb-4">
                     <h3 className="text-base sm:text-lg font-bold text-gray-800">
@@ -136,8 +136,8 @@ function HeroSection() {
                     <div className="text-xs text-gray-500">#INV-2023-001</div>
                   </div>
 
-                  <div className="border-t border-gray-200 pt-2 sm:pt-3 mb-3 sm:mb-4">
-                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                  <div className="border-t border-gray-200 pt-2 sm:pt-3 mb-3 sm:mb-4  ">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3 ">
                       <div>
                         <p className="text-xs text-gray-500">From:</p>
                         <p className="text-xs sm:text-sm font-medium">
@@ -218,7 +218,7 @@ function HeroSection() {
                     </p>
 
                     <div className="mb-2 sm:mb-3">
-                      <p className="text-xs font-medium mb-1">
+                      <p className="text-xs mb-1 text-gray-900">
                         Overall Experience
                       </p>
                       <div className="flex space-x-1">
@@ -234,7 +234,7 @@ function HeroSection() {
                     </div>
 
                     <div className="mb-2 sm:mb-3">
-                      <p className="text-xs font-medium mb-1">
+                      <p className="text-xs  mb-1 text-gray-900">
                         What did you like most?
                       </p>
                       <textarea
