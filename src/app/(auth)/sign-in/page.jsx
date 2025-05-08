@@ -117,7 +117,7 @@ function SignInContent() {
             <div className="space-y-3 mt-4">
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                <p>Secure and anonymous feedback system</p>
+                <p>Secure and honest feedback system</p>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
@@ -193,7 +193,7 @@ function SignInContent() {
             <div className="space-y-3 mt-4">
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                <p>Secure and anonymous feedback system</p>
+                <p>Secure and honest feedback system</p>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
@@ -282,7 +282,7 @@ function SignInContent() {
           <div className="space-y-3 mt-4">
             <div className="flex items-center space-x-3">
               <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-              <p>Secure and anonymous feedback system</p>
+              <p>Secure and honest feedback system</p>
             </div>
             <div className="flex items-center space-x-3">
               <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>

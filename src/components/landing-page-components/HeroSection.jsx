@@ -46,8 +46,6 @@ function HeroSection() {
   }, []);
 
   const pathname = usePathname();
-  
-  
 
   return (
     <section
@@ -85,8 +83,8 @@ function HeroSection() {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="text-base sm:text-lg text-gray-300 mb-4 sm:mb-6 leading-relaxed max-w-xl"
             >
-              InvisiFeed helps you embed AI-powered feedback forms inside your
-              invoices so customers can give feedback anonymously.
+              InvisiFeed helps you embed smart feedback forms inside your
+              invoices so customers can give honest feedback.
             </motion.p>
 
             <motion.div
@@ -96,27 +94,27 @@ function HeroSection() {
               className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto"
             >
               <Link href="/register" passHref>
-      <motion.div
-        whileHover={!isNavigating ? { scale: 1.05 } : undefined}
-        whileTap={!isNavigating ? { scale: 0.95 } : undefined}
-        onClick={() => setIsNavigating(true)}
-        className="cursor-pointer group flex items-center justify-center space-x-2 sm:space-x-3 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 w-full sm:w-auto"
-      >
-        {isNavigating ? (
-          <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 border-2 border-t-transparent border-gray-900 rounded-full animate-spin"></div>
-            <span className="text-sm sm:text-base">Loading...</span>
-          </div>
-        ) : (
-          <>
-            <span className="text-sm sm:text-base">
-              Generate Your First Smart Invoice
-            </span>
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-          </>
-        )}
-      </motion.div>
-    </Link>
+                <motion.div
+                  whileHover={!isNavigating ? { scale: 1.05 } : undefined}
+                  whileTap={!isNavigating ? { scale: 0.95 } : undefined}
+                  onClick={() => setIsNavigating(true)}
+                  className="cursor-pointer group flex items-center justify-center space-x-2 sm:space-x-3 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30 w-full sm:w-auto"
+                >
+                  {isNavigating ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-t-transparent border-gray-900 rounded-full animate-spin"></div>
+                      <span className="text-sm sm:text-base">Loading...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <span className="text-sm sm:text-base">
+                        Generate Your First Smart Invoice
+                      </span>
+                      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    </>
+                  )}
+                </motion.div>
+              </Link>
             </motion.div>
           </motion.div>
 
@@ -207,15 +205,16 @@ function HeroSection() {
                 <div className="p-3 sm:p-4">
                   <div className="flex justify-between items-center mb-2 sm:mb-3">
                     <h3 className="text-base sm:text-lg font-bold text-gray-800">
-                      Anonymous Feedback
+                      Honest Feedback
                     </h3>
                     <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
                   </div>
 
                   <div className="mb-3 sm:mb-4">
                     <p className="text-xs text-gray-600 mb-2 sm:mb-3">
-                      We value your honest feedback to improve our services.
-                      Your response is completely anonymous.
+                      We value your honest feedback to help us improve our
+                      services. Your input plays a key role in shaping a better
+                      experience for everyone.
                     </p>
 
                     <div className="mb-2 sm:mb-3">
@@ -284,7 +283,7 @@ function HeroSection() {
                 isSmallScreen ? "text-sm" : "text-base"
               }`}
             >
-              Embed AI-powered feedback forms in your invoices for anonymous
+              Embed smart feedback forms in your invoices for honest
               customer insights.
             </motion.p>
 
@@ -298,40 +297,64 @@ function HeroSection() {
               }`}
             >
               <div className="flex flex-col items-center">
-                <div className={`${
-                  isSmallScreen ? "w-12 h-12" : "w-14 h-14"
-                } bg-yellow-400/10 rounded-full flex items-center justify-center mb-1`}>
-                  <BarChart className={`${
-                    isSmallScreen ? "w-6 h-6" : "w-7 h-7"
-                  } text-yellow-400`} />
+                <div
+                  className={`${
+                    isSmallScreen ? "w-12 h-12" : "w-14 h-14"
+                  } bg-yellow-400/10 rounded-full flex items-center justify-center mb-1`}
+                >
+                  <BarChart
+                    className={`${
+                      isSmallScreen ? "w-6 h-6" : "w-7 h-7"
+                    } text-yellow-400`}
+                  />
                 </div>
-                <span className={`${
-                  isSmallScreen ? "text-xs" : "text-sm"
-                } text-gray-300`}>Smart Analysis</span>
+                <span
+                  className={`${
+                    isSmallScreen ? "text-xs" : "text-sm"
+                  } text-gray-300`}
+                >
+                  Smart Analysis
+                </span>
               </div>
               <div className="flex flex-col items-center">
-                <div className={`${
-                  isSmallScreen ? "w-12 h-12" : "w-14 h-14"
-                } bg-yellow-400/10 rounded-full flex items-center justify-center mb-1`}>
-                  <Shield className={`${
-                    isSmallScreen ? "w-6 h-6" : "w-7 h-7"
-                  } text-yellow-400`} />
+                <div
+                  className={`${
+                    isSmallScreen ? "w-12 h-12" : "w-14 h-14"
+                  } bg-yellow-400/10 rounded-full flex items-center justify-center mb-1`}
+                >
+                  <Shield
+                    className={`${
+                      isSmallScreen ? "w-6 h-6" : "w-7 h-7"
+                    } text-yellow-400`}
+                  />
                 </div>
-                <span className={`${
-                  isSmallScreen ? "text-xs" : "text-sm"
-                } text-gray-300`}>Anonymous</span>
+                <span
+                  className={`${
+                    isSmallScreen ? "text-xs" : "text-sm"
+                  } text-gray-300`}
+                >
+                  Anonymous
+                </span>
               </div>
               <div className="flex flex-col items-center">
-                <div className={`${
-                  isSmallScreen ? "w-12 h-12" : "w-14 h-14"
-                } bg-yellow-400/10 rounded-full flex items-center justify-center mb-1`}>
-                  <Zap className={`${
-                    isSmallScreen ? "w-6 h-6" : "w-7 h-7"
-                  } text-yellow-400`} />
+                <div
+                  className={`${
+                    isSmallScreen ? "w-12 h-12" : "w-14 h-14"
+                  } bg-yellow-400/10 rounded-full flex items-center justify-center mb-1`}
+                >
+                  <Zap
+                    className={`${
+                      isSmallScreen ? "w-6 h-6" : "w-7 h-7"
+                    } text-yellow-400`}
+                  />
                 </div>
-                <span className={`${
-                  isSmallScreen ? "text-xs" : "text-sm"
-                } text-gray-300`}>AI-Powered</span>
+                <span
+                  className={`${
+                    isSmallScreen ? "text-xs" : "text-sm"
+                  } text-gray-300`}
+                >
+                  AI-Powered
+                </span>
               </div>
             </motion.div>
 
@@ -350,12 +373,14 @@ function HeroSection() {
                 } bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-gray-900 font-semibold rounded-xl transition-all duration-300 shadow-lg shadow-yellow-500/20 hover:shadow-yellow-500/30`}
                 onClick={() => router.push("/register")}
               >
-                <span className={`${
-                  isSmallScreen ? "text-base" : "text-lg"
-                }`}>Get Started</span>
-                <ArrowRight className={`${
-                  isSmallScreen ? "w-4 h-4" : "w-5 h-5"
-                } transition-transform group-hover:translate-x-1`} />
+                <span className={`${isSmallScreen ? "text-base" : "text-lg"}`}>
+                  Get Started
+                </span>
+                <ArrowRight
+                  className={`${
+                    isSmallScreen ? "w-4 h-4" : "w-5 h-5"
+                  } transition-transform group-hover:translate-x-1`}
+                />
               </motion.button>
             </motion.div>
 
@@ -366,27 +391,37 @@ function HeroSection() {
               transition={{ duration: 0.5, delay: 0.7 }}
               className="w-full max-w-xs mx-auto"
             >
-              <div className={`bg-gradient-to-r from-yellow-500/10 to-yellow-400/5 rounded-xl ${
-                isSmallScreen ? "p-3.5" : "p-4.5"
-              } border border-yellow-400/20`}>
+              <div
+                className={`bg-gradient-to-r from-yellow-500/10 to-yellow-400/5 rounded-xl ${
+                  isSmallScreen ? "p-3.5" : "p-4.5"
+                } border border-yellow-400/20`}
+              >
                 <div className="flex justify-between items-center">
                   <div className="flex items-center">
-                    <ThumbsUp className={`${
-                      isSmallScreen ? "w-5 h-5" : "w-6 h-6"
-                    } text-yellow-400 mr-2`} />
-                    <span className={`${
-                      isSmallScreen ? "text-sm" : "text-base"
-                    } text-gray-300`}>
+                    <ThumbsUp
+                      className={`${
+                        isSmallScreen ? "w-5 h-5" : "w-6 h-6"
+                      } text-yellow-400 mr-2`}
+                    />
+                    <span
+                      className={`${
+                        isSmallScreen ? "text-sm" : "text-base"
+                      } text-gray-300`}
+                    >
                       Boost Customer Loyalty
                     </span>
                   </div>
                   <div className="flex items-center">
-                    <CheckCircle className={`${
-                      isSmallScreen ? "w-5 h-5" : "w-6 h-6"
-                    } text-yellow-400 mr-2`} />
-                    <span className={`${
-                      isSmallScreen ? "text-sm" : "text-base"
-                    } text-gray-300`}>
+                    <CheckCircle
+                      className={`${
+                        isSmallScreen ? "w-5 h-5" : "w-6 h-6"
+                      } text-yellow-400 mr-2`}
+                    />
+                    <span
+                      className={`${
+                        isSmallScreen ? "text-sm" : "text-base"
+                      } text-gray-300`}
+                    >
                       Increase Sales by 40%
                     </span>
                   </div>

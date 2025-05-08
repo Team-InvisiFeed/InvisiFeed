@@ -188,12 +188,12 @@ function Page() {
             </h1>
           </Link>
           <p className="text-lg text-gray-200">
-            Transform your business with honest, anonymous feedback
+            Transform your business with honest feedback
           </p>
           <div className="space-y-3 mt-4">
             <div className="flex items-center space-x-3">
               <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-              <p>Secure and anonymous feedback system</p>
+              <p>Secure and honest feedback system</p>
             </div>
             <div className="flex items-center space-x-3">
               <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>

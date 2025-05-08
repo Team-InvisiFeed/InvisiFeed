@@ -39,7 +39,7 @@ const securityFeatures = [
   },
   {
     title: "Anonymous Feedback",
-    description: "Customer feedback is completely anonymous, encouraging honest responses.",
+    description: "Customers may choose to submit feedback anonymously to encourage honesty.",
     icon: EyeOff,
     delay: 0.5,
   },
