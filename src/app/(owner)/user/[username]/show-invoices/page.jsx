@@ -210,7 +210,7 @@ export default function ShowInvoicesPage({ params }) {
                     <TableHead className="text-yellow-400">Amount</TableHead>
                     <TableHead className="text-yellow-400">Feedback</TableHead>
                     <TableHead className="text-yellow-400">
-                      Received Time
+                      Created At
                     </TableHead>
                   </TableRow>
                 </TableHeader>
