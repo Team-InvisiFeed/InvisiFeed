@@ -26,6 +26,10 @@ function validateCouponData(couponData) {
     throw new Error("Invalid coupon code format");
   }
 
+  if (couponData.couponCode.includes(" ")) {
+    throw new Error("Coupon code must not contain spaces");
+  }
+
   if (!couponData.description || typeof couponData.description !== "string") {
     throw new Error("Invalid coupon description format");
   }

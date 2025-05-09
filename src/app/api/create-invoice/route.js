@@ -15,6 +15,48 @@ cloudinary.v2.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+function validateCouponData(couponData) {
+  if (!couponData) return null;
+
+  couponData = JSON.parse(couponData);
+  // Required fields validation
+  if (!couponData.code || typeof couponData.code !== "string") {
+    throw new Error("Invalid coupon code ");
+  }
+  if (couponData.code.includes(" ")) {
+    throw new Error("Coupon code must not contain spaces");
+  }
+  if (!couponData.description || typeof couponData.description !== "string") {
+    throw new Error("Invalid coupon description ");
+  }
+
+  // Length validations
+  if (couponData.code.length < 3 || couponData.code.length > 10) {
+    throw new Error("Coupon code must be between 3 and 10 characters");
+  }
+
+  if (
+    couponData.description.length < 10 ||
+    couponData.description.length > 200
+  ) {
+    throw new Error("Coupon description must be between 10 and 200 characters");
+  }
+
+  // Expiry days validation
+  if (couponData.expiryDays < 1 || couponData.expiryDays > 365) {
+    throw new Error("Expiry days must be between 1 and 365");
+  }
+
+  // Format validations
+  if (!/^[A-Z0-9]+$/.test(couponData.code)) {
+    throw new Error(
+      "Coupon code must contain only uppercase letters and numbers"
+    );
+  }
+
+  return true;
+}
+
 export async function POST(req) {
   try {
     await dbConnect();
@@ -22,6 +64,22 @@ export async function POST(req) {
     const { ...invoiceData } = data;
 
     const { customerName, customerEmail } = invoiceData;
+
+    let couponData = invoiceData.coupon;
+
+    if (invoiceData.addCoupon) {
+      try {
+        couponData = JSON.stringify(couponData);
+        // Validate coupon data against schema
+        validateCouponData(couponData);
+      } catch (error) {
+        log(error);
+        return NextResponse.json(
+          { success: false, message: `Invalid coupon data: ${error.message}` },
+          { status: 400 }
+        );
+      }
+    }
 
     const session = await getServerSession(authOptions);
     const username = session?.user?.username;

@@ -157,8 +157,6 @@ export default function InvoiceManagement() {
   };
 
   const handleFileChange = (e) => {
-    console.log(e);
-
     const selectedFile = e.target.files[0];
 
     // Check if file size is greater than 3MB
