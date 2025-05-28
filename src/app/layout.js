@@ -18,9 +18,6 @@ export const metadata = {
   title: "InvisiFeed",
   description:
     "Empowering businesses with authentic, anonymous feedback through secure QR-based invoicing.",
-   verification: {
-    google: 'zv5irB-R4RF0BMewa4wyOX7BpNnRglGG4x8IP3JHJP8',
-  },
 };
 
 export default function RootLayout({ children }) {
