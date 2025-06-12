@@ -8,10 +8,10 @@ const creators = [
   {
     name: "Shubh Verma",
     role: "Full Stack Developer",
-    linkedin: "https://www.linkedin.com/in/shubh-v21",
-    github: "https://github.com/shubh-v21",
-    twitter: "https://twitter.com/shubhonx",
-    bmc: "https://buymeacoffee.com/shubhdevs",
+    linkedin: "https://www.linkedin.com/in/zenoshubh",
+    github: "https://github.com/zenoshubh",
+    twitter: "https://twitter.com/zenoshubh",
+    bmc: "https://buymeacoffee.com/zenoshubh",
     description: "",
   },
   {

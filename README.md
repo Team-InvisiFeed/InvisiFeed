@@ -218,9 +218,9 @@ Want a demo, walkthrough, or request access to the private repo?
 
 #### **Shubh Verma**
 
-- Email: [shubhverma2003@gmail.com](mailto:shubhverma2003@gmail.com)
-- Twitter: [@ShubhOnX](https://x.com/ShubhOnX)
-- LinkedIn: [@shubh-v21](https://linkedin.com/in/shubh-v21)
+- Email: [zenoshubh@gmail.com](mailto:zenoshubh@gmail.com)
+- Twitter: [@zenoshubh](https://x.com/zenoshubh)
+- LinkedIn: [@zenoshubh](https://linkedin.com/in/zenoshubh)
 
 #### **Sneha Sharma**
 
