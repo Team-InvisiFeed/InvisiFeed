@@ -2,7 +2,7 @@
 
 **Live App:** [invisifeed.vercel.app](https://invisifeed.vercel.app)
 
-**Status:** ✅ Fully Functional | 🔐 Main Codebase is Private
+**Status:** ✅ Fully Functional
 
 ---
 
