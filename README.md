@@ -199,7 +199,6 @@ See our [Purpose Page](https://invisifeed.vercel.app/purpose) for survey data an
 ## 📊 Project Metrics
 
 - ✔️ **Fully Functional SaaS Platform**
-- 🔐 **Private Repo for Protection**
 - 📊 **35+ Backend APIs**
 - 🎨 **50+ Frontend Components**
 - ⚙️ **20+ Utility Functions**
@@ -210,9 +209,7 @@ See our [Purpose Page](https://invisifeed.vercel.app/purpose) for survey data an
 
 ---
 
-## 📧 Contact & Access
-
-Want a demo, walkthrough, or request access to the private repo?
+## 📧 Contact 
 
 **Connect with:**
 
