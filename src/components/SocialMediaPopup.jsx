@@ -17,10 +17,10 @@ const creators = [
   {
     name: "Sneha Sharma",
     role: "Full Stack Developer",
-    linkedin: "https://www.linkedin.com/in/ss0807/",
-    github: "https://github.com/SnehaSharma245",
-    twitter: "https://twitter.com/SnehaDevs",
-    bmc: "https://buymeacoffee.com/snehadevs",
+    linkedin: "https://www.linkedin.com/in/celersneha/",
+    github: "https://github.com/celersneha",
+    twitter: "https://twitter.com/celersneha",
+    bmc: "https://buymeacoffee.com/celersneha",
 
     description: "",
   },
